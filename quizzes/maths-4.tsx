@@ -4,13 +4,12 @@ window.ALL_QUIZZES['maths-4'] = {
   YT_SUFFIX: 'Yvan Monka',
   SUMMER_TOPIC: 'maths',
   SUBJECT: {
-  id: 'maths',
-  name: 'Mathématiques',
-  short: 'Maths',
-  level: 'Fin de 4ème',
-  mark: '∑',
-  tagline: 'Évaluation diagnostique',
     id: 'maths-4',
+    name: 'Mathématiques',
+    short: 'Maths',
+    level: 'Fin de 4ème',
+    mark: '∑',
+    tagline: 'Évaluation diagnostique',
   },
   DOMAINS: {
   relatifs:   { id:'relatifs',   name:'Nombres relatifs',                  short:'Relatifs',    coef:2, color:'#0f5e6b', icon:'±',   search:'nombres relatifs 4eme' },

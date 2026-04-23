@@ -1,8 +1,10 @@
+/// <reference path="./types.ts" />
 // ============================================================
-// APP.JSX — Logique commune de tous les quiz
+// app.tsx — Logique commune de tous les quiz (partie React).
 // Monté dynamiquement par index.html via window.mountQuizApp(key, {reportAt}).
 // Tout le module est wrappé dans une IIFE pour éviter les collisions de noms
 // avec le routeur vanilla JS d'index.html (ALL_BADGES, slugName, showToast, etc.).
+// Les types (AnalyzeResult, QuizKey, etc.) sont globaux via types.ts.
 // ============================================================
 
 (function appJsxModule() {
@@ -258,7 +260,7 @@ function weightedSampleWithoutReplacement(items, count, weightFn) {
   return out;
 }
 
-function buildQuiz(forceKeys) {
+function buildQuiz(forceKeys?) {
   const questions = [];
   const pushQuestion = (src, did) => {
     const order = shuffle(src.options.map((_, i) => i)); // ordre shuffle stocké
@@ -298,7 +300,7 @@ function buildQuiz(forceKeys) {
 // → incite à passer plutôt que répondre au hasard (voir message sur HomeScreen).
 const WRONG_PENALTY = 0.5;
 
-function analyze(questions, answers) {
+function analyze(questions, answers): AnalyzeResult {
   const byDomain = {};
   Object.keys(DOMAINS).forEach(d => { byDomain[d] = { correct:0, total:0, errors:[], skipped:0, wrong:0, wrongWeighted:0 }; });
   let correct = 0, total = 0, skipped = 0, wrong = 0, weighted = 0, weightedMax = 0, wrongWeighted = 0;
@@ -407,7 +409,7 @@ async function syncFromServer(studentName) {
       (data.quizzes[qid].attempts || []).forEach(a => {
         if (!localDates.has(a.date)) { hist[slug].attempts.push(a); merged++; }
       });
-      hist[slug].attempts.sort((a,b) => new Date(a.date) - new Date(b.date));
+      hist[slug].attempts.sort((a,b) => +new Date(a.date) - +new Date(b.date));
       if (data.name) hist[slug].name = data.name;
       if (data.klass) hist[slug].klass = data.klass;
       try { localStorage.setItem(key, JSON.stringify(hist)); } catch {}
@@ -661,12 +663,13 @@ function allAttemptsForStudent(slug) {
       } catch {}
     });
   });
-  return out.sort((a,b) => new Date(a.date) - new Date(b.date));
+  return out.sort((a,b) => +new Date(a.date) - +new Date(b.date));
 }
 
 function computeStreakDays(attempts) {
   if (!attempts.length) return 0;
-  const days = [...new Set(attempts.map(a => a.date.slice(0,10)))].sort();
+  const dayStrings: string[] = attempts.map(a => a.date.slice(0, 10));
+  const days = [...new Set(dayStrings)].sort();
   if (days.length === 0) return 0;
   // La streak "active" = jours consécutifs finissant aujourd'hui ou hier
   const today = new Date().toISOString().slice(0,10);
@@ -675,9 +678,7 @@ function computeStreakDays(attempts) {
   if (last !== today && last !== yesterday) return 0;
   let streak = 1;
   for (let i = days.length - 2; i >= 0; i--) {
-    const cur = new Date(days[i+1]);
-    const prev = new Date(days[i]);
-    const diff = (cur - prev) / 86400000;
+    const diff = (+new Date(days[i+1]) - +new Date(days[i])) / 86400000;
     if (Math.round(diff) === 1) streak++;
     else break;
   }
@@ -695,7 +696,7 @@ const ALL_BADGES = [
   { id: 'triple',   emoji:'🎨', title:'Polyvalent',       desc:'Teste les 3 matières',                test: a => new Set(a.map(x => x.subjectKey)).size >= 3 },
   { id: 'levels',   emoji:'🎓', title:'Cartographe',      desc:'Un test à chaque niveau (6e→3e)',     test: a => new Set(a.map(x => x.level)).size >= 4 },
   { id: 'progress', emoji:'🚀', title:'Progression',       desc:'+3 points sur un même quiz',          test: a => {
-      const byQ = {};
+      const byQ: Record<string, number[]> = {};
       a.forEach(x => { const k = x.subjectKey+'-'+x.level; if(!byQ[k]) byQ[k]=[]; byQ[k].push(x.note); });
       return Object.values(byQ).some(notes => notes.length >= 2 && (Math.max(...notes) - notes[0]) >= 3);
     }
@@ -742,7 +743,8 @@ function HomeScreen({ onStart }) {
   const lastAttempt = profile?.attempts?.[profile.attempts.length - 1];
 
   const nDomains = Object.keys(DOMAINS).length;
-  const nTotal = Object.values(PICK).reduce((a,b) => a+b, 0);
+  const pickValues: number[] = Object.values(PICK);
+  const nTotal = pickValues.reduce((a,b) => a+b, 0);
 
   return (
     <div className="layer min-h-screen flex flex-col px-5 pt-8 pb-16 md:pt-16">

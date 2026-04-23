@@ -4,13 +4,12 @@ window.ALL_QUIZZES['physique-4'] = {
   YT_SUFFIX: 'college physique',
   SUMMER_TOPIC: 'physique-chimie',
   SUBJECT: {
-  id: 'physique',
-  name: 'Physique-Chimie',
-  short: 'Physique',
-  level: 'Fin de 4ème',
-  mark: '⚛',
-  tagline: 'Évaluation diagnostique',
     id: 'physique-4',
+    name: 'Physique-Chimie',
+    short: 'Physique',
+    level: 'Fin de 4ème',
+    mark: '⚛',
+    tagline: 'Évaluation diagnostique',
   },
   DOMAINS: {
   electricite: { id:'electricite', name:'Électricité & circuits',            short:'Électricité', coef:4, color:'#b45309', icon:'⚡', search:'electricite circuit intensite tension loi ohm 4eme' },

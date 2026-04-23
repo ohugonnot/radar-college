@@ -29,11 +29,15 @@ const presetReact = (() => {
   try { require.resolve('@babel/preset-react'); return '@babel/preset-react'; }
   catch { return '/tmp/node_modules/@babel/preset-react'; }
 })();
+const presetTs = (() => {
+  try { require.resolve('@babel/preset-typescript'); return '@babel/preset-typescript'; }
+  catch { return null; }
+})();
 
-// SPA : les pools sont maintenant dans quizzes/*.jsx (un fichier par quiz).
+// SPA : les pools sont maintenant dans quizzes/*.tsx (un fichier par quiz).
 const quizDir = path.join(__dirname, 'quizzes');
 const files = fs.existsSync(quizDir)
-  ? fs.readdirSync(quizDir).filter(f => /^(maths|physique|svt)-\d\.jsx$/.test(f)).sort().map(f => path.join('quizzes', f))
+  ? fs.readdirSync(quizDir).filter(f => /^(maths|physique|svt)-\d\.tsx$/.test(f)).sort().map(f => path.join('quizzes', f))
   : [];
 
 if (files.length === 0) {
@@ -45,14 +49,15 @@ let totalErrors = 0;
 let totalWarnings = 0;
 
 function extractConfig(src, file) {
-  // quizzes/*.jsx contient directement window.ALL_QUIZZES['key'] = {...};
+  // quizzes/*.tsx contient directement window.ALL_QUIZZES['key'] = {...};
   // On retourne le fichier brut — le parser Babel et les regex de checkIntegrity gèrent.
   return src.includes('window.ALL_QUIZZES') || src.includes('window.QUIZ_CONFIG') ? src : null;
 }
 
 function parseJSX(src) {
   // Vérifie que ça compile ; on ne peut pas exécuter car JSX + DOM.
-  babel.parseSync(src, { presets: [presetReact], sourceType: 'script' });
+  const presets = presetTs ? [presetReact, presetTs] : [presetReact];
+  babel.parseSync(src, { presets, sourceType: 'script', filename: 'quiz.tsx' });
 }
 
 function checkIntegrity(src, file) {

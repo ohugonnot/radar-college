@@ -34,15 +34,16 @@ Plateforme d'évaluations diagnostiques pour collégiens : **12 quiz** (6ème �
 
 ## Stack technique
 
-| Domaine       | Choix                                              |
-|---------------|----------------------------------------------------|
-| Front         | React 18 (UMD) + JSX compilé par Babel Standalone  |
-| Styles        | Tailwind CDN + CSS custom (design tokens maison)   |
-| Routeur       | Hash sémantique maison, compatible `file://`       |
-| PWA           | Service Worker cache-first, manifest.webmanifest   |
-| Persistance   | `localStorage` + PHP plat (JSON par slug)          |
-| Build         | `build.sh` (bash + python) : inline CSS/JSX/quizzes |
-| Tests         | Playwright (Chromium) — 48 scénarios E2E           |
+| Domaine       | Choix                                                                          |
+|---------------|--------------------------------------------------------------------------------|
+| Front         | React 18 (UMD) + **TypeScript** compilé au runtime par Babel Standalone (TSX)  |
+| Types         | Types de domaine globaux dans `types.ts` · `tsc --noEmit` en CI                |
+| Styles        | Tailwind CDN + CSS custom (design tokens maison)                               |
+| Routeur       | Hash sémantique maison, compatible `file://`                                   |
+| PWA           | Service Worker cache-first, manifest.webmanifest                               |
+| Persistance   | `localStorage` + PHP plat (JSON par slug)                                      |
+| Build         | `build.sh` (bash + python) : inline CSS + app.tsx + 12 quizzes .tsx            |
+| Tests         | Playwright (Chromium) — 48 scénarios E2E · CI GitHub Actions                   |
 
 ## Contraintes techniques volontaires (et pourquoi)
 
@@ -50,11 +51,11 @@ Ce projet tourne **sans serveur ni build step au déploiement** et **par double-
 
 - **Zero infra** : `scp` le dossier sur un hébergement mutualisé PHP basique, c'est en ligne. Pas de CI deploy, pas de Vercel, pas de Node sur le serveur.
 - **File:// compatible** : le parent peut donner l'archive à un enfant qui n'a pas le wifi, il ouvre `index.html` et ça marche offline. Contrainte réelle pour l'usage familial visé.
-- **Édition de questions sans rebuild** : les 12 pools de questions (`quizzes/*.jsx`) s'éditent direct, `./build.sh` inline le tout. Un parent non-dev peut corriger une coquille.
+- **Édition de questions sans rebuild** : les 12 pools de questions (`quizzes/*.tsx`) s'éditent direct, `./build.sh` inline le tout. Un parent non-dev peut corriger une coquille.
 
 Conséquences assumées :
-- Babel Standalone charge ~400 KB au premier load (déclenche un warning console documenté). Acceptable vu le public (jamais plus d'un ou deux cold loads par utilisateur, le SW cache ensuite).
-- Pas de TypeScript. Validation via `validate.js` qui parse les pools avec Babel et vérifie les invariants (clés uniques, somme des `PICK = 30`, `correct ∈ [0..3]`…).
+- Babel Standalone charge ~400 KB au premier load (+ preset-typescript inclus dans la bundle UMD depuis 7.10). Acceptable vu le public (jamais plus d'un ou deux cold loads par utilisateur, le SW cache ensuite).
+- **TypeScript strict-progressif** : `tsc --noEmit` en CI attrape les bugs de typage, `types.ts` documente les contrats de données ; `strict: false` le temps de la migration legacy, resserré par étapes.
 - Pas de bundler : index.html fait 300 KB inlinés, tout se cache trivialement côté SW.
 
 ## Architecture
@@ -63,10 +64,12 @@ SPA mono-HTML. Un seul `index.html` déployé, construit par `build.sh` à parti
 
 ```
 index.html           template (wizard vanilla JS + markers BEGIN_QUIZZES / BEGIN_APP_JSX)
-app.jsx              logique React partagée (HomeScreen, QuizScreen, ReportScreen…)
+app.tsx              logique React partagée (HomeScreen, QuizScreen, ReportScreen…)
 app.css              styles du quiz React (wizard-style inline dans index.html)
-quizzes/             12 fichiers JSX, un par quiz (window.ALL_QUIZZES['maths-5'] = {...})
+types.ts             types de domaine globaux (QuizConfig, Attempt, AnalyzeResult, props React…)
+quizzes/             12 fichiers TSX, un par quiz (window.ALL_QUIZZES['maths-5'] = {...})
 build.sh             concat tout → index.html, bump CACHE_NAME dans sw.js
+tsconfig.json        strict-progressif, cible TSX via preset-typescript
 ```
 
 ### Routeur hash sémantique
@@ -83,9 +86,9 @@ build.sh             concat tout → index.html, bump CACHE_NAME dans sw.js
 
 ### Scope isolation vanilla ↔ React
 
-Le routeur vanilla d'`index.html` et `app.jsx` partagent la même page. Pour éviter les collisions de noms globaux (`ALL_BADGES`, `slugName`, `showToast`…), **`app.jsx` est wrappé dans une IIFE**. Communication via `window` :
+Le routeur vanilla d'`index.html` et `app.tsx` partagent la même page. Pour éviter les collisions de noms globaux (`ALL_BADGES`, `slugName`, `showToast`…), **`app.tsx` est wrappé dans une IIFE**. Communication via `window` :
 
-- `window.mountQuizApp(key, {reportAt})` / `window.unmountQuizApp()` exposés par `app.jsx`
+- `window.mountQuizApp(key, {reportAt})` / `window.unmountQuizApp()` exposés par `app.tsx`
 - `window.setHashSilently(hash)` exposé par le routeur
 - `window.__pendingQuizMount` : queue pour gérer la race condition entre le routeur (synchrone au load) et Babel (async)
 
@@ -100,11 +103,14 @@ Passer d'un quiz à l'autre sans recharger la page : les constantes `CFG / SUBJE
 npm install
 npx playwright install chromium --with-deps
 
-# Build (inline quizzes/*.jsx + app.jsx + app.css dans index.html)
+# Build (inline quizzes/*.tsx + app.tsx + app.css dans index.html)
 ./build.sh
 
 # Validation d'intégrité des pools
 npm run validate
+
+# Type-check (mêmes règles que le CI)
+npm run typecheck
 
 # Serve + tester
 npm run serve &
@@ -115,7 +121,7 @@ Pour lancer sans serveur : **double-clic sur `index.html`** après `./build.sh`.
 
 ## Ajouter / modifier un quiz
 
-Les questions sont dans `quizzes/{matière}-{niveau}.jsx`, une par ligne environ. Chaque pool contient :
+Les questions sont dans `quizzes/{matière}-{niveau}.tsx`, une par ligne environ. Chaque pool contient :
 
 ```js
 window.ALL_QUIZZES['maths-4'] = {

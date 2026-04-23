@@ -260,7 +260,7 @@ function weightedSampleWithoutReplacement(items, count, weightFn) {
   return out;
 }
 
-function buildQuiz(forceKeys?) {
+function buildQuiz(forceKeys?): Question[] {
   const questions = [];
   const pushQuestion = (src, did) => {
     const order = shuffle(src.options.map((_, i) => i)); // ordre shuffle stocké
@@ -722,7 +722,7 @@ function isNewRecordFor(subjectKey, level, studentSlug, note) {
   } catch { return false; }
 }
 
-function HomeScreen({ onStart }) {
+function HomeScreen({ onStart }: HomeScreenProps) {
   const activeStudent = useMemo(() => getActiveStudent(), []);
   const defaultLevel = SUBJECT.level.replace('Fin de ', '').replace(' (brevet)', '');
   // Pré-remplir la classe depuis le profil stocké si déjà renseignée (ex: "4ème B"),
@@ -736,7 +736,7 @@ function HomeScreen({ onStart }) {
   }, []);
   const [name, setName] = useState(activeStudent?.name || '');
   const [klass, setKlass] = useState(initialKlass);
-  const [mode, setMode] = useState('training');
+  const [mode, setMode] = useState(initialMode);
   const canStart = name.trim().length >= 2;
   const profile = useMemo(() => getProfile(name), [name]);
   useEffect(() => { if (profile && profile.klass && !klass) setKlass(profile.klass); }, [profile]);
@@ -873,15 +873,15 @@ function HomeScreen({ onStart }) {
 // ============================================================
 // QUIZ
 // ============================================================
-function QuizScreen({ student, quiz, onFinish, mode }) {
+function QuizScreen({ student, quiz, onFinish, mode }: QuizScreenProps) {
   const [current, setCurrent] = useState(0);
-  const [answers, setAnswers] = useState({});
-  const [timings, setTimings] = useState({});
+  const [answers, setAnswers] = useState(initialAnswers);
+  const [timings, setTimings] = useState(initialTimings);
   const [showConfirm, setShowConfirm] = useState(false);
   // hintLevel : 0 = caché, 1 = méthode du chapitre (MEMO_BANK), 2 = astuce spécifique (q.hint)
   const [hintLevel, setHintLevel] = useState(0);
-  const [hintsUsed, setHintsUsed] = useState({});
-  const [remaining, setRemaining] = useState(null);
+  const [hintsUsed, setHintsUsed] = useState(initialHints);
+  const [remaining, setRemaining] = useState(initialRemaining);
   const quizStartedAt = useRef(Date.now());
   const questionStartedAt = useRef(Date.now());
 
@@ -1139,11 +1139,11 @@ function ConfirmScreen({ quiz, answers, onValidate, onCancel, onGoBack }) {
 // ============================================================
 // REPORT
 // ============================================================
-function ReportScreen({ student, quiz, answers, timings, totalMs, hintsUsed, mode, onRestart, onRetryWrong, historyMode }) {
+function ReportScreen({ student, quiz, answers, timings, totalMs, hintsUsed, mode, onRestart, onRetryWrong, historyMode }: ReportScreenProps) {
   const result = useMemo(() => analyze(quiz, answers), [quiz, answers]);
-  const [openDomain, setOpenDomain] = useState(null);
-  const [profile, setProfile] = useState(() => getProfile(student.name));
-  const [celebration, setCelebration] = useState(null);
+  const [openDomain, setOpenDomain] = useState(initialOpenDomain);
+  const [profile, setProfile] = useState(() => getProfile(student.name) || initialProfile());
+  const [celebration, setCelebration] = useState(initialCelebration);
 
   useEffect(() => {
     if (historyMode) {
@@ -1559,17 +1559,30 @@ function rebuildFromAttempt(attempt) {
   return { quiz: quizArr.map((q, i) => ({ ...q, num: i + 1 })), answers: ans };
 }
 
+// Initial state factories : Babel Standalone TSX ne supporte pas `useState<T>(v)` ni
+// `v as T` inline dans un appel. Passer un initializer typé `(): T => ...` contourne
+// les deux problèmes et laisse TS inférer correctement le type du state.
+const initialPhase = (): QuizPhase => 'home';
+const initialStudent = (): StudentInfo | null => null;
+const initialMode = (): Mode => 'training';
+const initialAnswers = (): AnswersMap => ({});
+const initialTimings = (): TimingsMap => ({});
+const initialHints = (): HintsMap => ({});
+const initialOpenDomain = (): string | null => null;
+const initialProfile = (): Profile | null => null;
+const initialCelebration = (): Celebration | null => null;
+const initialRemaining = (): number | null => null;
+
 function App() {
-  // ── State groupé par rôle ──────────────────────────────────
-  const [screen, setScreen]             = useState('home');
-  const [historyMode, setHistoryMode]   = useState(false);
-  const [student, setStudent]           = useState(null);
-  const [mode, setMode]                 = useState('training');
-  const [quiz, setQuiz]                 = useState(() => buildQuiz());
-  const [answers, setAnswers]           = useState({});
-  const [timings, setTimings]           = useState({});
-  const [hintsUsed, setHintsUsed]       = useState({});
-  const [totalMs, setTotalMs]           = useState(0);
+  const [screen, setScreen]           = useState(initialPhase);
+  const [historyMode, setHistoryMode] = useState(false);
+  const [student, setStudent]         = useState(initialStudent);
+  const [mode, setMode]               = useState(initialMode);
+  const [quiz, setQuiz]               = useState(buildQuiz);
+  const [answers, setAnswers]         = useState(initialAnswers);
+  const [timings, setTimings]         = useState(initialTimings);
+  const [hintsUsed, setHintsUsed]     = useState(initialHints);
+  const [totalMs, setTotalMs]         = useState(0);
 
   // Nettoyage : coupe la sous-route /report/<ISO> du hash pour revenir à #/Neme/subject.
   // Utilise setHashSilently (exposé par le routeur wizard) pour éviter un re-render.

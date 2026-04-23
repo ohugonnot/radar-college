@@ -16,17 +16,21 @@ type Level = 3 | 4 | 5 | 6;
 /** Identifiant composite matière-niveau, ex: 'maths-4', 'svt-6'. */
 type QuizKey = `${Subject}-${Level}`;
 
-interface Question {
-  /** Identifiant stable (base du tracker d'erreurs + log). */
+/** Question brute dans POOL (sans domain — le domain est la clé du POOL parent). */
+interface SourceQuestion {
   key: string;
-  /** Énoncé (peut contenir du JSX). */
   q: React.ReactNode;
-  /** 4 options. */
   options: React.ReactNode[];
-  /** Index 0..3 de la bonne réponse. */
-  correct: 0 | 1 | 2 | 3;
-  /** Astuce détaillée (mode entraînement). */
+  /** Index 0..3 de la bonne réponse dans les options (ordre original, pré-shuffle). */
+  correct: number;
   hint?: string;
+}
+
+/** Question post-buildQuiz : domain ajouté, options shuffled, correct réindexé. */
+interface Question extends SourceQuestion {
+  domain: string;
+  /** Permutation d'ordre appliquée pour shuffler les options (pour relecture exacte). */
+  order: number[];
 }
 
 interface Domain {
@@ -63,7 +67,7 @@ interface QuizConfig {
   };
   DOMAINS: Record<string, Domain>;
   RESOURCES: Resource[];
-  POOL: Record<string, Question[]>;
+  POOL: Record<string, SourceQuestion[]>;
   /** Questions par domaine. Somme = 30 (vérifié par validate.js). */
   PICK: Record<string, number>;
   /** Actions de remédiation par domaine et niveau. */
@@ -104,6 +108,24 @@ interface Profile {
   attempts: Attempt[];
 }
 
+/** Élève actif dans le HomeScreen du quiz (prénom + classe saisis/pré-remplis). */
+interface StudentInfo {
+  name: string;
+  klass: string;
+}
+
+/** Écran actif dans le cycle de vie du quiz React. */
+type QuizPhase = 'home' | 'quiz' | 'report';
+
+// ─── Dicts runtime indexés par `Question.key` ─────────────────────────────────
+
+/** Réponse donnée à chaque question : index 0..3 dans les options shuffled, ou null si passée. */
+type AnswersMap = Record<string, number | null>;
+/** Temps passé (ms) par question. */
+type TimingsMap = Record<string, number>;
+/** Niveau d'ampoule utilisé par question (0 = aucun, 1 = méthode, 2 = astuce complète). */
+type HintsMap = Record<string, number>;
+
 // ─── Résultat de analyze() ────────────────────────────────────────────────────
 
 interface DomainAnalysis {
@@ -131,6 +153,56 @@ interface AnalyzeResult {
   appreciation: string;
   levelLabel: string;
   levelColor: string;
+}
+
+// ─── Badges & célébration ─────────────────────────────────────────────────────
+
+interface Badge {
+  id: string;
+  emoji: string;
+  title: string;
+  desc: string;
+}
+
+/** Payload animé sur le rapport après un test réussi. */
+interface Celebration {
+  newBadges: Badge[];
+  newRecord: boolean;
+  perfect: boolean;
+  streak: number;
+}
+
+// ─── Props des composants React (app.tsx) ────────────────────────────────────
+
+interface HomeScreenProps {
+  onStart: (info: StudentInfo, mode: Mode) => void;
+}
+
+interface QuizScreenProps {
+  student: StudentInfo;
+  quiz: Question[];
+  mode: Mode;
+  onFinish: (
+    answers: AnswersMap,
+    timings: TimingsMap,
+    totalMs: number,
+    hintsUsed: HintsMap,
+    finalMode: Mode
+  ) => void;
+}
+
+interface ReportScreenProps {
+  student: StudentInfo;
+  quiz: Question[];
+  answers: AnswersMap;
+  timings: TimingsMap;
+  totalMs: number;
+  hintsUsed: HintsMap;
+  mode: Mode;
+  onRestart: () => void;
+  onRetryWrong: (wrongKeys: string[]) => void;
+  /** true = relecture d'un attempt archivé (désactive les actions destructives). */
+  historyMode: boolean;
 }
 
 // ─── Globals exposés par le routeur vanilla / React ──────────────────────────

@@ -40,7 +40,7 @@ Plateforme d'évaluations diagnostiques pour collégiens : **12 quiz** (6ème �
 | Types         | Types de domaine globaux dans `types.ts` · `tsc --noEmit` en CI                |
 | Styles        | Tailwind CDN + CSS custom (design tokens maison)                               |
 | Routeur       | Hash sémantique maison, compatible `file://`                                   |
-| PWA           | Service Worker cache-first, manifest.webmanifest                               |
+| PWA           | Service Worker (network-first HTML, SWR assets), manifest.webmanifest          |
 | Persistance   | `localStorage` + PHP plat (JSON par slug)                                      |
 | Build         | `build.sh` (bash + python) : inline CSS + app.tsx + 12 quizzes .tsx            |
 | Tests         | Playwright (Chromium) — 48 scénarios E2E · CI GitHub Actions                   |

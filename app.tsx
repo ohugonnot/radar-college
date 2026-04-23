@@ -30,21 +30,29 @@ function showToast(msg: string, icon?: string): void {
   } catch {}
 }
 
-// Sync au chargement : récupère les attempts depuis le serveur (cross-device)
+// Sync au chargement : récupère les attempts depuis le serveur (cross-device).
+// Pas de setTimeout arbitraire : on attend simplement DOMContentLoaded pour
+// laisser le premier paint se faire, puis on lance la sync asynchrone.
+// La dédup via `syncInFlight` (voir plus bas) évite les doubles requêtes
+// si index.html et app.tsx tentent la sync en parallèle.
 (function initSyncFromServer() {
   if (location.protocol === 'file:') return;
-  try {
-    const raw = localStorage.getItem('quiz-active-student');
-    const active = raw ? JSON.parse(raw) : null;
-    if (active?.name) {
-      setTimeout(async () => {
-        const merged = await syncFromServer(active.name);
-        if (merged > 0) {
-          showToast(`Synchronisé · ${merged} nouveau${merged>1?'x':''} test${merged>1?'s':''} récupéré${merged>1?'s':''}`, '☁️');
-        }
-      }, 200);
-    }
-  } catch {}
+  const run = async () => {
+    try {
+      const raw = localStorage.getItem('quiz-active-student');
+      const active = raw ? JSON.parse(raw) : null;
+      if (!active?.name) return;
+      const merged = await syncFromServer(active.name);
+      if (merged > 0) {
+        showToast(`Synchronisé · ${merged} nouveau${merged>1?'x':''} test${merged>1?'s':''} récupéré${merged>1?'s':''}`, '☁️');
+      }
+    } catch {}
+  };
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    queueMicrotask(run);
+  } else {
+    document.addEventListener('DOMContentLoaded', run, { once: true });
+  }
 })();
 
 // Enregistre le service worker (PWA) — uniquement en HTTP(S), pas en file://
@@ -194,17 +202,45 @@ function slugName(s: string | null | undefined): string {
 function loadHistory(): Record<string, Profile> {
   try { const raw = localStorage.getItem(storageKey()); return raw ? JSON.parse(raw) : {}; } catch { return {}; }
 }
+// Écriture localStorage résiliente : si QuotaExceeded, on purge les tentatives
+// les plus anciennes et on retente (max 3 coupes) pour ne pas perdre le dernier
+// attempt en silence. Renvoie true si la sauvegarde a réussi, false sinon.
+function safeSetItem(key: string, value: string): boolean {
+  try { localStorage.setItem(key, value); return true; } catch (e) {
+    const ee = e || {};
+    const name = ee.name || ee.code;
+    const isQuota = name === 'QuotaExceededError' || name === 22 || name === 'NS_ERROR_DOM_QUOTA_REACHED';
+    if (!isQuota) return false;
+    // Essaie de réduire : parse JSON, coupe attempts à 20, puis 10, puis 5.
+    const sizes = [20, 10, 5];
+    for (const max of sizes) {
+      try {
+        const data = JSON.parse(value);
+        for (const slug of Object.keys(data || {})) {
+          const arr = data[slug]?.attempts;
+          if (Array.isArray(arr) && arr.length > max) data[slug].attempts = arr.slice(-max);
+        }
+        const trimmed = JSON.stringify(data);
+        localStorage.setItem(key, trimmed);
+        showToast('Stockage presque plein · anciens tests compactés', '⚠️');
+        return true;
+      } catch {}
+    }
+    showToast('Espace de stockage plein — le dernier test n\'a pas pu être enregistré localement.', '⚠️');
+    return false;
+  }
+}
 function saveHistoryFor(name, klass, attempt) {
-  try {
-    const hist = loadHistory();
-    const key = slugName(name); if (!key) return;
-    if (!hist[key]) hist[key] = { name, klass, attempts: [] };
-    hist[key].name = name;
-    if (klass) hist[key].klass = klass;
-    hist[key].attempts.push(attempt);
-    if (hist[key].attempts.length > 50) hist[key].attempts = hist[key].attempts.slice(-50);
-    localStorage.setItem(storageKey(), JSON.stringify(hist));
-  } catch {}
+  const key = slugName(name);
+  if (!key) return;
+  let hist;
+  try { hist = loadHistory(); } catch { hist = {}; }
+  if (!hist[key]) hist[key] = { name, klass, attempts: [] };
+  hist[key].name = name;
+  if (klass) hist[key].klass = klass;
+  hist[key].attempts.push(attempt);
+  if (hist[key].attempts.length > 50) hist[key].attempts = hist[key].attempts.slice(-50);
+  safeSetItem(storageKey(), JSON.stringify(hist));
 }
 function getProfile(name: string): Profile | null {
   if (!name) return null;
@@ -370,10 +406,19 @@ function getSummerTime(r: AnalyzeResult): string {
   if (n >= 8)  return '1h par jour + stage de révision';
   return '1h30 par jour + accompagnement régulier';
 }
+// fetch avec timeout (AbortController). Toute erreur/timeout remonte au caller
+// qui décide d'afficher un toast (sauvegarde) ou de silencer (sync en tâche de fond).
+async function fetchWithTimeout(url: string, opts: RequestInit = {}, timeoutMs = 6000): Promise<Response> {
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...opts, signal: ctl.signal });
+  } finally { clearTimeout(t); }
+}
 async function saveAttemptToServer(student: StudentInfo, attempt: Attempt): Promise<void> {
   if (location.protocol === 'file:') return;
   try {
-    await fetch('save.php', {
+    const resp = await fetchWithTimeout('save.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -384,7 +429,48 @@ async function saveAttemptToServer(student: StudentInfo, attempt: Attempt): Prom
         attempt,
       }),
       keepalive: true,
-    });
+    }, 6000);
+    if (!resp.ok) throw new Error('http_' + resp.status);
+  } catch (err) {
+    // Sauvegarde locale ok (déjà faite), mais sync serveur KO : on prévient l'utilisateur
+    // et on stocke l'attempt dans une file pour retry à la prochaine sync.
+    try {
+      const qk = 'quiz-pending-sync-v1';
+      const raw = localStorage.getItem(qk);
+      const pending = raw ? JSON.parse(raw) : [];
+      pending.push({ quizId: SUBJECT.id, slug: slugName(student.name), name: student.name, klass: student.klass || '', attempt });
+      // Limiter la file à 50 éléments (évite explosion si serveur durablement down).
+      if (pending.length > 50) pending.splice(0, pending.length - 50);
+      safeSetItem(qk, JSON.stringify(pending));
+    } catch {}
+    showToast('Sauvegarde en ligne indisponible — test enregistré localement, nouvelle tentative plus tard.', '⚠️');
+  }
+}
+
+// Dédup : un seul fetch load.php en vol à la fois pour un même slug.
+const _syncInFlight: Record<string, Promise<number>> = {};
+
+// Tente de renvoyer les attempts en attente (file de retry). Idempotent côté
+// serveur grâce à la date ISO. Appelé après une sync réussie.
+async function flushPendingSync(): Promise<void> {
+  if (location.protocol === 'file:') return;
+  let pending: any[] = [];
+  try { pending = JSON.parse(localStorage.getItem('quiz-pending-sync-v1') || '[]'); } catch {}
+  if (!Array.isArray(pending) || pending.length === 0) return;
+  const remaining: any[] = [];
+  for (const p of pending) {
+    try {
+      const resp = await fetchWithTimeout('save.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(p),
+      }, 6000);
+      if (!resp.ok) remaining.push(p);
+    } catch { remaining.push(p); }
+  }
+  try {
+    if (remaining.length) localStorage.setItem('quiz-pending-sync-v1', JSON.stringify(remaining));
+    else localStorage.removeItem('quiz-pending-sync-v1');
   } catch {}
 }
 
@@ -394,8 +480,10 @@ async function syncFromServer(studentName) {
   if (location.protocol === 'file:') return 0;
   const slug = slugName(studentName);
   if (!slug) return 0;
+  if (_syncInFlight[slug]) return _syncInFlight[slug];
+  const p = (async () => {
   try {
-    const resp = await fetch('load.php?slug=' + encodeURIComponent(slug), { cache: 'no-store' });
+    const resp = await fetchWithTimeout('load.php?slug=' + encodeURIComponent(slug), { cache: 'no-store' }, 6000);
     if (!resp.ok) return 0;
     const data = await resp.json();
     if (!data || data.empty || !data.quizzes) return 0;
@@ -412,10 +500,15 @@ async function syncFromServer(studentName) {
       hist[slug].attempts.sort((a,b) => +new Date(a.date) - +new Date(b.date));
       if (data.name) hist[slug].name = data.name;
       if (data.klass) hist[slug].klass = data.klass;
-      try { localStorage.setItem(key, JSON.stringify(hist)); } catch {}
+      safeSetItem(key, JSON.stringify(hist));
     });
+    // Profite d'une sync réussie pour renvoyer les attempts en attente.
+    flushPendingSync();
     return merged;
   } catch { return 0; }
+  })();
+  _syncInFlight[slug] = p;
+  try { return await p; } finally { delete _syncInFlight[slug]; }
 }
 
 // ============================================================
@@ -923,19 +1016,26 @@ function QuizScreen({ student, quiz, onFinish, mode }: QuizScreenProps) {
   const prev   = () => { if (current > 0) setCurrent(current - 1); };
   const skip   = () => { if (selected === undefined) select(null); next(); };
 
+  // Handler clavier attaché UNE seule fois au montage, mais qui lit toujours
+  // les dernières valeurs de current/q/showConfirm via une ref mutable.
+  // Évite de dé/re-abonner un listener à chaque question (30×2 add/remove)
+  // et supprime tout risque de closure stale.
+  const kbdStateRef = useRef({ next, prev, select, q, showConfirm });
+  kbdStateRef.current = { next, prev, select, q, showConfirm };
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (showConfirm) return;
-      if (e.key === 'ArrowRight' || e.key === 'Enter') next();
-      else if (e.key === 'ArrowLeft') prev();
+      const st = kbdStateRef.current;
+      if (st.showConfirm) return;
+      if (e.key === 'ArrowRight' || e.key === 'Enter') st.next();
+      else if (e.key === 'ArrowLeft') st.prev();
       else {
         const map: Record<string, number> = {'1':0,'2':1,'3':2,'4':3,'a':0,'b':1,'c':2,'d':3,'A':0,'B':1,'C':2,'D':3};
-        if (map[e.key] !== undefined && map[e.key] < q.options.length) select(map[e.key]);
+        if (map[e.key] !== undefined && map[e.key] < st.q.options.length) st.select(map[e.key]);
       }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [current, showConfirm, answers, q]);
+  }, []);
 
   useEffect(() => { window.scrollTo({ top:0, behavior:'smooth' }); }, [current]);
 

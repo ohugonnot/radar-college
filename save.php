@@ -48,6 +48,34 @@ if (!is_array($attempt) || empty($attempt['date'])) {
     http_response_code(400); exit(json_encode(['error'=>'invalid_attempt']));
 }
 
+// Validation stricte des champs (évite les données aberrantes : note > 20, totaux négatifs, log géant).
+function validAttempt(array $a): bool {
+    // date ISO plausible (on ne vérifie pas le parsing complet, juste la forme)
+    if (!is_string($a['date']) || !preg_match('/^\d{4}-\d{2}-\d{2}T/', $a['date'])) return false;
+    $mode = $a['mode'] ?? 'training';
+    if (!in_array($mode, ['training', 'exam'], true)) return false;
+    foreach (['note', 'noteRaw'] as $k) {
+        if (!isset($a[$k]) || !is_numeric($a[$k])) return false;
+        $v = (float)$a[$k];
+        if ($v < 0 || $v > 20) return false;
+    }
+    foreach (['correct', 'total'] as $k) {
+        if (!isset($a[$k]) || !is_numeric($a[$k])) return false;
+        $v = (int)$a[$k];
+        if ($v < 0 || $v > 200) return false;
+    }
+    if ((int)$a['correct'] > (int)$a['total']) return false;
+    if (!isset($a['totalMs']) || !is_numeric($a['totalMs']) || (int)$a['totalMs'] < 0 || (int)$a['totalMs'] > 24*3600*1000) return false;
+    if (isset($a['domains']) && !is_array($a['domains'])) return false;
+    if (isset($a['log'])) {
+        if (!is_array($a['log']) || count($a['log']) > 200) return false;
+    }
+    return true;
+}
+if (!validAttempt($attempt)) {
+    http_response_code(422); exit(json_encode(['error'=>'invalid_attempt_fields']));
+}
+
 $dir = __DIR__ . '/data';
 if (!is_dir($dir)) { @mkdir($dir, 0755, true); }
 

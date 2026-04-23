@@ -3494,7 +3494,7 @@ const { useState, useEffect, useMemo, useRef } = React;
 })();
 
 // Toast réutilisable
-function showToast(msg, icon) {
+function showToast(msg: string, icon?: string): void {
   try {
     document.querySelectorAll('.toast').forEach(n => n.remove());
     const t = document.createElement('div');
@@ -3663,7 +3663,7 @@ const MEMO_BANK = {
 // SPA : STORAGE_KEY dépend du quiz actif → getter lazy (SUBJECT est défini par setActiveQuiz).
 const storageKey = () => 'quiz-' + SUBJECT.id + '-history-v1';
 
-function slugName(s) {
+function slugName(s: string | null | undefined): string {
   return (s || '').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/\s+/g,' ');
 }
 function loadHistory(): Record<string, Profile> {
@@ -3703,7 +3703,7 @@ const wrongTrackerKey = () => 'quiz-' + SUBJECT.id + '-wrong-tracker-v1';
 function getWrongTracker() {
   try { return JSON.parse(localStorage.getItem(wrongTrackerKey())) || {}; } catch { return {}; }
 }
-function recordWrongAnswers(questions, answers) {
+function recordWrongAnswers(questions: Question[], answers: AnswersMap): void {
   try {
     const tracker = getWrongTracker();
     questions.forEach(q => {
@@ -3719,7 +3719,7 @@ function recordWrongAnswers(questions, answers) {
 
 // Tire aléatoirement dans un tableau avec pondération : les questions
 // souvent ratées par l'élève ont + de chances d'être tirées.
-function weightedSampleWithoutReplacement(items, count, weightFn) {
+function weightedSampleWithoutReplacement<T>(items: T[], count: number, weightFn: (x: T) => number): T[] {
   const pool = items.slice();
   const out = [];
   while (out.length < count && pool.length > 0) {
@@ -3753,7 +3753,7 @@ function buildQuiz(forceKeys?: string[]): Question[] {
 
   const tracker = getWrongTracker();
   Object.keys(DOMAINS).forEach(did => {
-    const pool = POOL[did] || [];
+    const pool: SourceQuestion[] = POOL[did] || [];
     const picks = weightedSampleWithoutReplacement(
       pool, PICK[did] || 3,
       (q) => {
@@ -3820,7 +3820,7 @@ function analyze(questions: Question[], answers: AnswersMap): AnalyzeResult {
   else                         { appreciation = 'Niveau préoccupant. Une remise à niveau structurée est vivement recommandée.'; levelLabel='Très insuffisant'; levelColor='var(--danger)'; }
   return { total, correct, wrong, skipped, penaltyPoints, noteSur20, noteWeighted, byDomain, forces, lacunes, appreciation, levelLabel, levelColor };
 }
-function planOf(domainId, level) { return PLANS?.[domainId]?.[level] || []; }
+function planOf(domainId: string, level: LevelLabel): string[] { return PLANS?.[domainId]?.[level] || []; }
 function getFinalAdvice(r: AnalyzeResult): string {
   const n = r.noteWeighted;
   if (n >= 17) return 'Continue comme ça — maintenir le rythme sera la meilleure stratégie.';

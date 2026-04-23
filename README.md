@@ -4,7 +4,7 @@ Plateforme d'évaluations diagnostiques pour collégiens : **12 quiz** (6ème �
 
 **Démo en ligne** : [web-developpeur.com/quizz](https://web-developpeur.com/quizz)
 
-![CI](https://github.com/ohugonnot/quizz-college/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/ohugonnot/radar-college/actions/workflows/ci.yml/badge.svg)
 
 ---
 
@@ -19,9 +19,18 @@ Plateforme d'évaluations diagnostiques pour collégiens : **12 quiz** (6ème �
 - **Persistance bicouche** : `localStorage` (source de vérité offline) + `save.php` / `load.php` pour sync cross-device par slug élève.
 - **PWA installable**, **mode sombre**, **police dyslexie**, mobile-first.
 
-## Démo rapide
+## Aperçu
 
-![Screenshot](docs/screenshot.png) <!-- optionnel, ajouter plus tard -->
+<p align="center">
+  <img src="docs/01-wizard-matiere.png" alt="Wizard — choix de la matière" width="49%" />
+  <img src="docs/02-quiz.png"            alt="Quiz en cours"                width="49%" />
+</p>
+<p align="center">
+  <img src="docs/03-rapport-radar.png"   alt="Rapport avec rose des compétences" width="49%" />
+  <img src="docs/04-dashboard.png"       alt="Dashboard multi-matières"          width="49%" />
+</p>
+
+<sub>Screenshots régénérables via <code>cd docs && npx playwright test screenshots.spec.js --config=playwright.config.js</code> (serveur lancé sur :8765).</sub>
 
 ## Stack technique
 

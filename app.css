@@ -1,0 +1,371 @@
+  :root {
+    --ink:        #050a16;
+    --ink-soft:   #1a2540;
+    --paper:      #faf5eb;
+    --paper-warm: #efe7d4;
+    --paper-edge: #d9cfb8;
+    --accent:     #b8323d;
+    --accent-deep:#8c1f2a;
+    --ochre:      #c78a1d;
+    --sea:        #0f5e6b;
+    --leaf:       #2f6e3a;
+    --success:    #166a39;
+    --danger:     #a31e2a;
+    --muted:      #6b7280;
+    --line:       #c9bfa7;
+    --grid:       rgba(5,10,22,0.035);
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Figtree', system-ui, sans-serif;
+    font-size: 17px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior-y: none;
+  }
+
+  @media (min-width: 768px) { html, body { font-size: 18px; } }
+
+  .font-display {
+    font-family: 'Fraunces', Georgia, serif;
+    font-optical-sizing: auto;
+    font-variation-settings: 'opsz' 144;
+    letter-spacing: -0.01em;
+  }
+  .font-mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+  /* Papier quadrillé de cahier — subtil */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 28px 28px;
+    background-position: -1px -1px;
+    mask-image: radial-gradient(ellipse at center, black 40%, transparent 85%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 85%);
+  }
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background:
+      radial-gradient(60% 40% at 0% 0%,  rgba(184,50,61,0.06), transparent 70%),
+      radial-gradient(60% 40% at 100% 100%, rgba(199,138,29,0.08), transparent 70%);
+  }
+  .layer { position: relative; z-index: 2; }
+
+  /* Expressions mathématiques — mono pour opérateurs bien lisibles */
+  .math {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-weight: 600;
+    font-style: normal;
+    letter-spacing: 0;
+  }
+  .option.selected .math,
+  .option.selected .frac { color: var(--paper); }
+  .math sup { font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.72em; }
+  .frac {
+    display: inline-flex;
+    flex-direction: column;
+    vertical-align: middle;
+    text-align: center;
+    margin: 0 5px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    font-size: 0.82em;
+    line-height: 1.05;
+    position: relative;
+    top: -0.05em;
+  }
+  .frac > span:first-child { border-bottom: 2px solid currentColor; padding: 0 5px 2px; }
+  .frac > span:last-child  { padding: 2px 5px 0; }
+
+  /* Animations entrée étagée */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(14px);} to { opacity:1; transform:none;} }
+  @keyframes slideIn { from { opacity: 0; transform: translateX(-10px);} to { opacity:1; transform:none;} }
+  @keyframes popIn { 0%{transform:scale(.6);opacity:0} 55%{transform:scale(1.12)} 100%{transform:scale(1);opacity:1} }
+  @keyframes dash  { to { stroke-dashoffset: 0; } }
+
+  .fade-up  { animation: fadeUp .45s cubic-bezier(.2,.8,.2,1) both; }
+  .slide-in { animation: slideIn .35s ease-out both; }
+  .pop-in   { animation: popIn .35s cubic-bezier(.34,1.56,.64,1) both; }
+
+  /* Progress bar */
+  .shimmer {
+    background: linear-gradient(90deg, var(--accent) 0%, #d84b5a 50%, var(--accent) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 3s linear infinite;
+  }
+  @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+
+  /* Dots de navigation quiz (cliquables) */
+  .dots { display: flex; gap: 6px; overflow-x: auto; padding: 2px 2px 8px; scrollbar-width: none; }
+  .dots::-webkit-scrollbar { display: none; }
+  .dot {
+    flex: 0 0 auto;
+    min-width: 28px; height: 28px;
+    border: 1.5px solid var(--line);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; font-weight: 600;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: transform .15s ease, border-color .15s ease, background .15s ease, color .15s ease;
+  }
+  .dot.answered { border-color: var(--ink); color: var(--ink); background: rgba(11,26,46,0.04); }
+  .dot.current  { border-color: var(--accent); background: var(--accent); color: #fff;
+                  transform: scale(1.08); box-shadow: 0 4px 10px -3px rgba(184,50,61,.45); }
+  .dot.skipped  { border-style: dashed; border-color: var(--ochre); color: var(--ochre); }
+
+  /* Options — tap targets généreux */
+  .option {
+    display: flex; align-items: center; gap: 14px;
+    padding: 18px 18px;
+    min-height: 64px;
+    background: rgba(255,255,255,0.82);
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    text-align: left;
+    transition: transform .15s ease, border-color .15s ease, background .15s ease, box-shadow .2s ease;
+    cursor: pointer;
+    touch-action: manipulation;
+    font-size: 1.05rem;
+  }
+  .option:active { transform: scale(0.985); }
+  @media (hover:hover) { .option:hover { border-color: var(--ink-soft); box-shadow: 0 6px 18px -10px rgba(11,26,46,.25);} }
+  .option.selected {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+    box-shadow: 0 10px 24px -10px rgba(11,26,46,.45);
+  }
+  .option .letter {
+    flex-shrink: 0;
+    width: 38px; height: 38px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 8px;
+    background: var(--paper-warm);
+    color: var(--ink);
+    font-family: 'Fraunces', serif; font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.02em;
+    transition: background .15s ease, color .15s ease;
+  }
+  .option.selected .letter { background: var(--accent); color: #fff; }
+  .option .letter-hint {
+    position: absolute; right: -5px; bottom: -5px;
+    font-size: 9px; line-height: 1; padding: 2px 3px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    color: var(--muted);
+  }
+  .option .letter-wrap { position: relative; }
+
+  /* Encadré étiqueté */
+  .frame {
+    position: relative;
+    border: 2px solid var(--ink);
+    border-radius: 12px;
+    background: rgba(255,255,255,0.55);
+  }
+  .frame-label {
+    position: absolute; top: -11px; left: 20px;
+    padding: 0 10px;
+    background: var(--paper);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.18em;
+    color: var(--ink);
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  /* Chips */
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 10px 5px 8px;
+    border-radius: 999px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.14em;
+    background: rgba(11,26,46,0.06);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    white-space: nowrap;
+  }
+  .chip .dotmark { width: 6px; height: 6px; border-radius: 999px; background: currentColor; }
+
+  /* Jauge */
+  .gauge-ring { transform: rotate(-90deg); transform-origin: center; }
+
+  /* Domaine card (rapport) */
+  .domain-card {
+    border: 1.5px solid var(--line);
+    background: rgba(255,255,255,0.55);
+    border-radius: 12px;
+    padding: 18px;
+    transition: border-color .15s ease, box-shadow .2s ease;
+  }
+  .domain-card[data-level="acquis"]     { border-color: rgba(22,106,57,.55); background: rgba(22,106,57,.06); }
+  .domain-card[data-level="fragile"]    { border-color: rgba(199,138,29,.6); background: rgba(199,138,29,.07); }
+  .domain-card[data-level="non-acquis"] { border-color: rgba(163,30,42,.55); background: rgba(163,30,42,.06); }
+  @media (hover:hover) { .domain-card:hover { box-shadow: 0 10px 24px -14px rgba(11,26,46,.3);} }
+
+  /* Kbd */
+  kbd {
+    display: inline-block;
+    padding: 2px 7px;
+    border: 1px solid var(--line);
+    border-bottom-width: 2px;
+    border-radius: 5px;
+    background: #fff9ec;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; font-weight: 600;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+
+  /* Boutons primaires */
+  .btn-primary {
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 16px 24px;
+    min-height: 56px;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Fraunces', serif; font-weight: 600;
+    font-size: 1.1rem;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: transform .15s ease, box-shadow .2s ease, background .15s ease;
+  }
+  .btn-primary:hover:not(:disabled) { background: var(--ink-soft); box-shadow: 0 12px 28px -12px rgba(11,26,46,.5); transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-primary:disabled { background: var(--line); color: var(--muted); cursor: not-allowed; }
+  .btn-secondary {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 14px 18px;
+    min-height: 48px;
+    border: 1.5px solid var(--ink);
+    color: var(--ink);
+    background: transparent;
+    border-radius: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; letter-spacing: 0.14em; font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: background .15s ease;
+  }
+  .btn-secondary:hover { background: rgba(11,26,46,.06); }
+
+  /* Input papier */
+  .input-paper {
+    width: 100%;
+    background: transparent;
+    border: 0; border-bottom: 2px solid var(--line);
+    padding: 10px 0 10px;
+    font-family: 'Fraunces', serif;
+    font-size: 1.35rem; font-weight: 500;
+    color: var(--ink);
+    outline: none;
+    transition: border-color .15s ease;
+  }
+  .input-paper::placeholder { color: var(--muted); font-weight: 400; opacity: .7; }
+  .input-paper:focus { border-color: var(--accent); }
+
+  /* Print */
+  @media print {
+    body { background: white; }
+    body::before, body::after { display: none; }
+    .no-print { display: none !important; }
+    .domain-card { break-inside: avoid; }
+  }
+
+  /* Mode sombre : override des variables de base */
+  html.dark {
+    --ink:        #eceef4;
+    --ink-soft:   #b5bacb;
+    --paper:      #141720;
+    --paper-warm: #1d2130;
+    --paper-edge: #2c3244;
+    --line:       #384253;
+    --grid:       rgba(255,255,255,0.035);
+    --muted:      #8b92a6;
+    --accent:     #e8646f;
+    --ochre:      #d9a12a;
+    --leaf:       #5ca371;
+    --sea:        #4eb7c9;
+    --success:    #4f9d6a;
+    --danger:     #dd4d5a;
+  }
+  html.dark body::after {
+    background:
+      radial-gradient(60% 40% at 0% 0%, rgba(232,100,111,0.09), transparent 70%),
+      radial-gradient(60% 40% at 100% 100%, rgba(217,161,42,0.09), transparent 70%);
+  }
+  html.dark .option,
+  html.dark .frame,
+  html.dark .domain-card,
+  html.dark kbd {
+    background: rgba(255,255,255,0.04);
+  }
+  html.dark .option.selected {
+    background: var(--paper-warm);
+    border-color: var(--accent);
+  }
+  html.dark .option.selected .letter { background: var(--accent); color: #111; }
+
+  /* Accessibilité : mode "dyslexie" — interlignage + taille + famille différente */
+  html.dyslexia body, html.dyslexia {
+    font-family: 'OpenDyslexic', 'Comic Sans MS', Arial, sans-serif !important;
+    line-height: 1.75 !important;
+    letter-spacing: 0.02em !important;
+  }
+  html.dyslexia .font-display { letter-spacing: 0 !important; }
+  html.dyslexia .option, html.dyslexia .btn-primary, html.dyslexia .btn-secondary,
+  html.dyslexia .input-paper { font-family: inherit !important; }
+
+  /* Toast flottant (sync, notifications) */
+  .toast {
+    position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    z-index: 100;
+    background: var(--ink); color: var(--paper);
+    padding: 12px 20px; border-radius: 999px;
+    font-family: 'Figtree', sans-serif; font-weight: 600; font-size: 14px;
+    box-shadow: 0 16px 40px -10px rgba(11,26,46,.4);
+    animation: toast-in .25s cubic-bezier(.2,.9,.3,1.2) both, toast-out .3s ease-in 3.5s both;
+    pointer-events: none;
+    max-width: calc(100% - 40px);
+    display: flex; align-items: center; gap: 8px;
+  }
+  @keyframes toast-in  { from { opacity: 0; transform: translate(-50%, -16px);} to { opacity: 1; transform: translate(-50%, 0);} }
+  @keyframes toast-out { to   { opacity: 0; transform: translate(-50%, -12px);} }
+
+  /* Confettis de célébration */
+  @keyframes confetti-fall {
+    0%   { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(260px) rotate(720deg); opacity: 0; }
+  }
+
+  /* Réduire mouvement */
+  @media (prefers-reduced-motion: reduce) {
+    .fade-up, .slide-in, .pop-in, .shimmer { animation: none !important; }
+    .confetti-layer { display: none !important; }
+  }

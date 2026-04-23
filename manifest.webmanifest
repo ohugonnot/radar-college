@@ -1,0 +1,21 @@
+{
+  "name": "Évaluations collège",
+  "short_name": "Quiz collège",
+  "description": "Quiz diagnostiques maths, physique-chimie et SVT de la 6ème à la 3ème.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#faf5eb",
+  "theme_color": "#b8323d",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education"]
+}

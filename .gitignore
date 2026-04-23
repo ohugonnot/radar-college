@@ -1,0 +1,23 @@
+# Dépendances
+node_modules/
+package-lock.json
+
+# Tests
+test-results/
+playwright-report/
+.playwright/
+
+# Données runtime (save.php crée des fichiers JSON par élève)
+data/
+
+# Éditeurs / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# Secrets
+.env
+.env.local

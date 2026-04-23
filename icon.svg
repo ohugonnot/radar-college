@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Quiz collège">
+  <defs>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M 48 0 L 0 0 0 48" fill="none" stroke="#0b1a2e" stroke-width="0.8" opacity="0.08"/>
+    </pattern>
+    <radialGradient id="paperGlow" cx="50%" cy="40%" r="65%">
+      <stop offset="0%" stop-color="#fff9ec"/>
+      <stop offset="100%" stop-color="#efe2c7"/>
+    </radialGradient>
+    <linearGradient id="sealRing" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#b8323d"/>
+      <stop offset="100%" stop-color="#8c1f2a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Fond crème (zone maskable sûre) -->
+  <rect width="512" height="512" rx="112" fill="url(#paperGlow)"/>
+  <rect width="512" height="512" rx="112" fill="url(#grid)"/>
+
+  <!-- Sceau circulaire principal -->
+  <g transform="translate(256 256)">
+
+    <!-- Anneau extérieur avec graduations (cadran) -->
+    <circle r="196" fill="none" stroke="url(#sealRing)" stroke-width="5" opacity="0.85"/>
+    <circle r="182" fill="none" stroke="#0b1a2e" stroke-width="1" opacity="0.25"/>
+    <g stroke="#0b1a2e" stroke-width="1.2" opacity="0.35">
+      <!-- 24 graduations, plus longues tous les 6 -->
+      <g id="ticks">
+        <line x1="0" y1="-196" x2="0" y2="-184"/>
+        <line x1="0" y1="-196" x2="0" y2="-184" transform="rotate(15)"/>
+        <line x1="0" y1="-196" x2="0" y2="-184" transform="rotate(30)"/>
+        <line x1="0" y1="-196" x2="0" y2="-184" transform="rotate(45)"/>
+        <line x1="0" y1="-196" x2="0" y2="-184" transform="rotate(60)"/>
+        <line x1="0" y1="-196" x2="0" y2="-184" transform="rotate(75)"/>
+        <line x1="0" y1="-196" x2="0" y2="-184" transform="rotate(90)"/>
+        <line x1="0" y1="-196" x2="0" y2="-184" transform="rotate(105)"/>
+        <line x1="0" y1="-196" x2="0" y2="-184" transform="rotate(120)"/>
+        <line x1="0" y1="-196" x2="0" y2="-184" transform="rotate(135)"/>
+        <line x1="0" y1="-196" x2="0" y2="-184" transform="rotate(150)"/>
+        <line x1="0" y1="-196" x2="0" y2="-184" transform="rotate(165)"/>
+        <line x1="0" y1="-196" x2="0" y2="-184" transform="rotate(180)"/>
+        <line x1="0" y1="-196" x2="0" y2="-184" transform="rotate(195)"/>
+        <line x1="0" y1="-196" x2="0" y2="-184" transform="rotate(210)"/>
+        <line x1="0" y1="-196" x2="0" y2="-184" transform="rotate(225)"/>
+        <line x1="0" y1="-196" x2="0" y2="-184" transform="rotate(240)"/>
+        <line x1="0" y1="-196" x2="0" y2="-184" transform="rotate(255)"/>
+        <line x1="0" y1="-196" x2="0" y2="-184" transform="rotate(270)"/>
+        <line x1="0" y1="-196" x2="0" y2="-184" transform="rotate(285)"/>
+        <line x1="0" y1="-196" x2="0" y2="-184" transform="rotate(300)"/>
+        <line x1="0" y1="-196" x2="0" y2="-184" transform="rotate(315)"/>
+        <line x1="0" y1="-196" x2="0" y2="-184" transform="rotate(330)"/>
+        <line x1="0" y1="-196" x2="0" y2="-184" transform="rotate(345)"/>
+      </g>
+    </g>
+
+    <!-- 3 ornements cardinaux (étoiles/diamants) aux 3 sommets d'un triangle équilatéral -->
+    <g fill="#b8323d">
+      <!-- haut -->
+      <path d="M 0 -160 L 6 -148 L 0 -136 L -6 -148 Z"/>
+      <!-- bas gauche -->
+      <path d="M -138 80 L -132 92 L -138 104 L -144 92 Z"/>
+      <!-- bas droit -->
+      <path d="M 138 80 L 144 92 L 138 104 L 132 92 Z"/>
+    </g>
+
+    <!-- Cercle intérieur blanc cassé (médaillon) -->
+    <circle r="138" fill="#fff9ec" stroke="#0b1a2e" stroke-width="2"/>
+
+    <!-- Lettre principale ∑ (style Fraunces bold) -->
+    <text x="0" y="38" text-anchor="middle"
+          font-family="Fraunces, 'Playfair Display', Georgia, serif"
+          font-weight="700" font-size="200"
+          fill="#0b1a2e" style="letter-spacing:-0.04em;">∑</text>
+
+    <!-- Ruban inférieur avec 3 pastilles : maths, physique, svt -->
+    <g transform="translate(0 94)">
+      <circle cx="-28" cy="0" r="10" fill="#b8323d"/>
+      <circle cx="0"   cy="0" r="10" fill="#0f5e6b"/>
+      <circle cx="28"  cy="0" r="10" fill="#166a39"/>
+    </g>
+  </g>
+
+  <!-- Signature en bas -->
+  <text x="256" y="476" text-anchor="middle"
+        font-family="JetBrains Mono, ui-monospace, monospace"
+        font-size="18" font-weight="600" letter-spacing="6"
+        fill="#b8323d" opacity="0.85">COLLÈGE · SCIENCES</text>
+</svg>

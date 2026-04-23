@@ -1,16 +1,16 @@
 #!/bin/bash
-# Build SPA : inline app.css + app.jsx + quizzes/*.jsx dans index.html, bump CACHE_NAME du SW.
-# À lancer après toute modif de app.css, app.jsx ou d'un fichier dans quizzes/.
+# Build SPA : inline app.css + app.tsx + quizzes/*.tsx dans index.html, bump CACHE_NAME du SW.
+# À lancer après toute modif de app.css, app.tsx ou d'un fichier dans quizzes/.
 
 set -e
 cd "$(dirname "$0")"
 
-if [ ! -f app.css ] || [ ! -f app.jsx ] || [ ! -f index.html ]; then
-  echo "Erreur : app.css, app.jsx et index.html doivent être présents."
+if [ ! -f app.css ] || [ ! -f app.tsx ] || [ ! -f index.html ]; then
+  echo "Erreur : app.css, app.tsx et index.html doivent être présents."
   exit 1
 fi
 
-if [ ! -d quizzes ] || [ -z "$(ls -A quizzes/*.jsx 2>/dev/null)" ]; then
+if [ ! -d quizzes ] || [ -z "$(ls -A quizzes/*.tsx 2>/dev/null)" ]; then
   echo "Erreur : dossier quizzes/ vide ou absent."
   exit 1
 fi
@@ -32,7 +32,7 @@ python3 <<'PYEOF'
 import re, glob, os
 
 with open('app.css','r')    as f: css = f.read()
-with open('app.jsx','r')    as f: jsx = f.read()
+with open('app.tsx','r')    as f: jsx = f.read()
 with open('index.html','r') as f: html = f.read()
 
 # 1. Inline app.css : cible UNIQUEMENT <style id="app-style">...</style>.
@@ -42,8 +42,8 @@ if not style_re.search(html):
     raise SystemExit('Marqueur <style id="app-style"> introuvable dans index.html')
 html = style_re.sub(lambda m: '<style id="app-style">\n' + css + '\n</style>', html, count=1)
 
-# 2. Inline tous les quizzes/*.jsx entre les marqueurs // BEGIN_QUIZZES et // END_QUIZZES.
-quiz_files = sorted(glob.glob('quizzes/*.jsx'))
+# 2. Inline tous les quizzes/*.tsx entre les marqueurs // BEGIN_QUIZZES et // END_QUIZZES.
+quiz_files = sorted(glob.glob('quizzes/*.tsx'))
 parts = []
 for qf in quiz_files:
     with open(qf,'r') as f:
@@ -56,12 +56,12 @@ if not quizzes_re.search(html):
 # Lambda pour éviter l'interprétation des \ dans le replacement.
 html = quizzes_re.sub(lambda m: f"// BEGIN_QUIZZES\n{quizzes_block}\n// END_QUIZZES", html)
 
-# 3. Inline app.jsx entre les marqueurs // BEGIN_APP_JSX et // END_APP_JSX.
+# 3. Inline app.tsx entre les marqueurs // BEGIN_APP_JSX et // END_APP_JSX.
 app_re = re.compile(r'// BEGIN_APP_JSX\n.*?// END_APP_JSX', re.S)
 if not app_re.search(html):
     raise SystemExit("Marqueurs BEGIN_APP_JSX / END_APP_JSX introuvables dans index.html")
 html = app_re.sub(lambda m: f"// BEGIN_APP_JSX\n{jsx}\n// END_APP_JSX", html)
 
 with open('index.html','w') as f: f.write(html)
-print(f"  ✓ index.html régénéré : {len(quiz_files)} quizzes + app.jsx ({len(jsx)}o) + app.css ({len(css)}o) inlinés")
+print(f"  ✓ index.html régénéré : {len(quiz_files)} quizzes + app.tsx ({len(jsx)}o) + app.css ({len(css)}o) inlinés")
 PYEOF

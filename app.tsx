@@ -1,8 +1,10 @@
+/// <reference path="./types.ts" />
 // ============================================================
-// APP.JSX — Logique commune de tous les quiz
+// app.tsx — Logique commune de tous les quiz (partie React).
 // Monté dynamiquement par index.html via window.mountQuizApp(key, {reportAt}).
 // Tout le module est wrappé dans une IIFE pour éviter les collisions de noms
 // avec le routeur vanilla JS d'index.html (ALL_BADGES, slugName, showToast, etc.).
+// Les types (AnalyzeResult, QuizKey, etc.) sont globaux via types.ts.
 // ============================================================
 
 (function appJsxModule() {
@@ -17,7 +19,7 @@ const { useState, useEffect, useMemo, useRef } = React;
 })();
 
 // Toast réutilisable
-function showToast(msg, icon) {
+function showToast(msg: string, icon?: string): void {
   try {
     document.querySelectorAll('.toast').forEach(n => n.remove());
     const t = document.createElement('div');
@@ -186,10 +188,10 @@ const MEMO_BANK = {
 // SPA : STORAGE_KEY dépend du quiz actif → getter lazy (SUBJECT est défini par setActiveQuiz).
 const storageKey = () => 'quiz-' + SUBJECT.id + '-history-v1';
 
-function slugName(s) {
+function slugName(s: string | null | undefined): string {
   return (s || '').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/\s+/g,' ');
 }
-function loadHistory() {
+function loadHistory(): Record<string, Profile> {
   try { const raw = localStorage.getItem(storageKey()); return raw ? JSON.parse(raw) : {}; } catch { return {}; }
 }
 function saveHistoryFor(name, klass, attempt) {
@@ -204,7 +206,7 @@ function saveHistoryFor(name, klass, attempt) {
     localStorage.setItem(storageKey(), JSON.stringify(hist));
   } catch {}
 }
-function getProfile(name) {
+function getProfile(name: string): Profile | null {
   if (!name) return null;
   const hist = loadHistory();
   return hist[slugName(name)] || null;
@@ -213,7 +215,7 @@ function getProfile(name) {
 // ============================================================
 // BUILD QUIZ
 // ============================================================
-function shuffle(arr) {
+function shuffle<T>(arr: T[]): T[] {
   const a = arr.slice();
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -226,7 +228,7 @@ const wrongTrackerKey = () => 'quiz-' + SUBJECT.id + '-wrong-tracker-v1';
 function getWrongTracker() {
   try { return JSON.parse(localStorage.getItem(wrongTrackerKey())) || {}; } catch { return {}; }
 }
-function recordWrongAnswers(questions, answers) {
+function recordWrongAnswers(questions: Question[], answers: AnswersMap): void {
   try {
     const tracker = getWrongTracker();
     questions.forEach(q => {
@@ -242,7 +244,7 @@ function recordWrongAnswers(questions, answers) {
 
 // Tire aléatoirement dans un tableau avec pondération : les questions
 // souvent ratées par l'élève ont + de chances d'être tirées.
-function weightedSampleWithoutReplacement(items, count, weightFn) {
+function weightedSampleWithoutReplacement<T>(items: T[], count: number, weightFn: (x: T) => number): T[] {
   const pool = items.slice();
   const out = [];
   while (out.length < count && pool.length > 0) {
@@ -258,9 +260,9 @@ function weightedSampleWithoutReplacement(items, count, weightFn) {
   return out;
 }
 
-function buildQuiz(forceKeys) {
-  const questions = [];
-  const pushQuestion = (src, did) => {
+function buildQuiz(forceKeys?: string[]): Question[] {
+  const questions: Question[] = [];
+  const pushQuestion = (src: SourceQuestion, did: string) => {
     const order = shuffle(src.options.map((_, i) => i)); // ordre shuffle stocké
     const options = order.map(i => src.options[i]);
     const correct = order.indexOf(src.correct);
@@ -276,7 +278,7 @@ function buildQuiz(forceKeys) {
 
   const tracker = getWrongTracker();
   Object.keys(DOMAINS).forEach(did => {
-    const pool = POOL[did] || [];
+    const pool: SourceQuestion[] = POOL[did] || [];
     const picks = weightedSampleWithoutReplacement(
       pool, PICK[did] || 3,
       (q) => {
@@ -298,9 +300,9 @@ function buildQuiz(forceKeys) {
 // → incite à passer plutôt que répondre au hasard (voir message sur HomeScreen).
 const WRONG_PENALTY = 0.5;
 
-function analyze(questions, answers) {
-  const byDomain = {};
-  Object.keys(DOMAINS).forEach(d => { byDomain[d] = { correct:0, total:0, errors:[], skipped:0, wrong:0, wrongWeighted:0 }; });
+function analyze(questions: Question[], answers: AnswersMap): AnalyzeResult {
+  const byDomain: Record<string, DomainAnalysis> = {};
+  Object.keys(DOMAINS).forEach(d => { byDomain[d] = { correct:0, total:0, errors:[], skipped:0, wrong:0, wrongWeighted:0, pct:0, level:'non-acquis' }; });
   let correct = 0, total = 0, skipped = 0, wrong = 0, weighted = 0, weightedMax = 0, wrongWeighted = 0;
   questions.forEach(q => {
     const ans = answers[q.key];
@@ -343,8 +345,8 @@ function analyze(questions, answers) {
   else                         { appreciation = 'Niveau préoccupant. Une remise à niveau structurée est vivement recommandée.'; levelLabel='Très insuffisant'; levelColor='var(--danger)'; }
   return { total, correct, wrong, skipped, penaltyPoints, noteSur20, noteWeighted, byDomain, forces, lacunes, appreciation, levelLabel, levelColor };
 }
-function planOf(domainId, level) { return PLANS?.[domainId]?.[level] || []; }
-function getFinalAdvice(r) {
+function planOf(domainId: string, level: LevelLabel): string[] { return PLANS?.[domainId]?.[level] || []; }
+function getFinalAdvice(r: AnalyzeResult): string {
   const n = r.noteWeighted;
   if (n >= 17) return 'Continue comme ça — maintenir le rythme sera la meilleure stratégie.';
   if (n >= 14) return 'Un été bien utilisé sur les points fragiles te mettra en très bonne position.';
@@ -352,7 +354,7 @@ function getFinalAdvice(r) {
   if (n >= 8)  return 'La situation demande une reprise sérieuse des bases dès maintenant.';
   return 'Un accompagnement structuré est vivement conseillé pour ne pas accumuler du retard.';
 }
-function getFinalDetail(r) {
+function getFinalDetail(r: AnalyzeResult): string {
   const n = r.noteWeighted, lac = r.lacunes.length;
   if (n >= 17) return `Excellent travail sur l'ensemble du programme. Pour maintenir ce niveau, quelques exercices réguliers suffiront.`;
   if (n >= 14) return `Le socle est là. ${lac>0?`Il reste ${lac} chapitre${lac>1?'s':''} à consolider`:'Tout est solide'}. 30-45 min de ${SUMMER_TOPIC} par jour sur 2-3 semaines de vacances suffiront.`;
@@ -360,7 +362,7 @@ function getFinalDetail(r) {
   if (n >= 8)  return `Plusieurs chapitres doivent être repris à la base, pas juste révisés. Envisage un stage de remise à niveau ou des cours particuliers.`;
   return `Un soutien régulier (école, cours particuliers, famille, plateforme) est essentiel pour reconstruire progressivement.`;
 }
-function getSummerTime(r) {
+function getSummerTime(r: AnalyzeResult): string {
   const n = r.noteWeighted;
   if (n >= 17) return '20-30 min, 2 fois par semaine';
   if (n >= 14) return '30-45 min par jour, 3 semaines';
@@ -368,7 +370,7 @@ function getSummerTime(r) {
   if (n >= 8)  return '1h par jour + stage de révision';
   return '1h30 par jour + accompagnement régulier';
 }
-async function saveAttemptToServer(student, attempt) {
+async function saveAttemptToServer(student: StudentInfo, attempt: Attempt): Promise<void> {
   if (location.protocol === 'file:') return;
   try {
     await fetch('save.php', {
@@ -407,7 +409,7 @@ async function syncFromServer(studentName) {
       (data.quizzes[qid].attempts || []).forEach(a => {
         if (!localDates.has(a.date)) { hist[slug].attempts.push(a); merged++; }
       });
-      hist[slug].attempts.sort((a,b) => new Date(a.date) - new Date(b.date));
+      hist[slug].attempts.sort((a,b) => +new Date(a.date) - +new Date(b.date));
       if (data.name) hist[slug].name = data.name;
       if (data.klass) hist[slug].klass = data.klass;
       try { localStorage.setItem(key, JSON.stringify(hist)); } catch {}
@@ -419,7 +421,7 @@ async function syncFromServer(studentName) {
 // ============================================================
 // UI COMPOSANTS COMMUNS
 // ============================================================
-function SubjectMark({ size = 40 }) {
+function SubjectMark({ size = 40 }: SubjectMarkProps) {
   return (
     <div className="flex items-center justify-center font-display font-bold"
       style={{ width:size, height:size, borderRadius:Math.round(size*0.22), background:'var(--ink)', color:'var(--paper)', fontSize:size*0.55, lineHeight:1 }}>
@@ -427,7 +429,7 @@ function SubjectMark({ size = 40 }) {
     </div>
   );
 }
-function Chip({ children, color, className='' }) {
+function Chip({ children, color, className='' }: ChipProps) {
   return (
     <span className={`chip ${className}`} style={color ? { background:`${color}14`, color, borderColor:`${color}55` } : undefined}>
       {color && <span className="dotmark" />}
@@ -435,7 +437,7 @@ function Chip({ children, color, className='' }) {
     </span>
   );
 }
-function CompetenceRadar({ byDomain, previousDomains }) {
+function CompetenceRadar({ byDomain, previousDomains }: CompetenceRadarProps) {
   const ids = Object.keys(byDomain);
   const n = ids.length;
   // ViewBox plus large que haut pour donner de l'air aux labels gauche/droite
@@ -529,7 +531,7 @@ function CompetenceRadar({ byDomain, previousDomains }) {
   );
 }
 
-function ProgressCurve({ attempts }) {
+function ProgressCurve({ attempts }: ProgressCurveProps) {
   const W = 640, H = 220, padL = 40, padR = 16, padT = 18, padB = 34;
   const iw = W - padL - padR, ih = H - padT - padB;
   const n = attempts.length;
@@ -661,12 +663,13 @@ function allAttemptsForStudent(slug) {
       } catch {}
     });
   });
-  return out.sort((a,b) => new Date(a.date) - new Date(b.date));
+  return out.sort((a,b) => +new Date(a.date) - +new Date(b.date));
 }
 
 function computeStreakDays(attempts) {
   if (!attempts.length) return 0;
-  const days = [...new Set(attempts.map(a => a.date.slice(0,10)))].sort();
+  const dayStrings: string[] = attempts.map(a => a.date.slice(0, 10));
+  const days = [...new Set(dayStrings)].sort();
   if (days.length === 0) return 0;
   // La streak "active" = jours consécutifs finissant aujourd'hui ou hier
   const today = new Date().toISOString().slice(0,10);
@@ -675,9 +678,7 @@ function computeStreakDays(attempts) {
   if (last !== today && last !== yesterday) return 0;
   let streak = 1;
   for (let i = days.length - 2; i >= 0; i--) {
-    const cur = new Date(days[i+1]);
-    const prev = new Date(days[i]);
-    const diff = (cur - prev) / 86400000;
+    const diff = (+new Date(days[i+1]) - +new Date(days[i])) / 86400000;
     if (Math.round(diff) === 1) streak++;
     else break;
   }
@@ -695,7 +696,7 @@ const ALL_BADGES = [
   { id: 'triple',   emoji:'🎨', title:'Polyvalent',       desc:'Teste les 3 matières',                test: a => new Set(a.map(x => x.subjectKey)).size >= 3 },
   { id: 'levels',   emoji:'🎓', title:'Cartographe',      desc:'Un test à chaque niveau (6e→3e)',     test: a => new Set(a.map(x => x.level)).size >= 4 },
   { id: 'progress', emoji:'🚀', title:'Progression',       desc:'+3 points sur un même quiz',          test: a => {
-      const byQ = {};
+      const byQ: Record<string, number[]> = {};
       a.forEach(x => { const k = x.subjectKey+'-'+x.level; if(!byQ[k]) byQ[k]=[]; byQ[k].push(x.note); });
       return Object.values(byQ).some(notes => notes.length >= 2 && (Math.max(...notes) - notes[0]) >= 3);
     }
@@ -721,7 +722,7 @@ function isNewRecordFor(subjectKey, level, studentSlug, note) {
   } catch { return false; }
 }
 
-function HomeScreen({ onStart }) {
+function HomeScreen({ onStart }: HomeScreenProps) {
   const activeStudent = useMemo(() => getActiveStudent(), []);
   const defaultLevel = SUBJECT.level.replace('Fin de ', '').replace(' (brevet)', '');
   // Pré-remplir la classe depuis le profil stocké si déjà renseignée (ex: "4ème B"),
@@ -735,14 +736,15 @@ function HomeScreen({ onStart }) {
   }, []);
   const [name, setName] = useState(activeStudent?.name || '');
   const [klass, setKlass] = useState(initialKlass);
-  const [mode, setMode] = useState('training');
+  const [mode, setMode] = useState(initialMode);
   const canStart = name.trim().length >= 2;
   const profile = useMemo(() => getProfile(name), [name]);
   useEffect(() => { if (profile && profile.klass && !klass) setKlass(profile.klass); }, [profile]);
   const lastAttempt = profile?.attempts?.[profile.attempts.length - 1];
 
   const nDomains = Object.keys(DOMAINS).length;
-  const nTotal = Object.values(PICK).reduce((a,b) => a+b, 0);
+  const pickValues: number[] = Object.values(PICK);
+  const nTotal = pickValues.reduce((a,b) => a+b, 0);
 
   return (
     <div className="layer min-h-screen flex flex-col px-5 pt-8 pb-16 md:pt-16">
@@ -871,15 +873,15 @@ function HomeScreen({ onStart }) {
 // ============================================================
 // QUIZ
 // ============================================================
-function QuizScreen({ student, quiz, onFinish, mode }) {
+function QuizScreen({ student, quiz, onFinish, mode }: QuizScreenProps) {
   const [current, setCurrent] = useState(0);
-  const [answers, setAnswers] = useState({});
-  const [timings, setTimings] = useState({});
+  const [answers, setAnswers] = useState(initialAnswers);
+  const [timings, setTimings] = useState(initialTimings);
   const [showConfirm, setShowConfirm] = useState(false);
   // hintLevel : 0 = caché, 1 = méthode du chapitre (MEMO_BANK), 2 = astuce spécifique (q.hint)
   const [hintLevel, setHintLevel] = useState(0);
-  const [hintsUsed, setHintsUsed] = useState({});
-  const [remaining, setRemaining] = useState(null);
+  const [hintsUsed, setHintsUsed] = useState(initialHints);
+  const [remaining, setRemaining] = useState(initialRemaining);
   const quizStartedAt = useRef(Date.now());
   const questionStartedAt = useRef(Date.now());
 
@@ -922,12 +924,12 @@ function QuizScreen({ student, quiz, onFinish, mode }) {
   const skip   = () => { if (selected === undefined) select(null); next(); };
 
   useEffect(() => {
-    const handler = (e) => {
+    const handler = (e: KeyboardEvent) => {
       if (showConfirm) return;
       if (e.key === 'ArrowRight' || e.key === 'Enter') next();
       else if (e.key === 'ArrowLeft') prev();
       else {
-        const map = {'1':0,'2':1,'3':2,'4':3,'a':0,'b':1,'c':2,'d':3,'A':0,'B':1,'C':2,'D':3};
+        const map: Record<string, number> = {'1':0,'2':1,'3':2,'4':3,'a':0,'b':1,'c':2,'d':3,'A':0,'B':1,'C':2,'D':3};
         if (map[e.key] !== undefined && map[e.key] < q.options.length) select(map[e.key]);
       }
     };
@@ -1098,7 +1100,7 @@ function QuizScreen({ student, quiz, onFinish, mode }) {
   );
 }
 
-function ConfirmScreen({ quiz, answers, onValidate, onCancel, onGoBack }) {
+function ConfirmScreen({ quiz, answers, onValidate, onCancel, onGoBack }: ConfirmScreenProps) {
   const skipped = [];
   quiz.forEach((qq, i) => { const a = answers[qq.key]; if (a === undefined || a === null) skipped.push(i); });
   const answeredCount = quiz.length - skipped.length;
@@ -1137,11 +1139,11 @@ function ConfirmScreen({ quiz, answers, onValidate, onCancel, onGoBack }) {
 // ============================================================
 // REPORT
 // ============================================================
-function ReportScreen({ student, quiz, answers, timings, totalMs, hintsUsed, mode, onRestart, onRetryWrong, historyMode }) {
+function ReportScreen({ student, quiz, answers, timings, totalMs, hintsUsed, mode, onRestart, onRetryWrong, historyMode }: ReportScreenProps) {
   const result = useMemo(() => analyze(quiz, answers), [quiz, answers]);
-  const [openDomain, setOpenDomain] = useState(null);
-  const [profile, setProfile] = useState(() => getProfile(student.name));
-  const [celebration, setCelebration] = useState(null);
+  const [openDomain, setOpenDomain] = useState(initialOpenDomain);
+  const [profile, setProfile] = useState(() => getProfile(student.name) || initialProfile());
+  const [celebration, setCelebration] = useState(initialCelebration);
 
   useEffect(() => {
     if (historyMode) {
@@ -1557,17 +1559,30 @@ function rebuildFromAttempt(attempt) {
   return { quiz: quizArr.map((q, i) => ({ ...q, num: i + 1 })), answers: ans };
 }
 
+// Initial state factories : Babel Standalone TSX ne supporte pas `useState<T>(v)` ni
+// `v as T` inline dans un appel. Passer un initializer typé `(): T => ...` contourne
+// les deux problèmes et laisse TS inférer correctement le type du state.
+const initialPhase = (): QuizPhase => 'home';
+const initialStudent = (): StudentInfo | null => null;
+const initialMode = (): Mode => 'training';
+const initialAnswers = (): AnswersMap => ({});
+const initialTimings = (): TimingsMap => ({});
+const initialHints = (): HintsMap => ({});
+const initialOpenDomain = (): string | null => null;
+const initialProfile = (): Profile | null => null;
+const initialCelebration = (): Celebration | null => null;
+const initialRemaining = (): number | null => null;
+
 function App() {
-  // ── State groupé par rôle ──────────────────────────────────
-  const [screen, setScreen]             = useState('home');
-  const [historyMode, setHistoryMode]   = useState(false);
-  const [student, setStudent]           = useState(null);
-  const [mode, setMode]                 = useState('training');
-  const [quiz, setQuiz]                 = useState(() => buildQuiz());
-  const [answers, setAnswers]           = useState({});
-  const [timings, setTimings]           = useState({});
-  const [hintsUsed, setHintsUsed]       = useState({});
-  const [totalMs, setTotalMs]           = useState(0);
+  const [screen, setScreen]           = useState(initialPhase);
+  const [historyMode, setHistoryMode] = useState(false);
+  const [student, setStudent]         = useState(initialStudent);
+  const [mode, setMode]               = useState(initialMode);
+  const [quiz, setQuiz]               = useState(buildQuiz);
+  const [answers, setAnswers]         = useState(initialAnswers);
+  const [timings, setTimings]         = useState(initialTimings);
+  const [hintsUsed, setHintsUsed]     = useState(initialHints);
+  const [totalMs, setTotalMs]         = useState(0);
 
   // Nettoyage : coupe la sous-route /report/<ISO> du hash pour revenir à #/Neme/subject.
   // Utilise setHashSilently (exposé par le routeur wizard) pour éviter un re-render.

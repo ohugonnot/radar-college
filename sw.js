@@ -1,6 +1,6 @@
 // Service worker minimal — cache-first pour les ressources locales,
 // network-first pour les CDN (avec fallback cache).
-const CACHE_NAME = 'quizcollege-20260423-090111';
+const CACHE_NAME = 'quizcollege-20260423-100742';
 // SPA : un seul HTML. Les anciens {matiere}-{niveau}.html n'existent plus.
 const LOCAL_ASSETS = [
   './',

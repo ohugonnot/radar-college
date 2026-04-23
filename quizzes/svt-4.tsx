@@ -4,13 +4,12 @@ window.ALL_QUIZZES['svt-4'] = {
   YT_SUFFIX: 'college svt',
   SUMMER_TOPIC: 'SVT',
   SUBJECT: {
-  id: 'svt',
-  name: 'Sciences de la Vie et de la Terre',
-  short: 'SVT',
-  level: 'Fin de 4ème',
-  mark: '🌿',
-  tagline: 'Évaluation diagnostique',
     id: 'svt-4',
+    name: 'Sciences de la Vie et de la Terre',
+    short: 'SVT',
+    level: 'Fin de 4ème',
+    mark: '🌿',
+    tagline: 'Évaluation diagnostique',
   },
   DOMAINS: {
   reproduction: { id:'reproduction', name:'Reproduction humaine & puberté',        short:'Reproduction', coef:3, color:'#be185d', icon:'♂♀', search:'reproduction humaine puberte 4eme' },

@@ -1,6 +1,5 @@
-# Dépendances
+# Dépendances (package-lock.json est versionné pour installs reproductibles en CI)
 node_modules/
-package-lock.json
 
 # Tests
 test-results/

@@ -34,22 +34,40 @@ test('02 — quiz (question active)', async ({ page }) => {
 });
 
 test('03 — rapport avec radar', async ({ page }) => {
-  // Seed un attempt factice avec log réel pour déclencher le mode historique
+  // Seed un attempt avec de VRAIES clés du pool maths-4. En omettant `order`,
+  // rebuildFromAttempt utilise le fallback `ans = ok ? correctIdx : (correctIdx+1)%N`
+  // — chaque ok:true devient donc une réponse exacte après rebuild,
+  // et l'analyse recalcule une note cohérente (≈ 14/20 ici).
   const FIXED = '2026-04-20T10:30:00.000Z';
   await page.addInitScript((date) => {
     localStorage.setItem('quiz-active-student', JSON.stringify({ name: 'Alice', slug: 'alice' }));
-    // Construit un log varié : 22 bonnes, 5 mauvaises, 3 passées sur maths-4 (clés réelles du pool)
-    const keys = ['rel-1','rel-2','rel-3','rel-4','pot-1','pot-2','pot-3','pot-4','pot-5','pyt-1','pyt-2','pyt-3','pyt-4','tha-1','tha-2','tha-3','sta-1','sta-2','sta-3','pro-1','pro-2','pro-3','lit-1','lit-2','lit-3','eqn-1','eqn-2','vol-1','vol-2','vol-3'];
-    // 20 bonnes (given = correct index via order mapping), 5 mauvaises, 5 passées
-    const log = keys.map((k, i) => {
-      const base = { pos: i+1, key: k, domain: 'relatifs', ok: true, ms: 2000 + i*100, hinted: false, order: [0,1,2,3] };
-      if (i < 20) return { ...base, given: 0, correct: 0, ok: true };   // assume first option is correct after order mapping
-      if (i < 25) return { ...base, given: 1, correct: 0, ok: false };  // wrong
-      return { ...base, given: null, correct: 0, ok: false };            // skipped
-    });
+    // 30 questions sur tous les domaines de maths-4, réussites variées
+    // pour que le radar dessine de vraies pointes et creux.
+    const plan = [
+      ['rel-1', true], ['rel-2', true], ['rel-3', true], ['rel-4', true],
+      ['fra-1', true], ['fra-2', true], ['fra-3', false],
+      ['pui-1', true], ['pui-2', false], ['pui-3', false],
+      ['lit-1', true], ['lit-2', true], ['lit-3', true],
+      ['pyt-1', true], ['pyt-2', true], ['pyt-3', true],
+      ['tha-1', true], ['tha-2', false],
+      ['tri-1', true], ['tri-2', true], ['tri-3', false],
+      ['gra-1', true], ['gra-2', true],
+      ['pro-1', true], ['pro-2', true], ['pro-3', true],
+      ['tra-1', true], ['tra-2', false],
+      ['pb-1',  true], ['pb-2',  true],
+    ];
+    const correct = plan.filter(p => p[1]).length;
+    const wrong = plan.length - correct;
+    const note = +(Math.max(0, (correct - 0.5 * wrong) / plan.length) * 20).toFixed(2);
+    const log = plan.map(([key, ok], i) => ({
+      pos: i + 1, key, domain: '',
+      given: ok ? 0 : 1, correct: 0,
+      ok, ms: 2400 + (i * 190) % 3500, hinted: false,
+    }));
     const hist = { alice: { name: 'Alice', klass: '4ème', attempts: [{
-      date, mode:'training', note: 14.5, noteRaw: 13.8,
-      correct: 20, total: 30, totalMs: 480000, domains: {}, log,
+      date, mode: 'training', note, noteRaw: note,
+      correct, total: plan.length, totalMs: 505000,
+      domains: {}, log,
     }] } };
     localStorage.setItem('quiz-maths-4-history-v1', JSON.stringify(hist));
   }, FIXED);

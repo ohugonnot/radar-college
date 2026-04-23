@@ -1,0 +1,117 @@
+// Source éditable — quiz histoire-5. Régénéré automatiquement dans index.html via build.sh.
+window.ALL_QUIZZES['histoire-5'] = {
+  SEARCH_SITES: 'site:lumni.fr OR site:francetveducation.fr OR site:fr.khanacademy.org',
+  YT_SUFFIX: 'histoire 5eme college moyen age renaissance',
+  SUMMER_TOPIC: 'Histoire médiévale et moderne',
+  SUBJECT: { id:'histoire-5', name:'Histoire', short:'Histoire', level:'Fin de 5ème', mark:'📜', tagline:'Évaluation diagnostique' },
+  DOMAINS: {
+    byzance:    { id:'byzance',    name:'Byzance et monde musulman (VIIe-XIIIe)', short:'Byz-Islam',  coef:2, color:'#065f46', icon:'☪',  search:'byzance empire byzantin islam 5eme' },
+    occident:   { id:'occident',   name:'L\'Occident féodal (seigneurs, paysans, Église)', short:'Féodal',    coef:3, color:'#78350f', icon:'🏰', search:'feodalite seigneurie moyen age 5eme' },
+    monarchie:  { id:'monarchie',  name:'L\'affirmation de l\'État monarchique en France', short:'Monarchie', coef:2, color:'#1e40af', icon:'♛',  search:'monarchie france capetiens guerre cent ans 5eme' },
+    decouvertes:{ id:'decouvertes',name:'Les Grandes Découvertes (XVe-XVIe)',    short:'Découv.',    coef:3, color:'#0369a1', icon:'⚓',  search:'grandes decouvertes colomb vasco de gama 5eme' },
+    renaissance:{ id:'renaissance',name:'Humanisme et Renaissance',              short:'Renaiss.',   coef:2, color:'#a16207', icon:'🖋',  search:'humanisme renaissance gutenberg 5eme' },
+    reformes:   { id:'reformes',   name:'Réformes protestantes et guerres de religion', short:'Réformes', coef:2, color:'#b91c1c', icon:'✠',  search:'luther calvin reforme protestante guerres religion 5eme' },
+    reperes:    { id:'reperes',    name:'Repères chronologiques',                short:'Repères',    coef:2, color:'#475569', icon:'⧗',  search:'reperes chronologiques moyen age 5eme' },
+  },
+  RESOURCES: [
+    { label:'Lumni — Histoire 5ème',        author:'France Télévisions éducation', url:'https://www.lumni.fr/college/cinquieme/histoire' },
+    { label:'France TV Éducation — Moyen Âge', author:'France TV éducation',       url:'https://www.lumni.fr/dossier/le-moyen-age' },
+    { label:'Khan Academy — Monde médiéval', author:'Cours + exercices',           url:'https://fr.khanacademy.org/humanities/world-history/medieval-times' },
+    { label:'Cours histoire 5ème vidéos',   author:'YouTube (collège)',             url:'https://www.youtube.com/results?search_query=histoire+5eme+cours' },
+  ],
+  POOL: {
+    byzance: [
+      { key:'byz-1', q:'Quelle est la capitale de l\'Empire byzantin ?', options:['Rome','Constantinople','Bagdad','Jérusalem'], correct:1, hint:'Constantinople = ancienne Byzance, fondée par l\'empereur Constantin en 330.' },
+      { key:'byz-2', q:'En quelle année Constantinople tombe-t-elle aux mains des Ottomans ?', options:['1096','1337','1453','1492'], correct:2, hint:'La prise de Constantinople par Mehmed II en 1453 marque la fin de l\'Empire byzantin.' },
+      { key:'byz-3', q:'L\'Hégire (début du calendrier musulman) correspond à la fuite de Mahomet de La Mecque vers Médine en :', options:['570','622','711','1095'], correct:1, hint:'622 = An 1 du calendrier hégirien. Mahomet fuit La Mecque et s\'installe à Médine.' },
+      { key:'byz-4', q:'Le livre sacré de l\'islam s\'appelle :', options:['La Torah','La Bible','Le Coran','Le Talmud'], correct:2, hint:'Le Coran recueille les révélations de Dieu (Allah) transmises à Mahomet.' },
+      { key:'byz-5', q:'Bagdad, grande capitale du califat abbasside, était réputée pour :', options:['Ses guerres constantes','Ses savants et sa Maison de la Sagesse','Sa pauvreté','Son isolement'], correct:1, hint:'La Maison de la Sagesse de Bagdad était un centre de traduction et de sciences au IXe siècle.' },
+      { key:'byz-6', q:'Al-Khwarizmi, savant musulman du IXe siècle, est à l\'origine :', options:['De la poudre à canon','De l\'algèbre (al-jabr)','De la boussole','De l\'imprimerie'], correct:1, hint:'Le mot "algèbre" vient du titre de son livre Al-Jabr. Son prénom latinisé a donné "algorithme".' },
+      { key:'byz-7', q:'La ville de Cordoue (Al-Andalus) était au Xe siècle :', options:['Une petite bourgade','L\'une des plus grandes villes d\'Europe, brillant foyer culturel','Conquise par les Francs','Une colonie byzantine'], correct:1, hint:'Cordoue comptait plus de 100 000 habitants et possédait bibliothèques et universités.' },
+    ],
+    occident: [
+      { key:'occ-1', q:'Dans la pyramide féodale, un vassal doit à son seigneur :', options:['Rien','Le service militaire et la fidélité en échange d\'un fief','Uniquement de l\'argent','Ses récoltes en totalité'], correct:1, hint:'Liens féodaux : le vassal rend l\'hommage et le service d\'ost (armée) ; il reçoit un fief (terre).' },
+      { key:'occ-2', q:'Les serfs au Moyen Âge étaient :', options:['Des chevaliers libres','Des paysans liés à la terre d\'un seigneur','Des moines','Des marchands'], correct:1, hint:'Les serfs (mainmortables, taillables) ne pouvaient quitter la seigneurie sans autorisation.' },
+      { key:'occ-3', q:'La cathédrale Notre-Dame de Paris a commencé à être construite en :', options:['800','987','1163','1337'], correct:2, hint:'Chantier lancé en 1163 sous Louis VII ; exemple parfait du style gothique (arcs-boutants, vitraux, ogives).' },
+      { key:'occ-4', q:'Le pape Urbain II prêche la 1re croisade en :', options:['987','1095','1163','1214'], correct:1, hint:'Au concile de Clermont (1095), Urbain II appelle les chrétiens à délivrer Jérusalem.' },
+      { key:'occ-5', q:'Jérusalem est prise par les croisés lors de la 1re croisade en :', options:['1054','1095','1099','1204'], correct:2, hint:'Les croisés prennent Jérusalem en 1099 et créent les États latins d\'Orient.' },
+      { key:'occ-6', q:'L\'ordre des Franciscains est fondé par :', options:['Dominique de Guzmán','François d\'Assise','Bernard de Clairvaux','Grégoire VII'], correct:1, hint:'François d\'Assise (début XIIIe) fonde les Frères mineurs (Franciscains), ordre mendiant voué à la pauvreté.' },
+      { key:'occ-7', q:'Le style architectural des cathédrales gothiques se caractérise par :', options:['Des murs épais et sombres','De grandes fenêtres, des arcs en ogive et des arcs-boutants','Des toits plats','Des coupoles dorées'], correct:1, hint:'Gothique = hauteur, lumière, ogives, rosaces — opposé au roman (murs massifs).' },
+    ],
+    monarchie: [
+      { key:'mon-1', q:'Hugues Capet devient roi de France en :', options:['768','843','987','1096'], correct:2, hint:'En 987, Hugues Capet est élu roi par les grands seigneurs ; il fonde la dynastie capétienne.' },
+      { key:'mon-2', q:'La bataille de Bouvines (1214) est remportée par :', options:['Richard Cœur de Lion','Philippe Auguste contre une coalition','Jean sans Peur','Louis IX'], correct:1, hint:'Philippe Auguste bat la coalition germano-anglaise à Bouvines, renforçant l\'autorité royale en France.' },
+      { key:'mon-3', q:'Louis IX (Saint Louis) est connu pour :', options:['Avoir perdu la guerre de Cent Ans','Avoir rendu la justice sous un chêne et participé aux croisades','Avoir inventé l\'imprimerie','Avoir découvert l\'Amérique'], correct:1, hint:'Saint Louis (1226-1270) symbolise le roi juste et pieux ; il part en croisade et instaure une justice royale.' },
+      { key:'mon-4', q:'La guerre de Cent Ans oppose principalement :', options:['La France et l\'Espagne','La France et l\'Angleterre (1337-1453)','La France et l\'Empire germanique','La France et le pape'], correct:1, hint:'Guerre de succession entre Valois (France) et Plantagenêts (Angleterre) : 1337-1453.' },
+      { key:'mon-5', q:'Jeanne d\'Arc lève le siège d\'Orléans en :', options:['1337','1415','1429','1453'], correct:2, hint:'En 1429, Jeanne d\'Arc fait lever le siège d\'Orléans, tournant décisif de la guerre de Cent Ans.' },
+      { key:'mon-6', q:'Philippe le Bel (1285-1314) est surtout connu pour avoir :', options:['Fondé Paris','Supprimé l\'ordre du Temple et renforcé le pouvoir royal','Perdu Bouvines','Lancé les croisades'], correct:1, hint:'Philippe le Bel démantèle l\'ordre des Templiers (1307) et affirme l\'autorité royale face au pape.' },
+    ],
+    decouvertes: [
+      { key:'dec-1', q:'Christophe Colomb arrive en Amérique en :', options:['1488','1492','1498','1519'], correct:1, hint:'12 octobre 1492 : Colomb, navigateur génois au service de l\'Espagne, aborde les Caraïbes.' },
+      { key:'dec-2', q:'Vasco de Gama atteint l\'Inde en contournant l\'Afrique en :', options:['1492','1498','1510','1522'], correct:1, hint:'1498 : Vasco de Gama ouvre la route maritime des épices vers l\'Inde via le cap de Bonne-Espérance.' },
+      { key:'dec-3', q:'La première circumnavigation (tour du monde) est réalisée par l\'expédition de :', options:['Christophe Colomb','Vasco de Gama','Magellan (1519-1522)','Bartolomeu Dias'], correct:2, hint:'Magellan part en 1519 ; tué aux Philippines, son équipage rentre en 1522 — premier tour du monde.' },
+      { key:'dec-4', q:'Hernán Cortés conquiert l\'empire aztèque (Mexique) au nom de :', options:['Portugal','France','Espagne','Angleterre'], correct:2, hint:'Cortés renverse l\'empire aztèque de Moctezuma II entre 1519 et 1521 pour la couronne espagnole.' },
+      { key:'dec-5', q:'La première traite atlantique désigne :', options:['Le commerce des épices','La déportation d\'Africains réduits en esclavage vers les Amériques','L\'échange de céréales','Le commerce de l\'or en Afrique du Nord'], correct:1, hint:'Dès le XVIe siècle, des millions d\'Africains sont déportés en esclavage vers les plantations américaines.' },
+      { key:'dec-6', q:'Francisco Pizarro conquiert l\'empire inca (Pérou) pour :', options:['Le Portugal','L\'Espagne','La France','L\'Angleterre'], correct:1, hint:'Pizarro renverse Atahualpa et l\'empire inca en 1532-1535 au profit de la couronne espagnole.' },
+      { key:'dec-7', q:'Quel cap africain Bartolomeu Dias double-t-il en 1488, ouvrant la route vers l\'Inde ?', options:['Cap Vert','Cap Horn','Cap de Bonne-Espérance','Cap Blanc'], correct:2, hint:'Le cap de Bonne-Espérance (pointe sud de l\'Afrique) est doublé par Dias en 1488, avant Vasco de Gama.' },
+    ],
+    renaissance: [
+      { key:'ren-1', q:'Gutenberg met au point l\'imprimerie à caractères mobiles vers :', options:['1350','1450','1517','1550'], correct:1, hint:'Vers 1450 à Mayence, Gutenberg invente la presse à imprimer ; la Bible de Gutenberg date de ~1455.' },
+      { key:'ren-2', q:'L\'humanisme est un courant intellectuel qui :', options:['Rejette l\'homme au profit de Dieu','Place l\'homme au centre de la réflexion et valorise l\'Antiquité gréco-romaine','Interdit les arts','Prône le retour au Moyen Âge'], correct:1, hint:'Les humanistes (Érasme, More, Montaigne) redécouvrent l\'Antiquité et croient au progrès par l\'éducation.' },
+      { key:'ren-3', q:'Léonard de Vinci est connu comme :', options:['Un explorateur espagnol','Un peintre, sculpteur et inventeur de la Renaissance italienne','Un roi de France','Un réformateur religieux'], correct:1, hint:'Léonard (1452-1519) peint La Joconde, dessine des machines, incarne l\'idéal humaniste de l\'homme universel.' },
+      { key:'ren-4', q:'La Renaissance naît d\'abord en :', options:['France','Espagne','Angleterre','Italie (Florence, Rome)'], correct:3, hint:'Florence, sous les Médicis, est le berceau de la Renaissance (XVe s.) avant que le mouvement se diffuse en Europe.' },
+      { key:'ren-5', q:'François Ier fait construire quel château de la Loire pour y installer la cour ?', options:['Versailles','Vincennes','Chambord','Fontainebleau'], correct:2, hint:'Chambord (1519) est le plus grand château de la Loire, commandé par François Ier, chef-d\'œuvre Renaissance.' },
+      { key:'ren-6', q:'Nicolas Copernic affirme que :', options:['La Terre est plate','La Terre tourne autour du Soleil (héliocentrisme)','Le Soleil tourne autour de la Terre','La Lune est habitée'], correct:1, hint:'Copernic (1543) renverse le géocentrisme de l\'Église : la Terre tourne autour du Soleil.' },
+    ],
+    reformes: [
+      { key:'ref-1', q:'En quelle année Martin Luther affiche ses 95 thèses à Wittenberg ?', options:['1492','1498','1517','1562'], correct:2, hint:'Le 31 octobre 1517, Luther cloue ses 95 thèses contre les indulgences — acte fondateur de la Réforme protestante.' },
+      { key:'ref-2', q:'Jean Calvin installe sa réforme dans quelle ville ?', options:['Rome','Paris','Wittenberg','Genève'], correct:3, hint:'Calvin s\'installe à Genève (1541) et y établit une théocratie calviniste, modèle pour d\'autres protestants.' },
+      { key:'ref-3', q:'Le massacre de la Saint-Barthélemy (1572) est :', options:['Une bataille navale','Le massacre de milliers de protestants (huguenots) en France','La prise de Jérusalem','Un tremblement de terre'], correct:1, hint:'La nuit du 23-24 août 1572, des milliers de protestants sont massacrés à Paris sur ordre de Catherine de Médicis.' },
+      { key:'ref-4', q:'L\'édit de Nantes (1598) est signé par :', options:['Charles IX','Henri III','Henri IV','Louis XIII'], correct:2, hint:'Henri IV (ancien protestant converti) signe l\'édit de Nantes en 1598 : il accorde la liberté de culte aux protestants.' },
+      { key:'ref-5', q:'Que reproche Luther à l\'Église catholique en 1517 ?', options:['De construire trop de cathédrales','De vendre des indulgences (pardon des péchés contre argent)','D\'organiser des croisades','De soutenir les rois'], correct:1, hint:'Les indulgences permettaient d\'acheter l\'absolution des péchés — Luther y voit une corruption de la foi chrétienne.' },
+      { key:'ref-6', q:'Les guerres de religion en France durent de :', options:['1095 à 1204','1337 à 1453','1562 à 1598','1618 à 1648'], correct:2, hint:'8 guerres de religion entre catholiques et protestants (huguenots) se succèdent de 1562 à la paix de 1598.' },
+    ],
+    reperes: [
+      { key:'rep-1', q:'Le XVe siècle correspond aux années :', options:['1300-1399','1400-1499','1500-1599','1600-1699'], correct:1, hint:'XVe siècle = années 1400-1499. Mémo : numéro du siècle = centaines + 1 → XVe commence en 1400.' },
+      { key:'rep-2', q:'En quelle année Hugues Capet devient-il roi de France ?', options:['768','843','987','1096'], correct:2, hint:'987 : Hugues Capet est élu roi, fondant la dynastie capétienne qui durera jusqu\'en 1328.' },
+      { key:'rep-3', q:'Qu\'est-ce que la féodalité ?', options:['Un régime de démocratie directe','Un système basé sur les liens de vassalité et le fief entre seigneurs','Une religion','Un type de commerce'], correct:1, hint:'Féodalité = réseau de liens personnels (hommage, fief) entre seigneurs de niveaux différents.' },
+      { key:'rep-4', q:'Une croisade est :', options:['Un pèlerinage pacifique','Une expédition militaire chrétienne pour défendre ou reprendre des lieux saints','Un concile religieux','Une révolte paysanne'], correct:1, hint:'Les croisades (1096-1291) sont des guerres saintes pour reprendre Jérusalem aux musulmans.' },
+      { key:'rep-5', q:'La seigneurie au Moyen Âge est :', options:['Une ville marchande','Un domaine où le seigneur exerce autorité sur les paysans (serfs et vilains)','Un monastère','Une cathédrale'], correct:1, hint:'La seigneurie = domaine + pouvoir banal (justice, taxes, moulin, four). Les paysans lui doivent redevances.' },
+      { key:'rep-6', q:'L\'humanisme, c\'est :', options:['La croyance que l\'homme est mauvais par nature','Un courant valorisant l\'homme, la raison et les lettres antiques','Un ordre religieux du Moyen Âge','Une technique agricole'], correct:1, hint:'Les humanistes (XVe-XVIe s.) croient en la valeur de l\'homme, redécouvrent le grec et le latin, défendent l\'éducation.' },
+      { key:'rep-7', q:'La Réforme protestante désigne :', options:['La réforme agricole du XVIIe siècle','Le mouvement religieux qui au XVIe s. conteste l\'autorité du pape et fonde de nouvelles Églises chrétiennes','La réforme de l\'armée royale','La restructuration des universités'], correct:1, hint:'Réforme = rupture avec Rome : Luther (luthéranisme), Calvin (calvinisme), Henri VIII (anglicanisme).' },
+    ],
+  },
+  PICK: {
+    byzance: 4, occident: 5, monarchie: 4, decouvertes: 5, renaissance: 4, reformes: 4, reperes: 4,
+  },
+  PLANS: {
+    byzance: {
+      'non-acquis': ['Apprendre les dates clés : Hégire 622, chute de Constantinople 1453', 'Distinguer les deux grandes civilisations : Empire byzantin (chrétien) et Islam (Mahomet, Coran)', 'Retenir les grandes villes : Constantinople, Bagdad, Cordoue et leur rôle culturel'],
+      'fragile':    ['Mémoriser les apports scientifiques arabes : algèbre (Al-Khwarizmi), astronomie, médecine (Avicenne)'],
+    },
+    occident: {
+      'non-acquis': ['Schéma de la pyramide féodale : roi → grands seigneurs → chevaliers → paysans', 'Retenir les conditions de vie des serfs (liés à la terre, redevances, droit de ban)', 'Connaître les grandes étapes des croisades (1095 Urbain II, prise de Jérusalem 1099)'],
+      'fragile':    ['Distinguer roman et gothique en architecture ; connaître Notre-Dame de Paris (1163)'],
+    },
+    monarchie: {
+      'non-acquis': ['Frise chronologique : Hugues Capet 987 → Bouvines 1214 → Jeanne d\'Arc 1429 → fin guerre 1453', 'Comprendre comment les rois capétiens renforcent leur pouvoir face aux seigneurs', 'Rôle de Jeanne d\'Arc dans la guerre de Cent Ans'],
+      'fragile':    ['Philippe le Bel et la suppression des Templiers ; tensions roi/pape'],
+    },
+    decouvertes: {
+      'non-acquis': ['Frise : Colomb 1492, Vasco de Gama 1498, Magellan 1519-1522', 'Distinguer les zones de conquête : Espagne (Amériques) / Portugal (Afrique, Inde)', 'Conséquences : choc des cultures, traite atlantique, afflux d\'or en Europe'],
+      'fragile':    ['Noms des conquérants et des peuples vaincus : Cortés/Aztèques, Pizarro/Incas'],
+    },
+    renaissance: {
+      'non-acquis': ['Retenir les idées clés de l\'humanisme : valeur de l\'homme, éducation, retour à l\'Antiquité', 'Gutenberg et l\'imprimerie (~1450) : révolution de la diffusion des idées', 'Artistes italiens : Léonard de Vinci, Michel-Ange, Raphaël'],
+      'fragile':    ['Copernic et l\'héliocentrisme ; François Ier et la Renaissance en France (Chambord)'],
+    },
+    reformes: {
+      'non-acquis': ['Luther 1517 (95 thèses, Wittenberg), Calvin (Genève) — causes de la rupture avec Rome', 'Guerres de religion en France 1562-1598 ; massacre de la Saint-Barthélemy 1572', 'Édit de Nantes 1598 : Henri IV accorde la tolérance religieuse'],
+      'fragile':    ['Distinguer luthéranisme, calvinisme, anglicanisme ; notion d\'indulgence'],
+    },
+    reperes: {
+      'non-acquis': ['Calculer le siècle depuis une année (ex. 1453 → XVe s.)', 'Vocabulaire essentiel : féodalité, vassal, serf, seigneurie, croisade, humanisme, réforme', 'Placer sur une frise les 7 dates : 987, 1095, 1214, 1337-1453, 1429, 1492, 1517, 1598'],
+      'fragile':    ['Distinguer Moyen Âge (Ve-XVe s.) et Renaissance/époque moderne (XVIe s.)'],
+    },
+  },
+};

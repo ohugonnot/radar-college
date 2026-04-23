@@ -1,0 +1,116 @@
+// Source éditable — quiz histoire-4. Régénéré automatiquement dans index.html via build.sh.
+window.ALL_QUIZZES['histoire-4'] = {
+  SEARCH_SITES: 'site:lumni.fr OR site:francetveducation.fr OR site:curiosphere.tv OR site:ina.fr',
+  YT_SUFFIX: 'histoire 4eme college',
+  SUMMER_TOPIC: 'Histoire',
+  SUBJECT: { id:'histoire-4', name:'Histoire', short:'Histoire', level:'Fin de 4ème', mark:'📜', tagline:'Évaluation diagnostique' },
+  DOMAINS: {
+    lumieres:    { id:'lumieres',    name:'Le XVIIIe, Lumières et traite négrière',       short:'Lumières',     coef:3, color:'#a16207', icon:'💡', search:'lumieres philosophes XVIIIe siecle 4eme' },
+    revolution:  { id:'revolution',  name:'La Révolution française (1789-1799)',           short:'Révolution',   coef:4, color:'#b91c1c', icon:'⚑',  search:'revolution francaise 1789 4eme' },
+    empire:      { id:'empire',      name:'Napoléon et l\'Empire (1799-1815)',             short:'Empire',       coef:3, color:'#1e3a8a', icon:'👑', search:'napoleon empire consulat 4eme' },
+    industrielle:{ id:'industrielle',name:'Révolution industrielle et sociétés au XIXe',  short:'Industrielle', coef:3, color:'#4b5563', icon:'⚙',  search:'revolution industrielle XIXe siecle 4eme' },
+    colonial:    { id:'colonial',    name:'Conquêtes et empires coloniaux au XIXe',        short:'Colonial',     coef:2, color:'#78350f', icon:'🗺', search:'colonisation XIXe siecle 4eme' },
+    republique:  { id:'republique',  name:'La IIIe République (1870-1914)',                short:'IIIe Rép.',    coef:3, color:'#0f5e6b', icon:'🇫🇷', search:'troisieme republique lois ferry 4eme' },
+    reperes:     { id:'reperes',     name:'Repères chronologiques',                        short:'Repères',      coef:2, color:'#475569', icon:'⧗', search:'reperes chronologiques XVIIIe XIXe siecle 4eme' },
+  },
+  RESOURCES: [
+    { label:'Lumni — Histoire 4ème',        author:'France TV éducation',  url:'https://www.lumni.fr/college/quatrieme/histoire' },
+    { label:'France TV Éducation — Révol.', author:'Vidéos pédagogiques',  url:'https://www.francetveducation.fr/4eme/histoire/' },
+    { label:'Curiosphère — XIXe siècle',    author:'Arte / Curiosphère',   url:'https://www.curiosphere.tv/histoire' },
+    { label:'INA — Archives histoire',      author:'Institut National Audiovisuel', url:'https://www.ina.fr/education' },
+  ],
+  POOL: {
+    lumieres: [
+      { key:'lum-1', q:'Quel philosophe des Lumières est l\'auteur du Contrat social (1762) ?', options:['Voltaire','Rousseau','Diderot','Montesquieu'], correct:1, hint:'Jean-Jacques Rousseau : le peuple est souverain, les lois doivent respecter la volonté générale.' },
+      { key:'lum-2', q:'Qui a théorisé la séparation des pouvoirs (législatif, exécutif, judiciaire) dans De l\'Esprit des lois (1748) ?', options:['Rousseau','Voltaire','Montesquieu','d\'Alembert'], correct:2, hint:'Montesquieu propose de séparer les trois pouvoirs pour éviter la tyrannie.' },
+      { key:'lum-3', q:'L\'Encyclopédie (1751-1772) est dirigée par :', options:['Voltaire et Rousseau','Diderot et d\'Alembert','Montesquieu et Voltaire','Locke et Kant'], correct:1, hint:'Diderot (directeur) et d\'Alembert (co-directeur) rassemblent tous les savoirs des Lumières.' },
+      { key:'lum-4', q:'Le commerce triangulaire désigne :', options:['Un commerce entre trois villes françaises','Le trafic entre Europe, Afrique et Amériques (esclaves, marchandises)','Un traité entre trois rois','Un échange de livres entre philosophes'], correct:1, hint:'Triangle : Europe (textiles, armes) → Afrique (esclaves) → Amériques (sucre, coton) → Europe.' },
+      { key:'lum-5', q:'La Convention abolit l\'esclavage en :', options:['1685','1789','1794','1848'], correct:2, hint:'4 février 1794 (16 pluviôse an II) : première abolition, annulée par Napoléon en 1802.' },
+      { key:'lum-6', q:'Le Code noir (1685) est un texte qui :', options:['Interdit la traite négrière','Réglemente l\'esclavage dans les colonies françaises','Libère les esclaves','Crée l\'Encyclopédie'], correct:1, hint:'Édit de Louis XIV : statut juridique des esclaves, obligations des maîtres, droit d\'achat.' },
+      { key:'lum-7', q:'Voltaire est surtout connu pour :', options:['Écrire le Contrat social','Critiquer l\'intolérance et le fanatisme (Candide, Traité sur la tolérance)','Diriger l\'Encyclopédie','Séparer les pouvoirs'], correct:1, hint:'Voltaire : défenseur de la liberté de penser, ennemi du fanatisme religieux.' },
+    ],
+    revolution: [
+      { key:'rev-1', q:'Les États généraux sont convoqués en :', options:['1787','1788','1789','1792'], correct:2, hint:'Mai 1789 : Louis XVI convoque les États généraux à Versailles pour résoudre la crise financière.' },
+      { key:'rev-2', q:'Le serment du Jeu de Paume a lieu :', options:['14 juillet 1789','20 juin 1789','4 août 1789','26 août 1789'], correct:1, hint:'20 juin 1789 : les députés du Tiers État jurent de ne pas se séparer avant d\'avoir donné une Constitution.' },
+      { key:'rev-3', q:'La prise de la Bastille a lieu le :', options:['4 août 1789','20 juin 1789','26 août 1789','14 juillet 1789'], correct:3, hint:'14 juillet 1789 : le peuple parisien prend la Bastille — symbole du despotisme royal.' },
+      { key:'rev-4', q:'La nuit du 4 août 1789 voit :', options:['La prise de la Bastille','L\'abolition des privilèges féodaux','L\'adoption de la DDHC','La fuite du roi'], correct:1, hint:'Les nobles renoncent volontairement à leurs privilèges seigneuriaux — fin de la féodalité.' },
+      { key:'rev-5', q:'La Déclaration des droits de l\'homme et du citoyen (DDHC) est adoptée le :', options:['14 juillet 1789','20 juin 1789','26 août 1789','4 août 1789'], correct:2, hint:'26 août 1789 : liberté, égalité, propriété, résistance à l\'oppression, souveraineté de la Nation.' },
+      { key:'rev-6', q:'La Première République française est proclamée en :', options:['1789','1790','1791','1792'], correct:3, hint:'Septembre 1792 : la Convention abolit la monarchie et proclame la République.' },
+      { key:'rev-7', q:'Robespierre est associé à quelle période de la Révolution ?', options:['La Constituante (1789-1791)','Le Directoire (1795-1799)','La Terreur (1793-1794)','Le Consulat (1799-1804)'], correct:2, hint:'Comité de Salut public, loi des suspects, guillotine : Robespierre dirige la Terreur jusqu\'au 9 Thermidor (juillet 1794).' },
+      { key:'rev-8', q:'La fuite à Varennes (juin 1791) :', options:['Est un succès pour Louis XVI','Discrédite le roi qui est arrêté et ramené à Paris','Déclenche la Révolution','Déclenche la Terreur'], correct:1, hint:'Le roi tente de fuir en Autriche, reconnu à Varennes. Son image est définitivement brisée.' },
+    ],
+    empire: [
+      { key:'emp-1', q:'Le coup d\'État du 18 Brumaire an VIII (9 novembre 1799) installe :', options:['Le Directoire','Robespierre au pouvoir','Bonaparte comme Premier Consul','La IIIe République'], correct:2, hint:'Bonaparte renverse le Directoire par un coup de force. Il devient Premier Consul : c\'est le Consulat.' },
+      { key:'emp-2', q:'Napoléon Bonaparte se fait sacrer Empereur le :', options:['18 Brumaire 1799','2 décembre 1804','2 décembre 1805','18 juin 1815'], correct:1, hint:'2 décembre 1804 à Notre-Dame de Paris : il se couronne lui-même Napoléon Ier devant le pape Pie VII.' },
+      { key:'emp-3', q:'Le Code civil (1804) :', options:['Abolit l\'esclavage','Unifie le droit français (propriété, famille, contrats) sur tout le territoire','Interdit les syndicats','Crée les lycées'], correct:1, hint:'Code Napoléon : base du droit civil français encore en vigueur. Uniformise les lois héritées de la Révolution.' },
+      { key:'emp-4', q:'La bataille d\'Austerlitz (2 décembre 1805) oppose Napoléon à :', options:['L\'Angleterre seule','La Prusse','L\'Autriche et la Russie','L\'Espagne'], correct:2, hint:'Victoire éclatante contre l\'Autriche et la Russie (Alexandre Ier + François II). "La plus belle de mes batailles."' },
+      { key:'emp-5', q:'La campagne de Russie (1812) se solde par :', options:['Une victoire décisive de Napoléon','Une retraite désastreuse et la perte de la Grande Armée','Un traité de paix avantageux','La prise de Moscou définitive'], correct:1, hint:'L\'armée brûle Moscou mais doit battre en retraite sous le froid. 400 000 morts environ.' },
+      { key:'emp-6', q:'Napoléon est définitivement vaincu à :', options:['Leipzig (1813)','Waterloo (18 juin 1815)','Austerlitz (1805)','Borodino (1812)'], correct:1, hint:'Waterloo (Belgique) : défaite face aux Anglo-Prussiens. Napoléon abdique et est exilé à Sainte-Hélène.' },
+      { key:'emp-7', q:'Napoléon rétablit l\'esclavage en :', options:['1800','1801','1802','1804'], correct:2, hint:'Loi du 20 mai 1802 : il rétablit l\'esclavage aboli en 1794, sous pression des colons antillais.' },
+    ],
+    industrielle: [
+      { key:'ind-1', q:'La machine à vapeur (perfectionnée par James Watt vers 1769) est utilisée pour :', options:['Faire du pain','Entraîner des machines dans les usines et les locomotives','Pomper l\'eau des champs','Imprimer des journaux uniquement'], correct:1, hint:'La vapeur remplace la force animale et humaine : elle lance la mécanisation des industries.' },
+      { key:'ind-2', q:'La classe ouvrière qui travaille dans les usines au XIXe siècle est appelée :', options:['La bourgeoisie','Le prolétariat','L\'aristocratie','Le clergé'], correct:1, hint:'Prolétaires : n\'ont que leur force de travail à vendre. Conditions souvent précaires (enfants, longues heures).' },
+      { key:'ind-3', q:'Karl Marx et Friedrich Engels publient le Manifeste du Parti communiste en :', options:['1830','1848','1871','1889'], correct:1, hint:'1848 : "Un spectre hante l\'Europe, le spectre du communisme." Appel à la lutte des classes.' },
+      { key:'ind-4', q:'Émile Zola décrit la condition ouvrière dans les mines dans :', options:['Germinal','Les Misérables','Notre-Dame de Paris','Madame Bovary'], correct:0, hint:'Germinal (1885) : la mine, la grève, la misère ouvrière dans le Nord de la France.' },
+      { key:'ind-5', q:'Le chemin de fer se développe surtout à partir de :', options:['1780','1800','1830','1870'], correct:2, hint:'Premières lignes françaises dans les années 1830 (Paris-Saint-Germain 1837). Essor massif dans la 2e moitié du XIXe.' },
+      { key:'ind-6', q:'L\'exode rural au XIXe siècle désigne :', options:['Le départ des citadins à la campagne','La migration des paysans vers les villes industrielles','L\'émigration vers les colonies','Le déplacement des usines à la campagne'], correct:1, hint:'Les campagnes se dépeuplent au profit des grandes villes industrielles (Lyon, Lille, Paris, Saint-Étienne).' },
+      { key:'ind-7', q:'Le droit de grève est accordé aux ouvriers français en :', options:['1830','1848','1864','1884'], correct:2, hint:'Loi Ollivier de 1864 sous Napoléon III : la grève n\'est plus un délit. Les syndicats sont légalisés en 1884.' },
+    ],
+    colonial: [
+      { key:'col-1', q:'La France prend Alger en :', options:['1815','1830','1848','1870'], correct:1, hint:'Prise d\'Alger le 5 juillet 1830 : début de la conquête de l\'Algérie sous Charles X.' },
+      { key:'col-2', q:'La conférence de Berlin (1884-1885) sert à :', options:['Signer la paix après Waterloo','Organiser le partage de l\'Afrique entre puissances européennes','Abolir l\'esclavage','Créer la Croix-Rouge'], correct:1, hint:'"Scramble for Africa" : 14 puissances découpent l\'Afrique sans consulter les Africains.' },
+      { key:'col-3', q:'Jules Ferry justifie la colonisation par :', options:['La mission civilisatrice et la puissance économique','La recherche d\'or uniquement','L\'accord des peuples colonisés','La pression des États-Unis'], correct:0, hint:'Ferry (1885) : "les races supérieures ont le devoir de civiliser les races inférieures" — idéologie coloniale.' },
+      { key:'col-4', q:'Victor Schoelcher fait abolir l\'esclavage pour la deuxième fois en :', options:['1830','1848','1871','1905'], correct:1, hint:'27 avril 1848 : abolition définitive dans les colonies françaises, signée par le gouvernement provisoire.' },
+      { key:'col-5', q:'L\'Indochine française (Vietnam, Cambodge, Laos) est constituée sous :', options:['Napoléon Ier','Louis-Philippe','Jules Ferry (gouvernement de la IIIe République)','Napoléon III uniquement'], correct:2, hint:'Conquête progressive (1858-1893) sous la IIIe République. Jules Ferry est le principal promoteur.' },
+    ],
+    republique: [
+      { key:'rep-1', q:'La défaite de Sedan (2 septembre 1870) entraîne :', options:['La victoire de la France contre la Prusse','La chute de Napoléon III et la proclamation de la IIIe République le 4 septembre','La signature du Code civil','La révolution de 1848'], correct:1, hint:'Napoléon III capitule à Sedan. Deux jours plus tard, la République est proclamée à Paris.' },
+      { key:'rep-2', q:'La Commune de Paris (mars-mai 1871) est :', options:['Un gouvernement révolutionnaire ouvrier écrasé par l\'armée versaillaise','Un long règne pacifique','Une alliance franco-allemande','Le premier syndicat français'], correct:0, hint:'72 jours de gouvernement insurrectionnel à Paris. La "Semaine sanglante" (mai 1871) : 10 000-30 000 morts.' },
+      { key:'rep-3', q:'Les lois Ferry (1881-1882) instaurent une école :', options:['Privée et payante','Laïque, gratuite et obligatoire','Réservée aux garçons','Gérée par l\'Église'], correct:2, hint:'Jules Ferry : école publique gratuite (1881), obligatoire et laïque (1882). Instituteur = "hussard noir de la République".' },
+      { key:'rep-4', q:'L\'affaire Dreyfus (1894-1906) divise la France entre :', options:['Républicains et monarchistes','Dreyfusards (défenseurs de l\'innocence) et antidreyfusards','Catholiques et protestants','Ouvriers et patrons'], correct:1, hint:'Capitaine Dreyfus, juif, condamné à tort pour espionnage. Zola publie "J\'Accuse" (1898). Réhabilité en 1906.' },
+      { key:'rep-5', q:'La loi de séparation des Églises et de l\'État est votée en :', options:['1881','1894','1905','1914'], correct:2, hint:'9 décembre 1905 : la France est laïque. L\'État ne reconnaît ni ne salarie aucun culte.' },
+      { key:'rep-6', q:'Sous la IIIe République, le suffrage universel (masculin) est :', options:['Supprimé','Restreint aux propriétaires','Maintenu et consolidé','Étendu aux femmes'], correct:2, hint:'Le suffrage universel masculin, acquis en 1848, est maintenu. Les femmes voteront en 1944.' },
+    ],
+    reperes: [
+      { key:'chr-1', q:'En quelle année commence la Révolution française ?', options:['1776','1785','1789','1799'], correct:2, hint:'1789 : États généraux, Bastille, DDHC. Date fondatrice de l\'histoire contemporaine française.' },
+      { key:'chr-2', q:'Le Premier Empire prend fin en :', options:['1812','1813','1814','1815'], correct:3, hint:'Waterloo (18 juin 1815) → abdication définitive de Napoléon. Les Cent-Jours se terminent en juin 1815.' },
+      { key:'chr-3', q:'Quel événement a lieu en 1848 en France ?', options:['Proclamation de la IIIe République','Révolution (chute de Louis-Philippe) et IIe République','Abolition des privilèges','Prise de la Bastille'], correct:1, hint:'Février 1848 : révolution, abdication de Louis-Philippe, IIe République, suffrage universel masculin, abolition esclavage.' },
+      { key:'chr-4', q:'Lequel de ces événements est le plus ancien ?', options:['Conférence de Berlin (1885)','Lois Ferry (1881)','Commune de Paris (1871)','Séparation Église/État (1905)'], correct:2, hint:'Ordre : Commune 1871 → Lois Ferry 1881 → Berlin 1885 → Séparation 1905.' },
+      { key:'chr-5', q:'La "monarchie constitutionnelle" désigne :', options:['Un régime sans roi','Un régime où le roi gouverne sans limites','Un régime où le pouvoir du roi est limité par une Constitution','Une monarchie élective'], correct:2, hint:'Après 1791 : Louis XVI règne mais la Constitution limite ses pouvoirs. ≠ absolutisme, ≠ république.' },
+    ],
+  },
+  PICK: {
+    lumieres: 4, revolution: 6, empire: 4, industrielle: 5, colonial: 3, republique: 5, reperes: 3,
+  },
+  PLANS: {
+    lumieres: {
+      'non-acquis': ['Apprendre les 4 grands philosophes et leur œuvre principale (Montesquieu, Rousseau, Voltaire, Diderot)', 'Comprendre le commerce triangulaire et ses acteurs (Europe, Afrique, Amériques)', 'Distinguer les deux abolitions de l\'esclavage (1794 et 1848) et leurs auteurs'],
+      'fragile':    ['Relier les idées des Lumières aux événements de la Révolution française'],
+    },
+    revolution: {
+      'non-acquis': ['Mémoriser les dates clés (États généraux mai, Jeu de Paume 20 juin, Bastille 14 juillet, Nuit du 4 août, DDHC 26 août)', 'Comprendre l\'enchaînement Monarchie constitutionnelle → République → Terreur → Thermidor', 'Expliquer le rôle de la DDHC et ses grands principes'],
+      'fragile':    ['Distinguer les différentes phases et assemblées (Constituante, Convention, Directoire)'],
+    },
+    empire: {
+      'non-acquis': ['Retenir le fil chronologique : 18 Brumaire 1799 → Sacre 1804 → Austerlitz 1805 → Russie 1812 → Waterloo 1815', 'Savoir ce qu\'est le Code civil et son importance encore aujourd\'hui', 'Comprendre pourquoi l\'Empire s\'effondre (guerres permanentes, Russie, coalitions)'],
+      'fragile':    ['Connaître les réformes intérieures du Consulat (lycées, Banque de France, préfets, Code civil)'],
+    },
+    industrielle: {
+      'non-acquis': ['Expliquer ce que change la machine à vapeur pour la production et les transports', 'Définir bourgeoisie, prolétariat, conditions ouvrières au XIXe siècle', 'Situer Marx (Manifeste 1848) et Zola (Germinal) dans ce contexte'],
+      'fragile':    ['Distinguer socialisme utopique et marxisme, connaître la 1ère Internationale'],
+    },
+    colonial: {
+      'non-acquis': ['Retenir 1830 (Alger), 1848 (abolition Schoelcher), 1885 (conférence de Berlin)', 'Expliquer ce qu\'est la "mission civilisatrice" et pourquoi c\'est une justification idéologique', 'Identifier les principales régions colonisées par la France (Algérie, Indochine, Afrique sub-saharienne)'],
+      'fragile':    ['Mettre en lien colonisation et révolution industrielle (matières premières, marchés)'],
+    },
+    republique: {
+      'non-acquis': ['Connaître 1870 (Sedan → IIIe République), 1871 (Commune), 1881-82 (lois Ferry), 1905 (séparation)', 'Expliquer les lois Ferry et ce qu\'elles changent pour les enfants français', 'Raconter l\'affaire Dreyfus et ce qu\'elle révèle sur les tensions de l\'époque'],
+      'fragile':    ['Analyser la laïcité de 1905 comme aboutissement des combats républicains depuis 1789'],
+    },
+    reperes: {
+      'non-acquis': ['Placer sur une frise : 1789, 1799, 1804, 1815, 1830, 1848, 1870, 1885, 1905', 'Savoir associer chaque date à son événement sans hésitation', 'Distinguer les régimes : monarchie absolue, monarchie constitutionnelle, République, Empire'],
+      'fragile':    ['Retrouver le siècle d\'un événement (XVIIIe = 1700-1799, XIXe = 1800-1899)'],
+    },
+  },
+};

@@ -1,15 +1,15 @@
 # CLAUDE.md
 
-Plateforme d'évaluations diagnostiques collège (6ème → 3ème × maths/physique-chimie/SVT = 12 quiz). Usage perso/familial. Wizard UX mobile-first, gamification, PWA installable, persistance bicouche. **SPA mono-HTML** : un seul `index.html` déployé, tout le reste inliné par `build.sh`.
+Plateforme d'évaluations diagnostiques collège (6ème → 3ème × maths/physique-chimie/SVT/histoire = 16 quiz). Usage perso/familial. Wizard UX mobile-first, gamification, PWA installable, persistance bicouche. **SPA mono-HTML** : un seul `index.html` déployé, tout le reste inliné par `build.sh`.
 
 ## Structure
 
 ```
 /
-├── index.html                     SPA entry point (wizard + dashboard + router + 12 quizzes inlinés)
+├── index.html                     SPA entry point (wizard + dashboard + router + 16 quizzes inlinés)
 ├── app.css                        Styles partagés — source maître inlinée
 ├── app.jsx                        Logique React (wrappée en IIFE) — source maître inlinée
-├── build.sh                       Régénère index.html : inline CSS + JSX + 12 quizzes + bump CACHE_NAME
+├── build.sh                       Régénère index.html : inline CSS + JSX + 16 quizzes + bump CACHE_NAME
 ├── quizzes/                       12 fichiers JSX source : un par quiz (maths-{3,4,5,6}.jsx, etc.)
 ├── validate.js                    Vérifie intégrité des 12 pools (lit quizzes/*.jsx)
 ├── test.spec.js                   Tests Playwright (~47 scénarios)
@@ -130,7 +130,7 @@ Landing et chaque quiz ont : title spécifique, meta description, Open Graph com
 - Clé de question (`key`) stable — base du tracker d'erreurs et du log.
 - **`validate.js` détecte** : clés dupliquées, somme PICK ≠ 30, correct hors [0-3], doublons numériques dans les options (avec détection fractions).
 - Français uniquement.
-- Périmètre maths/physique/SVT — pas d'autres matières (QCM inadapté).
+- Périmètre maths/physique/SVT/histoire. Histoire = angle "faits & repères" (dates, personnages, chronologie, vocabulaire) — QCM **adapté** pour l'ancrage mémoire. Pas d'analyse de doc ni causalité ouverte (mal servies par le QCM).
 
 ## Pools — tailles actuelles
 
@@ -151,7 +151,7 @@ Tous les quiz ont entre 30 et 59 questions, ≥ 3 par domaine. Pour chaque passa
 
 ```bash
 ./validate.js                              # intégrité des pools
-./build.sh                                 # rebuild les 12 quiz
+./build.sh                                 # rebuild les 16 quiz
 # Playwright (après npm install local) :
 npx playwright test test.spec.js           # ~25 tests E2E
 ```

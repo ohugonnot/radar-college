@@ -6,16 +6,16 @@
 <meta name="theme-color" content="#faf5eb">
 
 <!-- SEO -->
-<title>Quiz Collège — Maths, Physique-Chimie, SVT (6ème, 5ème, 4ème, 3ème)</title>
-<meta name="description" content="12 quiz diagnostiques gratuits pour collégiens : mathématiques, physique-chimie, SVT, de la 6ème au brevet. Note sur 20, rapport détaillé par chapitre et plan de révision personnalisé.">
-<meta name="keywords" content="quiz collège, maths, physique chimie, SVT, 6ème, 5ème, 4ème, 3ème, brevet, révisions, évaluation diagnostique, programme officiel">
+<title>Quiz Collège — Maths, Physique-Chimie, SVT, Histoire (6ème, 5ème, 4ème, 3ème)</title>
+<meta name="description" content="16 quiz diagnostiques gratuits pour collégiens : mathématiques, physique-chimie, SVT, histoire, de la 6ème au brevet. Note sur 20, rapport détaillé par chapitre et plan de révision personnalisé.">
+<meta name="keywords" content="quiz collège, maths, physique chimie, SVT, histoire, 6ème, 5ème, 4ème, 3ème, brevet, révisions, évaluation diagnostique, programme officiel">
 <meta name="author" content="Quiz Collège">
 <link rel="canonical" href="./">
 
 <!-- Open Graph -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="Quiz Collège — Évaluations diagnostiques">
-<meta property="og:description" content="12 quiz gratuits pour faire le point en maths, physique-chimie et SVT, de la 6ème à la 3ème. 30 questions, rapport détaillé, plan de révision.">
+<meta property="og:description" content="16 quiz gratuits pour faire le point en maths, physique-chimie, SVT et histoire, de la 6ème à la 3ème. 30 questions, rapport détaillé, plan de révision.">
 <meta property="og:image" content="./icon.svg">
 <meta property="og:locale" content="fr_FR">
 
@@ -26,7 +26,7 @@
   "@type": "EducationalApplication",
   "name": "Quiz Collège",
   "applicationCategory": "EducationalApplication",
-  "description": "12 quiz diagnostiques pour collégiens en maths, physique-chimie et SVT (6ème à 3ème). Programme officiel Éducation Nationale.",
+  "description": "16 quiz diagnostiques pour collégiens en maths, physique-chimie, SVT et histoire (6ème à 3ème). Programme officiel Éducation Nationale.",
   "inLanguage": "fr",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
   "educationalLevel": "Secondary school",
@@ -97,6 +97,7 @@
   .choice.maths .choice-icon    { background: #b8323d; }
   .choice.physique .choice-icon { background: #0f5e6b; }
   .choice.svt .choice-icon      { background: #166a39; }
+  .choice.histoire .choice-icon { background: #78350f; }
   .choice-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
   .choice-title { font-family: 'Fraunces', serif; font-weight: 700; font-size: 18px; color: var(--ink); line-height: 1.2; }
   .choice-sub { font-family: 'Figtree', sans-serif; font-size: 13px; color: var(--muted); line-height: 1.35; }
@@ -699,6 +700,7 @@ const SUBJECTS = [
   { key: 'maths',    mark: '∑',  title: 'Mathématiques',   short: 'Maths',           color: '#b8323d' },
   { key: 'physique', mark: '⚛',  title: 'Physique-Chimie', short: 'Physique-Chimie', color: '#0f5e6b' },
   { key: 'svt',      mark: '🌿', title: 'SVT',             short: 'SVT',             color: '#166a39' },
+  { key: 'histoire', mark: '📜', title: 'Histoire',        short: 'Histoire',        color: '#78350f' },
 ];
 const SUBJECT_META = Object.fromEntries(SUBJECTS.map(s => [s.key, { n: s.short, m: s.mark, c: s.color }]));
 
@@ -749,7 +751,7 @@ const ALL_BADGES = [
   { id:'streak5',  emoji:'⚡', title:'En feu',          desc:'5 jours de suite',                  test: a => computeStreakDays(a) >= 5 },
   { id:'five',     emoji:'📚', title:'Assidu',          desc:'5 tests au total',                  test: a => a.length >= 5 },
   { id:'ten',      emoji:'🌟', title:'Expert',          desc:'10 tests au total',                 test: a => a.length >= 10 },
-  { id:'triple',   emoji:'🎨', title:'Polyvalent',      desc:'Les 3 matières testées',            test: a => new Set(a.map(x => x.subjectKey)).size >= 3 },
+  { id:'triple',   emoji:'🎨', title:'Polyvalent',      desc:'3 matières différentes testées',    test: a => new Set(a.map(x => x.subjectKey)).size >= 3 },
   { id:'levels',   emoji:'🎓', title:'Cartographe',     desc:'Un test à chaque niveau',           test: a => new Set(a.map(x => x.level)).size >= 4 },
   { id:'progress', emoji:'🚀', title:'Progression',     desc:'+3 points sur un même quiz',         test: a => {
       const byQ = {};
@@ -859,7 +861,7 @@ function parseHash(h) {
   if (s === '/niveau')    return { step: 'level' };
   if (s === '/dashboard') return { step: 'results' };
   // Match : /5eme  |  /5eme/maths  |  /5eme/maths/report/<ISOdate>
-  const m = s.match(/^\/([3-6])eme(?:\/(maths|physique|svt)(?:\/report\/(.+))?)?\/?$/);
+  const m = s.match(/^\/([3-6])eme(?:\/(maths|physique|svt|histoire)(?:\/report\/(.+))?)?\/?$/);
   if (!m) return null;
   if (!m[2]) return { step: 'subject', level: +m[1] };
   return { step: 'quiz', level: +m[1], subject: m[2], reportAt: m[3] ? decodeURIComponent(m[3]) : null };
@@ -887,7 +889,7 @@ function showQuiz(level, subject, reportAt) {
   if (wiz) wiz.style.display = 'none';
   const key = `${subject}-${level}`;
   currentStep = 'quiz';
-  const subj = { maths: 'Maths', physique: 'Physique-Chimie', svt: 'SVT' }[subject] || subject;
+  const subj = { maths: 'Maths', physique: 'Physique-Chimie', svt: 'SVT', histoire: 'Histoire' }[subject] || subject;
   document.title = `${subj} ${level}ème — Quiz Collège`;
   window.scrollTo({ top: 0, behavior: 'instant' });
   // Babel compile app.jsx async : si mountQuizApp n'existe pas encore, on queue.
@@ -1260,7 +1262,7 @@ function renderResults() {
   if (attempts.length === 0 && lvl) {
     reco = { title:'Commence par les maths', desc:`Une bonne entrée en matière pour ${LEVELS.find(l=>l.id===lvl)?.label}.`, href:`#/${lvl}eme/maths`, icon:'∑' };
   } else if (lvl && activeSubjects.size < 3) {
-    const missing = ['maths','physique','svt'].find(k => !activeSubjects.has(k));
+    const missing = ['maths','physique','svt','histoire'].find(k => !activeSubjects.has(k));
     const m = SUBJECT_META[missing];
     reco = { title:`Teste ${m.n}`, desc:`Tu n'as pas encore essayé cette matière en ${LEVELS.find(l=>l.id===lvl)?.label}.`, href:`#/${lvl}eme/${missing}`, icon: m.m };
   } else if (attempts.length > 0) {
@@ -1498,6 +1500,508 @@ window.ALL_QUIZZES = {};
 const F = ({n, d}) => <span className="frac"><span>{n}</span><span>{d}</span></span>;
 const M = ({children}) => <span className="math">{children}</span>;
 // BEGIN_QUIZZES
+// ── histoire-3.tsx ──
+// Source éditable — quiz histoire-3. Régénéré automatiquement dans index.html via build.sh.
+window.ALL_QUIZZES['histoire-3'] = {
+  SEARCH_SITES: 'site:lumni.fr OR site:ina.fr OR site:herodote.net OR site:francetveducation.fr',
+  YT_SUFFIX: 'histoire 3eme brevet college',
+  SUMMER_TOPIC: 'Histoire',
+  SUBJECT: { id:'histoire-3', name:'Histoire', short:'Histoire', level:'Fin de 3ème (brevet)', mark:'📜', tagline:'Évaluation brevet' },
+  DOMAINS: {
+    gm1:          { id:'gm1',          name:'La Première Guerre mondiale (1914-1918)',         short:'PGM',        coef:3, color:'#78350f', icon:'⚔',  search:'premiere guerre mondiale 1914 1918 brevet' },
+    entredeux:    { id:'entredeux',    name:'Entre-deux-guerres et totalitarismes',             short:'Entre-deux', coef:3, color:'#991b1b', icon:'☭',  search:'entre deux guerres totalitarisme staline hitler brevet' },
+    gm2:          { id:'gm2',          name:'La Seconde Guerre mondiale (1939-1945)',           short:'SGM',        coef:4, color:'#1e3a8a', icon:'☠',  search:'seconde guerre mondiale 1939 1945 shoah brevet' },
+    guerrefroide: { id:'guerrefroide', name:'La Guerre froide (1947-1991)',                    short:'Gfroide',    coef:3, color:'#4b5563', icon:'⚑⚐', search:'guerre froide bloc est ouest brevet' },
+    decolonisation:{ id:'decolonisation',name:'Décolonisation et Tiers-Monde',                short:'Décolon.',   coef:2, color:'#a16207', icon:'🌍', search:'decolonisation indochine algerie brevet' },
+    france45:     { id:'france45',     name:'La France depuis 1945 — IVe et Ve République',   short:'France 45',  coef:3, color:'#0f5e6b', icon:'🇫🇷', search:'france depuis 1945 IVe Ve republique brevet' },
+    europe:       { id:'europe',       name:'La construction européenne',                      short:'Europe',     coef:2, color:'#1e40af', icon:'⭐', search:'construction europeenne traite rome maastricht brevet' },
+    reperes:      { id:'reperes',      name:'Repères chronologiques',                         short:'Repères',    coef:2, color:'#475569', icon:'⧗',  search:'reperes chronologiques histoire 3eme brevet' },
+  },
+  RESOURCES: [
+    { label:'Lumni — Histoire 3ème',         author:'France TV éducation',    url:'https://www.lumni.fr/college/troisieme/histoire-geographie' },
+    { label:'INA — Archives audiovisuelles', author:'Institut National Audiovisuel', url:'https://www.ina.fr/enseignant' },
+    { label:'Hérodote — dossiers thématiques',author:'herodote.net',          url:'https://www.herodote.net' },
+    { label:'France TV Éducation — 3ème',    author:'francetveducation.fr',   url:'https://www.lumni.fr/parcours/preparer-le-brevet' },
+  ],
+  POOL: {
+    gm1: [
+      { key:'gm1-1', q:'Quel événement déclenche directement la Première Guerre mondiale le 28 juin 1914 ?', options:['Le krach boursier de New York','L\'assassinat de l\'archiduc François-Ferdinand à Sarajevo','L\'invasion de la Belgique par l\'Allemagne','La mobilisation générale de la France'], correct:1, hint:'L\'archiduc héritier d\'Autriche-Hongrie est assassiné par Gavrilo Princip, nationaliste serbe, à Sarajevo.' },
+      { key:'gm1-2', q:'Quel terme désigne la guerre menée dans des tranchées creusées face à face, caractéristique du front Ouest ?', options:['La guerre de mouvement','La guerre sous-marine','La guerre de position (ou de tranchées)','La guerre éclair'], correct:2, hint:'Après l\'échec de la guerre de mouvement fin 1914, le front se stabilise en tranchées de la Mer du Nord à la Suisse.' },
+      { key:'gm1-3', q:'La bataille de Verdun (1916) est surtout connue pour :', options:['La victoire rapide de l\'Allemagne','Ses pertes humaines colossales et le symbole de résistance française','L\'entrée en guerre des États-Unis','Le premier emploi du gaz moutarde'], correct:1, hint:'Verdun (fév-déc 1916) : environ 300 000 morts, symbole de l\'horreur des tranchées et du sacrifice français.' },
+      { key:'gm1-4', q:'En quelle année les États-Unis entrent-ils en guerre aux côtés des Alliés ?', options:['1914','1915','1916','1917'], correct:3, hint:'En avril 1917, après la guerre sous-marine à outrance et le télégramme Zimmermann, les États-Unis rejoignent les Alliés.' },
+      { key:'gm1-5', q:'L\'armistice mettant fin aux combats de la Première Guerre mondiale est signé le :', options:['11 novembre 1918','8 mai 1945','28 juin 1919','4 août 1914'], correct:0, hint:'Le 11 novembre 1918 à 11h, l\'armistice est signé dans un wagon à Rethondes (forêt de Compiègne).' },
+      { key:'gm1-6', q:'Le traité de Versailles (1919) impose à l\'Allemagne :', options:['Des réparations, la perte de territoires et la responsabilité de la guerre (article 231)','Une alliance avec la France','L\'entrée dans la SDN immédiatement','Une réduction de son armée à 500 000 hommes'], correct:0, hint:'Article 231 = clause de culpabilité. L\'Allemagne perd l\'Alsace-Lorraine, ses colonies et doit verser des réparations.' },
+      { key:'gm1-7', q:'La Société des Nations (SDN) est créée après la guerre pour :', options:['Préparer la prochaine guerre','Maintenir la paix et régler les conflits diplomatiquement','Organiser le commerce international','Rembourser les dettes de guerre'], correct:1, hint:'SDN créée en 1919 (siège à Genève) — ancêtre de l\'ONU, mais sans les États-Unis (Sénat refuse) et sans l\'URSS au départ.' },
+      { key:'gm1-8', q:'En 1917, la révolution bolchevique conduit la Russie à :', options:['Renforcer son armée sur le front','Signer la paix avec l\'Allemagne (traité de Brest-Litovsk 1918)','Envahir la France','Rejoindre les Alliés plus activement'], correct:1, hint:'Lénine prend le pouvoir en octobre 1917 et signe une paix séparée avec l\'Allemagne en mars 1918 — libérant des troupes allemandes vers l\'Ouest.' },
+    ],
+    entredeux: [
+      { key:'ed-1', q:'Le krach boursier qui déclenche la Grande Dépression se produit à Wall Street le :', options:['24 octobre 1929','11 novembre 1918','28 juin 1919','14 juillet 1936'], correct:0, hint:'Le « jeudi noir » du 24 octobre 1929 : effondrement des cours à la Bourse de New York, début de la crise mondiale.' },
+      { key:'ed-2', q:'Benito Mussolini prend le pouvoir en Italie en 1922 grâce à :', options:['Des élections libres','La marche sur Rome et la nomination comme chef du gouvernement','Un coup d\'État militaire','L\'appui des communistes'], correct:1, hint:'Mussolini organise la marche sur Rome (oct. 1922) ; le roi Victor-Emmanuel III le nomme Président du Conseil.' },
+      { key:'ed-3', q:'Adolf Hitler devient chancelier d\'Allemagne en :', options:['1929','1931','1933','1938'], correct:2, hint:'Le 30 janvier 1933, le président Hindenburg nomme Hitler chancelier (chef du gouvernement) de la République de Weimar.' },
+      { key:'ed-4', q:'Les lois de Nuremberg (1935) en Allemagne nazie :', options:['Accordent le droit de vote aux femmes','Privent les Juifs de la nationalité allemande et interdisent les mariages mixtes','Créent la Gestapo','Instituent le service militaire obligatoire'], correct:1, hint:'Lois raciales de Nuremberg : les Juifs deviennent « sujets » (pas citoyens), marriages et relations sexuelles avec des Aryens interdits.' },
+      { key:'ed-5', q:'En URSS, Staline met en place la collectivisation forcée, le Goulag et les grandes purges. Ces purges politiques débutent vers :', options:['1921','1929','1937','1941'], correct:2, hint:'Les grandes purges staliniennes (1936-1938) : procès de Moscou, exécution ou déportation de milliers de cadres du Parti et militaires.' },
+      { key:'ed-6', q:'Le Front populaire arrive au pouvoir en France en 1936 sous la direction de :', options:['Charles de Gaulle','Léon Blum','Philippe Pétain','Georges Clemenceau'], correct:1, hint:'Léon Blum (socialiste SFIO) est Président du Conseil. Le Front populaire obtient les congés payés (2 semaines), la semaine de 40h et les conventions collectives.' },
+      { key:'ed-7', q:'La Nuit de Cristal (9-10 novembre 1938) désigne :', options:['L\'invasion de la Pologne','Les pogroms antisémites organisés par les nazis en Allemagne et Autriche','La prise de la Bastille','Le début du Blitz sur Londres'], correct:1, hint:'Environ 7 500 commerces juifs détruits, synagogues brûlées, 91 Juifs tués et 30 000 déportés en camps de concentration.' },
+    ],
+    gm2: [
+      { key:'gm2-1', q:'La Seconde Guerre mondiale commence le 1er septembre 1939 avec :', options:['L\'attaque japonaise sur Pearl Harbor','L\'invasion de la Pologne par l\'Allemagne nazie','L\'entrée en guerre de la France','La capitulation de la France'], correct:1, hint:'Le 1er septembre 1939, Hitler envahit la Pologne. La France et le Royaume-Uni déclarent la guerre à l\'Allemagne le 3 septembre.' },
+      { key:'gm2-2', q:'Qui lance l\'Appel du 18 juin 1940 depuis Londres ?', options:['Philippe Pétain','Winston Churchill','Charles de Gaulle','Jean Moulin'], correct:2, hint:'Le général de Gaulle, depuis la BBC à Londres, appelle les Français à ne pas accepter la défaite et à continuer le combat.' },
+      { key:'gm2-3', q:'L\'attaque japonaise sur Pearl Harbor (7 décembre 1941) entraîne :', options:['La capitulation du Japon','L\'entrée en guerre des États-Unis','La défaite de l\'Allemagne','La création de l\'ONU'], correct:1, hint:'L\'attaque surprise sur la base navale américaine à Hawaï provoque l\'entrée en guerre des États-Unis le 8 décembre 1941.' },
+      { key:'gm2-4', q:'La bataille de Stalingrad (1942-1943) marque :', options:['La conquête de Moscou par l\'Allemagne','Le tournant de la guerre à l\'Est : première grande défaite allemande','La capitulation de la France','Le début de la Shoah'], correct:1, hint:'La reddition du maréchal Paulus (2 fév. 1943) : 300 000 soldats allemands perdus. Tournant décisif sur le front Est.' },
+      { key:'gm2-5', q:'La Shoah est l\'extermination systématique des Juifs d\'Europe par les nazis. Le nombre de victimes est estimé à :', options:['Environ 600 000','Environ 2 millions','Environ 6 millions','Environ 15 millions'], correct:2, hint:'Environ 6 millions de Juifs assassinés, soit deux tiers des Juifs d\'Europe, dans les camps d\'extermination (Auschwitz, Treblinka…) et les fusillades.' },
+      { key:'gm2-6', q:'La conférence de Wannsee (janvier 1942) décide de :', options:['La reddition de l\'Allemagne','La « solution finale » : l\'extermination industrielle de tous les Juifs d\'Europe','L\'opération Overlord','La création de la SDN'], correct:1, hint:'Wannsee (banlieue de Berlin) : Heydrich et 14 hauts responsables nazis coordonnent l\'extermination systématique.' },
+      { key:'gm2-7', q:'Le débarquement allié en Normandie (D-Day) a lieu le :', options:['6 juin 1944','8 mai 1945','11 novembre 1943','1er septembre 1944'], correct:0, hint:'Opération Overlord : 6 juin 1944, les Alliés débarquent sur les plages normandes. Plus grand débarquement amphibie de l\'histoire.' },
+      { key:'gm2-8', q:'La capitulation de l\'Allemagne nazie est signée le :', options:['6 août 1945','2 septembre 1945','8 mai 1945','11 novembre 1944'], correct:2, hint:'8 mai 1945 : capitulation sans condition de l\'Allemagne. Date commémorée chaque année comme jour de la Victoire en Europe.' },
+      { key:'gm2-9', q:'La bombe atomique est lâchée sur Hiroshima le :', options:['2 septembre 1945','6 août 1945','8 mai 1945','7 décembre 1941'], correct:1, hint:'6 août 1945 : première bombe atomique sur Hiroshima, puis Nagasaki le 9 août → capitulation du Japon le 2 septembre 1945.' },
+      { key:'gm2-10', q:'L\'Organisation des Nations Unies (ONU) est fondée en :', options:['1919','1939','1945','1947'], correct:2, hint:'Charte de San Francisco signée le 26 juin 1945 ; l\'ONU remplace la SDN avec 51 membres fondateurs.' },
+    ],
+    guerrefroide: [
+      { key:'gf-1', q:'Le terme « rideau de fer » est utilisé par Churchill lors de son discours de :', options:['Yalta (1945)','Fulton (1946)','Berlin (1948)','Genève (1955)'], correct:1, hint:'Discours de Fulton (Missouri), 5 mars 1946 : « Un rideau de fer est descendu à travers le continent européen. »' },
+      { key:'gf-2', q:'Le plan Marshall (1947) est un :', options:['Plan d\'armement américain','Programme d\'aide économique américaine à l\'Europe occidentale','Accord militaire de l\'OTAN','Plan de reconstruction soviétique'], correct:1, hint:'Plan Marshall = aide économique américaine (~13 milliards de $) pour reconstruire l\'Europe de l\'Ouest et endiguer le communisme.' },
+      { key:'gf-3', q:'Le blocus de Berlin par l\'URSS (1948-1949) est contourné par :', options:['Un tunnel creusé par les Américains','Un pont aérien américain et britannique','Une percée militaire de l\'OTAN','Un accord de paix diplomatique'], correct:1, hint:'Les Alliés organisent un gigantesque pont aérien (277 000 vols en 11 mois) pour ravitailler Berlin-Ouest bloquée par les Soviétiques.' },
+      { key:'gf-4', q:'Le mur de Berlin est construit le :', options:['13 août 1961','9 novembre 1989','4 juillet 1954','12 octobre 1962'], correct:0, hint:'Dans la nuit du 12 au 13 août 1961, l\'Allemagne de l\'Est bâtit le mur pour stopper l\'exode vers l\'Ouest (3 millions de fuyards depuis 1945).' },
+      { key:'gf-5', q:'La crise des missiles de Cuba (octobre 1962) oppose :', options:['La France et l\'Angleterre','Les États-Unis (Kennedy) et l\'URSS (Khrouchtchev)','L\'OTAN et la Chine','Cuba et les États-Unis seuls'], correct:1, hint:'L\'URSS installe des missiles à Cuba à 90 km des côtes américaines. 13 jours de tension intense → retrait soviétique en échange d\'engagements américains.' },
+      { key:'gf-6', q:'La chute du mur de Berlin a lieu le :', options:['13 août 1961','25 décembre 1991','9 novembre 1989','3 octobre 1990'], correct:2, hint:'Le 9 novembre 1989, le régime est-allemand ouvre ses frontières ; des milliers de Berlinois déchirent le mur. Symbole de la fin de la Guerre froide.' },
+      { key:'gf-7', q:'Mikhaïl Gorbatchev engage en URSS des réformes appelées :', options:['New Deal et Fair Deal','Glasnost (transparence) et Perestroïka (restructuration)','Plan quinquennal et collectivisation','Détente et coexistence pacifique'], correct:1, hint:'Gorbatchev (1985-1991) : glasnost = liberté d\'expression, perestroïka = réforme économique. Ces réformes accélèrent la désintégration de l\'URSS.' },
+      { key:'gf-8', q:'L\'URSS est officiellement dissoute le :', options:['9 novembre 1989','3 octobre 1990','25 décembre 1991','1er janvier 1992'], correct:2, hint:'Le 25 décembre 1991, Gorbatchev démissionne et le drapeau soviétique est abaissé du Kremlin. Fin officielle de l\'URSS.' },
+    ],
+    decolonisation: [
+      { key:'dec-1', q:'L\'Inde accède à l\'indépendance en :', options:['1945','1947','1954','1962'], correct:1, hint:'15 août 1947 : indépendance de l\'Inde (Jawaharlal Nehru) et du Pakistan. Gandhi a mené la résistance non-violente contre la colonisation britannique.' },
+      { key:'dec-2', q:'La bataille de Dien Bien Phu (1954) met fin à la guerre d\'Indochine par :', options:['La victoire française','La défaite française face au Viêt-minh de Hô Chi Minh','Un accord américain','Une médiation de l\'ONU'], correct:1, hint:'7 mai 1954 : la garnison française capitule. Les accords de Genève (juillet 1954) reconnaissent l\'indépendance du Vietnam, Laos et Cambodge.' },
+      { key:'dec-3', q:'La guerre d\'Algérie commence en :', options:['1945','1950','1954','1958'], correct:2, hint:'1er novembre 1954 : insurrection déclenchée par le FLN (Front de Libération Nationale). Guerre qui durera jusqu\'en 1962.' },
+      { key:'dec-4', q:'Les accords d\'Évian (18 mars 1962) mettent fin à :', options:['La guerre d\'Indochine','La guerre d\'Algérie','La crise de Suez','La guerre de Corée'], correct:1, hint:'Accords d\'Évian signés entre le gouvernement français (De Gaulle) et le FLN : cessez-le-feu et indépendance de l\'Algérie reconnue.' },
+      { key:'dec-5', q:'La conférence de Bandung (1955) réunit les pays d\'Asie et d\'Afrique pour :', options:['Rejoindre l\'OTAN','Affirmer leur indépendance et créer le mouvement des non-alignés','S\'allier avec l\'URSS','Intégrer le marché commun européen'], correct:1, hint:'29 pays d\'Asie et d\'Afrique se réunissent à Bandung (Indonésie) : refus de s\'aligner sur les deux blocs, affirmation de la solidarité du Tiers-Monde.' },
+      { key:'dec-6', q:'L\'année 1960 est appelée « l\'année de l\'Afrique » car :', options:['L\'Afrique du Sud gagne la Coupe du monde','17 pays africains accèdent à l\'indépendance','La guerre d\'Algérie commence','L\'OUA est fondée'], correct:1, hint:'En 1960, 17 colonies africaines (dont les colonies françaises d\'Afrique subsaharienne) deviennent indépendantes.' },
+    ],
+    france45: [
+      { key:'fr-1', q:'La IVe République française est instaurée en :', options:['1944','1946','1951','1958'], correct:1, hint:'La Constitution de la IVe République est adoptée par référendum le 13 octobre 1946. Elle est marquée par une forte instabilité gouvernementale.' },
+      { key:'fr-2', q:'De Gaulle revient au pouvoir en 1958 et fonde la Ve République dont la Constitution est adoptée le :', options:['8 mai 1945','13 mai 1958','4 octobre 1958','22 novembre 1963'], correct:2, hint:'4 octobre 1958 : la Constitution de la Ve République est promulguée. Elle renforce l\'exécutif (président) au détriment du Parlement.' },
+      { key:'fr-3', q:'Les événements de mai 1968 en France se caractérisent par :', options:['Un coup d\'État militaire','Une grève générale, des manifestations étudiantes et ouvrières remettant en cause la société','L\'arrivée au pouvoir de Mitterrand','Une guerre civile'], correct:1, hint:'Mai 68 : barricades du Quartier Latin, grève générale (10 millions de grévistes), accords de Grenelle. Crise sociale et culturelle majeure.' },
+      { key:'fr-4', q:'La loi Veil (1975) légalise en France :', options:['Le droit de vote des femmes','L\'interruption volontaire de grossesse (IVG)','L\'abolition de la peine de mort','Le mariage homosexuel'], correct:1, hint:'Simone Veil, ministre de la Santé de Giscard d\'Estaing, fait adopter la loi légalisant l\'avortement le 17 janvier 1975 malgré l\'opposition massive.' },
+      { key:'fr-5', q:'L\'abolition de la peine de mort en France est obtenue en 1981 sous la présidence de :', options:['Georges Pompidou','Valéry Giscard d\'Estaing','François Mitterrand','Jacques Chirac'], correct:2, hint:'Robert Badinter, garde des Sceaux de Mitterrand, fait voter l\'abolition le 9 octobre 1981 — un an après l\'élection de Mitterrand.' },
+      { key:'fr-6', q:'Valéry Giscard d\'Estaing abaisse la majorité électorale à 18 ans en :', options:['1958','1968','1974','1981'], correct:2, hint:'Juillet 1974 : la majorité (civile et électorale) est abaissée de 21 à 18 ans, donnant le droit de vote à environ 3 millions de jeunes Français.' },
+      { key:'fr-7', q:'La première « cohabitation » de la Ve République (1986-1988) voit coexister :', options:['De Gaulle président et Pompidou Premier ministre','Mitterrand président et Chirac Premier ministre','Chirac président et Jospin Premier ministre','Giscard président et Mauroy Premier ministre'], correct:1, hint:'1986-1988 : Mitterrand (socialiste) est président, Chirac (RPR, droite) est Premier ministre — première cohabitation de la Ve République.' },
+    ],
+    europe: [
+      { key:'eur-1', q:'La CECA (Communauté Européenne du Charbon et de l\'Acier), premier pas vers l\'Europe unie, est créée en :', options:['1945','1948','1951','1957'], correct:2, hint:'Traité de Paris, 18 avril 1951 : France, Allemagne, Italie, Belgique, Pays-Bas, Luxembourg — inspiré par Robert Schuman et Jean Monnet.' },
+      { key:'eur-2', q:'Le traité de Rome du 25 mars 1957 crée :', options:['L\'OTAN','La CEE (Communauté Économique Européenne) et l\'Euratom','Le Conseil de l\'Europe','L\'euro'], correct:1, hint:'Traité de Rome : 6 pays fondateurs créent la CEE (marché commun, libre circulation) et l\'Euratom (énergie nucléaire civile).' },
+      { key:'eur-3', q:'Le traité de Maastricht (1992) crée :', options:['La CECA','L\'Union européenne et prépare la monnaie unique','L\'espace Schengen','Le Conseil de l\'Europe'], correct:1, hint:'Signé le 7 février 1992, il crée l\'Union européenne, établit la citoyenneté européenne et prépare l\'euro (Union économique et monétaire).' },
+      { key:'eur-4', q:'L\'euro entre en circulation comme monnaie fiduciaire (billets et pièces) le :', options:['1er janvier 1999','1er janvier 2002','1er mai 2004','9 novembre 1989'], correct:1, hint:'1er janvier 2002 : les billets et pièces en euros remplacent les monnaies nationales dans 12 pays. Le taux de change avait été fixé le 1er janvier 1999.' },
+      { key:'eur-5', q:'Le Brexit désigne :', options:['L\'entrée de la Bulgarie dans l\'UE','La sortie du Royaume-Uni de l\'Union européenne (effective en 2020)','Le référendum irlandais de 2008','L\'élargissement de l\'UE à l\'Est'], correct:1, hint:'Référendum britannique du 23 juin 2016 : 51,9% pour quitter l\'UE. Sortie effective le 31 janvier 2020.' },
+      { key:'eur-6', q:'La Politique Agricole Commune (PAC), pilier de la construction européenne, garantit :', options:['La défense commune','Des prix agricoles stables et des revenus aux agriculteurs européens','La libre circulation des personnes','La politique étrangère commune'], correct:1, hint:'La PAC (depuis 1962) est la première grande politique commune : soutien des prix, subventions aux agriculteurs, auto-suffisance alimentaire.' },
+    ],
+    reperes: [
+      { key:'chr-1', q:'Replacez dans l\'ordre chronologique : mur de Berlin construit / D-Day / armistice SGM / chute du mur', options:['D-Day → armistice → mur construit → chute du mur','Armistice → D-Day → mur construit → chute du mur','Mur construit → D-Day → armistice → chute du mur','Chute du mur → D-Day → armistice → mur construit'], correct:0, hint:'D-Day = 6 juin 1944 → armistice = 8 mai 1945 → mur construit = 13 août 1961 → chute du mur = 9 nov. 1989.' },
+      { key:'chr-2', q:'Lequel de ces événements appartient au XXe siècle mais PAS au programme de 3ème ?', options:['La Révolution française (1789)','La Première Guerre mondiale (1914-1918)','La chute du mur de Berlin (1989)','La construction européenne (1957)'], correct:0, hint:'La Révolution française (1789) est du XVIIIe siècle et relève du programme de 4ème. Les trois autres sont au programme de 3ème.' },
+      { key:'chr-3', q:'Le terme « génocide » désigne :', options:['Une guerre entre deux États','L\'extermination systématique d\'un groupe national, ethnique ou religieux','Une épidémie mondiale','Un régime de terreur politique'], correct:1, hint:'Génocide (Raphael Lemkin, 1944) : destruction intentionnelle et systématique d\'un groupe. La Shoah et le génocide des Arméniens sont les exemples étudiés en 3ème.' },
+      { key:'chr-4', q:'Un régime totalitaire se caractérise par :', options:['Des élections libres et pluralistes','Le contrôle total de l\'État sur la société, un parti unique, une idéologie officielle et la terreur','La séparation des pouvoirs','La liberté de la presse et des partis'], correct:1, hint:'Totalitarisme (nazisme, stalinisme, fascisme) : parti unique, chef tout-puissant, propagande, police politique, encadrement de la population.' },
+    ],
+  },
+  PICK: {
+    gm1: 4, entredeux: 4, gm2: 6, guerrefroide: 4, decolonisation: 3, france45: 4, europe: 3, reperes: 2,
+  },
+  PLANS: {
+    gm1: {
+      'non-acquis': ['Révise la chronologie : 1914 (attentat) → 1917 (EU + révolution russe) → 1918 (armistice) → 1919 (traité Versailles)', 'Mémorise les caractéristiques de la guerre des tranchées (Verdun, gaz, no man\'s land, poilus)', 'Retiens les termes clés : SDN, Triple Entente, Triple Alliance, armistice, gueules cassées'],
+      'fragile': ['Distingue armistice (11 nov 1918) et traité de paix (Versailles, 28 juin 1919)']
+    },
+    entredeux: {
+      'non-acquis': ['Mémorise les dates clés : 1929 (krach), 1922 (Mussolini), 1933 (Hitler chancelier), 1936 (Front populaire)', 'Comprends les caractéristiques du nazisme et du stalinisme (régimes totalitaires)', 'Retiens les signes avant-coureurs de la WWII : lois Nuremberg, Nuit de Cristal, réarmement'],
+      'fragile': ['Distingue fascisme (Italie), nazisme (Allemagne) et stalinisme (URSS) — 3 totalitarismes différents']
+    },
+    gm2: {
+      'non-acquis': ['Chronologie : 1939 (Pologne) → 1940 (France, appel 18 juin) → 1941 (Pearl Harbor) → 1942-43 (Stalingrad) → 1942 (Wannsee) → 1944 (D-Day) → 1945 (capitulations)', 'La Shoah : définition, Wannsee, 6 millions de victimes, camps d\'extermination (Auschwitz)', 'Distingue Résistance (De Gaulle, Londres) et Collaboration (Pétain, Vichy)'],
+      'fragile': ['Savoir que 8 mai = capitulation Allemagne ET 2 septembre = capitulation Japon (fin officielle de la guerre)']
+    },
+    guerrefroide: {
+      'non-acquis': ['Mémorise le cadre : deux blocs (USA/OTAN vs URSS/Pacte de Varsovie) de 1947 à 1991', 'Dates clés : 1947 (plan Marshall), 1961 (mur Berlin construit), 1962 (Cuba), 1989 (chute mur), 1991 (dissolution URSS)', 'Comprends la notion de dissuasion nucléaire et de coexistence pacifique'],
+      'fragile': ['Distingue la Guerre froide (pas de conflit direct USA-URSS) des conflits par procuration (Corée, Vietnam)']
+    },
+    decolonisation: {
+      'non-acquis': ['Dates à retenir : 1947 (Inde), 1954 (Indochine + début guerre Algérie), 1955 (Bandung), 1960 (année de l\'Afrique), 1962 (accords Évian)', 'Comprends les deux voies : négociée (Inde) vs armée (Algérie, Indochine)', 'Le mouvement des non-alignés refuse les deux blocs — Tiers-Monde'],
+      'fragile': ['Sais qui est Gandhi (résistance non-violente, Inde) et Hô Chi Minh (Viêt-minh, Indochine)']
+    },
+    france45: {
+      'non-acquis': ['Mémorise les deux républiques : IVe (1946, instable) → Ve (1958, De Gaulle, Constitution renforcée)', 'Dates clés : 1958 (Ve République), 1968 (mai 68), 1974 (majorité à 18 ans), 1975 (loi Veil), 1981 (abolition peine de mort)', 'Comprends la cohabitation : président et Premier ministre de partis opposés'],
+      'fragile': ['Distingue IVe République (instable, régime parlementaire) et Ve République (présidentielle forte)']
+    },
+    europe: {
+      'non-acquis': ['Chronologie : 1951 (CECA) → 1957 (traité de Rome, CEE) → 1992 (Maastricht, UE) → 2002 (euro en circulation)', 'Les 6 fondateurs de la CEE : France, Allemagne, Italie, Belgique, Pays-Bas, Luxembourg', 'Comprends les 4 libertés du marché commun : libre circulation des marchandises, services, capitaux, personnes'],
+      'fragile': ['Distingue Conseil de l\'Europe (1949, droits de l\'homme) et Communauté/Union européenne (intégration économique)']
+    },
+    reperes: {
+      'non-acquis': ['Mémorise la grille chronologique du programme : 1914, 1918, 1929, 1933, 1939, 1945, 1947, 1958, 1962, 1968, 1989, 1991, 2002', 'Maîtrise les définitions : totalitarisme, dictature, génocide, crimes contre l\'humanité, résistance, collaboration', 'Sais à quel siècle appartient chaque événement (XXe = 1901-2000)'],
+      'fragile': ['Entraîne-toi à replacer les événements sur une frise chronologique sans aide']
+    },
+  },
+};
+
+// ── histoire-4.tsx ──
+// Source éditable — quiz histoire-4. Régénéré automatiquement dans index.html via build.sh.
+window.ALL_QUIZZES['histoire-4'] = {
+  SEARCH_SITES: 'site:lumni.fr OR site:francetveducation.fr OR site:curiosphere.tv OR site:ina.fr',
+  YT_SUFFIX: 'histoire 4eme college',
+  SUMMER_TOPIC: 'Histoire',
+  SUBJECT: { id:'histoire-4', name:'Histoire', short:'Histoire', level:'Fin de 4ème', mark:'📜', tagline:'Évaluation diagnostique' },
+  DOMAINS: {
+    lumieres:    { id:'lumieres',    name:'Le XVIIIe, Lumières et traite négrière',       short:'Lumières',     coef:3, color:'#a16207', icon:'💡', search:'lumieres philosophes XVIIIe siecle 4eme' },
+    revolution:  { id:'revolution',  name:'La Révolution française (1789-1799)',           short:'Révolution',   coef:4, color:'#b91c1c', icon:'⚑',  search:'revolution francaise 1789 4eme' },
+    empire:      { id:'empire',      name:'Napoléon et l\'Empire (1799-1815)',             short:'Empire',       coef:3, color:'#1e3a8a', icon:'👑', search:'napoleon empire consulat 4eme' },
+    industrielle:{ id:'industrielle',name:'Révolution industrielle et sociétés au XIXe',  short:'Industrielle', coef:3, color:'#4b5563', icon:'⚙',  search:'revolution industrielle XIXe siecle 4eme' },
+    colonial:    { id:'colonial',    name:'Conquêtes et empires coloniaux au XIXe',        short:'Colonial',     coef:2, color:'#78350f', icon:'🗺', search:'colonisation XIXe siecle 4eme' },
+    republique:  { id:'republique',  name:'La IIIe République (1870-1914)',                short:'IIIe Rép.',    coef:3, color:'#0f5e6b', icon:'🇫🇷', search:'troisieme republique lois ferry 4eme' },
+    reperes:     { id:'reperes',     name:'Repères chronologiques',                        short:'Repères',      coef:2, color:'#475569', icon:'⧗', search:'reperes chronologiques XVIIIe XIXe siecle 4eme' },
+  },
+  RESOURCES: [
+    { label:'Lumni — Histoire 4ème',        author:'France TV éducation',  url:'https://www.lumni.fr/college/quatrieme/histoire' },
+    { label:'France TV Éducation — Révol.', author:'Vidéos pédagogiques',  url:'https://www.francetveducation.fr/4eme/histoire/' },
+    { label:'Curiosphère — XIXe siècle',    author:'Arte / Curiosphère',   url:'https://www.curiosphere.tv/histoire' },
+    { label:'INA — Archives histoire',      author:'Institut National Audiovisuel', url:'https://www.ina.fr/education' },
+  ],
+  POOL: {
+    lumieres: [
+      { key:'lum-1', q:'Quel philosophe des Lumières est l\'auteur du Contrat social (1762) ?', options:['Voltaire','Rousseau','Diderot','Montesquieu'], correct:1, hint:'Jean-Jacques Rousseau : le peuple est souverain, les lois doivent respecter la volonté générale.' },
+      { key:'lum-2', q:'Qui a théorisé la séparation des pouvoirs (législatif, exécutif, judiciaire) dans De l\'Esprit des lois (1748) ?', options:['Rousseau','Voltaire','Montesquieu','d\'Alembert'], correct:2, hint:'Montesquieu propose de séparer les trois pouvoirs pour éviter la tyrannie.' },
+      { key:'lum-3', q:'L\'Encyclopédie (1751-1772) est dirigée par :', options:['Voltaire et Rousseau','Diderot et d\'Alembert','Montesquieu et Voltaire','Locke et Kant'], correct:1, hint:'Diderot (directeur) et d\'Alembert (co-directeur) rassemblent tous les savoirs des Lumières.' },
+      { key:'lum-4', q:'Le commerce triangulaire désigne :', options:['Un commerce entre trois villes françaises','Le trafic entre Europe, Afrique et Amériques (esclaves, marchandises)','Un traité entre trois rois','Un échange de livres entre philosophes'], correct:1, hint:'Triangle : Europe (textiles, armes) → Afrique (esclaves) → Amériques (sucre, coton) → Europe.' },
+      { key:'lum-5', q:'La Convention abolit l\'esclavage en :', options:['1685','1789','1794','1848'], correct:2, hint:'4 février 1794 (16 pluviôse an II) : première abolition, annulée par Napoléon en 1802.' },
+      { key:'lum-6', q:'Le Code noir (1685) est un texte qui :', options:['Interdit la traite négrière','Réglemente l\'esclavage dans les colonies françaises','Libère les esclaves','Crée l\'Encyclopédie'], correct:1, hint:'Édit de Louis XIV : statut juridique des esclaves, obligations des maîtres, droit d\'achat.' },
+      { key:'lum-7', q:'Voltaire est surtout connu pour :', options:['Écrire le Contrat social','Critiquer l\'intolérance et le fanatisme (Candide, Traité sur la tolérance)','Diriger l\'Encyclopédie','Séparer les pouvoirs'], correct:1, hint:'Voltaire : défenseur de la liberté de penser, ennemi du fanatisme religieux.' },
+    ],
+    revolution: [
+      { key:'rev-1', q:'Les États généraux sont convoqués en :', options:['1787','1788','1789','1792'], correct:2, hint:'Mai 1789 : Louis XVI convoque les États généraux à Versailles pour résoudre la crise financière.' },
+      { key:'rev-2', q:'Le serment du Jeu de Paume a lieu :', options:['14 juillet 1789','20 juin 1789','4 août 1789','26 août 1789'], correct:1, hint:'20 juin 1789 : les députés du Tiers État jurent de ne pas se séparer avant d\'avoir donné une Constitution.' },
+      { key:'rev-3', q:'La prise de la Bastille a lieu le :', options:['4 août 1789','20 juin 1789','26 août 1789','14 juillet 1789'], correct:3, hint:'14 juillet 1789 : le peuple parisien prend la Bastille — symbole du despotisme royal.' },
+      { key:'rev-4', q:'La nuit du 4 août 1789 voit :', options:['La prise de la Bastille','L\'abolition des privilèges féodaux','L\'adoption de la DDHC','La fuite du roi'], correct:1, hint:'Les nobles renoncent volontairement à leurs privilèges seigneuriaux — fin de la féodalité.' },
+      { key:'rev-5', q:'La Déclaration des droits de l\'homme et du citoyen (DDHC) est adoptée le :', options:['14 juillet 1789','20 juin 1789','26 août 1789','4 août 1789'], correct:2, hint:'26 août 1789 : liberté, égalité, propriété, résistance à l\'oppression, souveraineté de la Nation.' },
+      { key:'rev-6', q:'La Première République française est proclamée en :', options:['1789','1790','1791','1792'], correct:3, hint:'Septembre 1792 : la Convention abolit la monarchie et proclame la République.' },
+      { key:'rev-7', q:'Robespierre est associé à quelle période de la Révolution ?', options:['La Constituante (1789-1791)','Le Directoire (1795-1799)','La Terreur (1793-1794)','Le Consulat (1799-1804)'], correct:2, hint:'Comité de Salut public, loi des suspects, guillotine : Robespierre dirige la Terreur jusqu\'au 9 Thermidor (juillet 1794).' },
+      { key:'rev-8', q:'La fuite à Varennes (juin 1791) :', options:['Est un succès pour Louis XVI','Discrédite le roi qui est arrêté et ramené à Paris','Déclenche la Révolution','Déclenche la Terreur'], correct:1, hint:'Le roi tente de fuir en Autriche, reconnu à Varennes. Son image est définitivement brisée.' },
+    ],
+    empire: [
+      { key:'emp-1', q:'Le coup d\'État du 18 Brumaire an VIII (9 novembre 1799) installe :', options:['Le Directoire','Robespierre au pouvoir','Bonaparte comme Premier Consul','La IIIe République'], correct:2, hint:'Bonaparte renverse le Directoire par un coup de force. Il devient Premier Consul : c\'est le Consulat.' },
+      { key:'emp-2', q:'Napoléon Bonaparte se fait sacrer Empereur le :', options:['18 Brumaire 1799','2 décembre 1804','2 décembre 1805','18 juin 1815'], correct:1, hint:'2 décembre 1804 à Notre-Dame de Paris : il se couronne lui-même Napoléon Ier devant le pape Pie VII.' },
+      { key:'emp-3', q:'Le Code civil (1804) :', options:['Abolit l\'esclavage','Unifie le droit français (propriété, famille, contrats) sur tout le territoire','Interdit les syndicats','Crée les lycées'], correct:1, hint:'Code Napoléon : base du droit civil français encore en vigueur. Uniformise les lois héritées de la Révolution.' },
+      { key:'emp-4', q:'La bataille d\'Austerlitz (2 décembre 1805) oppose Napoléon à :', options:['L\'Angleterre seule','La Prusse','L\'Autriche et la Russie','L\'Espagne'], correct:2, hint:'Victoire éclatante contre l\'Autriche et la Russie (Alexandre Ier + François II). "La plus belle de mes batailles."' },
+      { key:'emp-5', q:'La campagne de Russie (1812) se solde par :', options:['Une victoire décisive de Napoléon','Une retraite désastreuse et la perte de la Grande Armée','Un traité de paix avantageux','La prise de Moscou définitive'], correct:1, hint:'L\'armée brûle Moscou mais doit battre en retraite sous le froid. 400 000 morts environ.' },
+      { key:'emp-6', q:'Napoléon est définitivement vaincu à :', options:['Leipzig (1813)','Waterloo (18 juin 1815)','Austerlitz (1805)','Borodino (1812)'], correct:1, hint:'Waterloo (Belgique) : défaite face aux Anglo-Prussiens. Napoléon abdique et est exilé à Sainte-Hélène.' },
+      { key:'emp-7', q:'Napoléon rétablit l\'esclavage en :', options:['1800','1801','1802','1804'], correct:2, hint:'Loi du 20 mai 1802 : il rétablit l\'esclavage aboli en 1794, sous pression des colons antillais.' },
+    ],
+    industrielle: [
+      { key:'ind-1', q:'La machine à vapeur (perfectionnée par James Watt vers 1769) est utilisée pour :', options:['Faire du pain','Entraîner des machines dans les usines et les locomotives','Pomper l\'eau des champs','Imprimer des journaux uniquement'], correct:1, hint:'La vapeur remplace la force animale et humaine : elle lance la mécanisation des industries.' },
+      { key:'ind-2', q:'La classe ouvrière qui travaille dans les usines au XIXe siècle est appelée :', options:['La bourgeoisie','Le prolétariat','L\'aristocratie','Le clergé'], correct:1, hint:'Prolétaires : n\'ont que leur force de travail à vendre. Conditions souvent précaires (enfants, longues heures).' },
+      { key:'ind-3', q:'Karl Marx et Friedrich Engels publient le Manifeste du Parti communiste en :', options:['1830','1848','1871','1889'], correct:1, hint:'1848 : "Un spectre hante l\'Europe, le spectre du communisme." Appel à la lutte des classes.' },
+      { key:'ind-4', q:'Émile Zola décrit la condition ouvrière dans les mines dans :', options:['Germinal','Les Misérables','Notre-Dame de Paris','Madame Bovary'], correct:0, hint:'Germinal (1885) : la mine, la grève, la misère ouvrière dans le Nord de la France.' },
+      { key:'ind-5', q:'Le chemin de fer se développe surtout à partir de :', options:['1780','1800','1830','1870'], correct:2, hint:'Premières lignes françaises dans les années 1830 (Paris-Saint-Germain 1837). Essor massif dans la 2e moitié du XIXe.' },
+      { key:'ind-6', q:'L\'exode rural au XIXe siècle désigne :', options:['Le départ des citadins à la campagne','La migration des paysans vers les villes industrielles','L\'émigration vers les colonies','Le déplacement des usines à la campagne'], correct:1, hint:'Les campagnes se dépeuplent au profit des grandes villes industrielles (Lyon, Lille, Paris, Saint-Étienne).' },
+      { key:'ind-7', q:'Le droit de grève est accordé aux ouvriers français en :', options:['1830','1848','1864','1884'], correct:2, hint:'Loi Ollivier de 1864 sous Napoléon III : la grève n\'est plus un délit. Les syndicats sont légalisés en 1884.' },
+    ],
+    colonial: [
+      { key:'col-1', q:'La France prend Alger en :', options:['1815','1830','1848','1870'], correct:1, hint:'Prise d\'Alger le 5 juillet 1830 : début de la conquête de l\'Algérie sous Charles X.' },
+      { key:'col-2', q:'La conférence de Berlin (1884-1885) sert à :', options:['Signer la paix après Waterloo','Organiser le partage de l\'Afrique entre puissances européennes','Abolir l\'esclavage','Créer la Croix-Rouge'], correct:1, hint:'"Scramble for Africa" : 14 puissances découpent l\'Afrique sans consulter les Africains.' },
+      { key:'col-3', q:'Jules Ferry justifie la colonisation par :', options:['La mission civilisatrice et la puissance économique','La recherche d\'or uniquement','L\'accord des peuples colonisés','La pression des États-Unis'], correct:0, hint:'Ferry (1885) : "les races supérieures ont le devoir de civiliser les races inférieures" — idéologie coloniale.' },
+      { key:'col-4', q:'Victor Schoelcher fait abolir l\'esclavage pour la deuxième fois en :', options:['1830','1848','1871','1905'], correct:1, hint:'27 avril 1848 : abolition définitive dans les colonies françaises, signée par le gouvernement provisoire.' },
+      { key:'col-5', q:'L\'Indochine française (Vietnam, Cambodge, Laos) est constituée sous :', options:['Napoléon Ier','Louis-Philippe','Jules Ferry (gouvernement de la IIIe République)','Napoléon III uniquement'], correct:2, hint:'Conquête progressive (1858-1893) sous la IIIe République. Jules Ferry est le principal promoteur.' },
+    ],
+    republique: [
+      { key:'rep-1', q:'La défaite de Sedan (2 septembre 1870) entraîne :', options:['La victoire de la France contre la Prusse','La chute de Napoléon III et la proclamation de la IIIe République le 4 septembre','La signature du Code civil','La révolution de 1848'], correct:1, hint:'Napoléon III capitule à Sedan. Deux jours plus tard, la République est proclamée à Paris.' },
+      { key:'rep-2', q:'La Commune de Paris (mars-mai 1871) est :', options:['Un gouvernement révolutionnaire ouvrier écrasé par l\'armée versaillaise','Un long règne pacifique','Une alliance franco-allemande','Le premier syndicat français'], correct:0, hint:'72 jours de gouvernement insurrectionnel à Paris. La "Semaine sanglante" (mai 1871) : 10 000-30 000 morts.' },
+      { key:'rep-3', q:'Les lois Ferry (1881-1882) instaurent une école :', options:['Privée et payante','Laïque, gratuite et obligatoire','Réservée aux garçons','Gérée par l\'Église'], correct:2, hint:'Jules Ferry : école publique gratuite (1881), obligatoire et laïque (1882). Instituteur = "hussard noir de la République".' },
+      { key:'rep-4', q:'L\'affaire Dreyfus (1894-1906) divise la France entre :', options:['Républicains et monarchistes','Dreyfusards (défenseurs de l\'innocence) et antidreyfusards','Catholiques et protestants','Ouvriers et patrons'], correct:1, hint:'Capitaine Dreyfus, juif, condamné à tort pour espionnage. Zola publie "J\'Accuse" (1898). Réhabilité en 1906.' },
+      { key:'rep-5', q:'La loi de séparation des Églises et de l\'État est votée en :', options:['1881','1894','1905','1914'], correct:2, hint:'9 décembre 1905 : la France est laïque. L\'État ne reconnaît ni ne salarie aucun culte.' },
+      { key:'rep-6', q:'Sous la IIIe République, le suffrage universel (masculin) est :', options:['Supprimé','Restreint aux propriétaires','Maintenu et consolidé','Étendu aux femmes'], correct:2, hint:'Le suffrage universel masculin, acquis en 1848, est maintenu. Les femmes voteront en 1944.' },
+    ],
+    reperes: [
+      { key:'chr-1', q:'En quelle année commence la Révolution française ?', options:['1776','1785','1789','1799'], correct:2, hint:'1789 : États généraux, Bastille, DDHC. Date fondatrice de l\'histoire contemporaine française.' },
+      { key:'chr-2', q:'Le Premier Empire prend fin en :', options:['1812','1813','1814','1815'], correct:3, hint:'Waterloo (18 juin 1815) → abdication définitive de Napoléon. Les Cent-Jours se terminent en juin 1815.' },
+      { key:'chr-3', q:'Quel événement a lieu en 1848 en France ?', options:['Proclamation de la IIIe République','Révolution (chute de Louis-Philippe) et IIe République','Abolition des privilèges','Prise de la Bastille'], correct:1, hint:'Février 1848 : révolution, abdication de Louis-Philippe, IIe République, suffrage universel masculin, abolition esclavage.' },
+      { key:'chr-4', q:'Lequel de ces événements est le plus ancien ?', options:['Conférence de Berlin (1885)','Lois Ferry (1881)','Commune de Paris (1871)','Séparation Église/État (1905)'], correct:2, hint:'Ordre : Commune 1871 → Lois Ferry 1881 → Berlin 1885 → Séparation 1905.' },
+      { key:'chr-5', q:'La "monarchie constitutionnelle" désigne :', options:['Un régime sans roi','Un régime où le roi gouverne sans limites','Un régime où le pouvoir du roi est limité par une Constitution','Une monarchie élective'], correct:2, hint:'Après 1791 : Louis XVI règne mais la Constitution limite ses pouvoirs. ≠ absolutisme, ≠ république.' },
+    ],
+  },
+  PICK: {
+    lumieres: 4, revolution: 6, empire: 4, industrielle: 5, colonial: 3, republique: 5, reperes: 3,
+  },
+  PLANS: {
+    lumieres: {
+      'non-acquis': ['Apprendre les 4 grands philosophes et leur œuvre principale (Montesquieu, Rousseau, Voltaire, Diderot)', 'Comprendre le commerce triangulaire et ses acteurs (Europe, Afrique, Amériques)', 'Distinguer les deux abolitions de l\'esclavage (1794 et 1848) et leurs auteurs'],
+      'fragile':    ['Relier les idées des Lumières aux événements de la Révolution française'],
+    },
+    revolution: {
+      'non-acquis': ['Mémoriser les dates clés (États généraux mai, Jeu de Paume 20 juin, Bastille 14 juillet, Nuit du 4 août, DDHC 26 août)', 'Comprendre l\'enchaînement Monarchie constitutionnelle → République → Terreur → Thermidor', 'Expliquer le rôle de la DDHC et ses grands principes'],
+      'fragile':    ['Distinguer les différentes phases et assemblées (Constituante, Convention, Directoire)'],
+    },
+    empire: {
+      'non-acquis': ['Retenir le fil chronologique : 18 Brumaire 1799 → Sacre 1804 → Austerlitz 1805 → Russie 1812 → Waterloo 1815', 'Savoir ce qu\'est le Code civil et son importance encore aujourd\'hui', 'Comprendre pourquoi l\'Empire s\'effondre (guerres permanentes, Russie, coalitions)'],
+      'fragile':    ['Connaître les réformes intérieures du Consulat (lycées, Banque de France, préfets, Code civil)'],
+    },
+    industrielle: {
+      'non-acquis': ['Expliquer ce que change la machine à vapeur pour la production et les transports', 'Définir bourgeoisie, prolétariat, conditions ouvrières au XIXe siècle', 'Situer Marx (Manifeste 1848) et Zola (Germinal) dans ce contexte'],
+      'fragile':    ['Distinguer socialisme utopique et marxisme, connaître la 1ère Internationale'],
+    },
+    colonial: {
+      'non-acquis': ['Retenir 1830 (Alger), 1848 (abolition Schoelcher), 1885 (conférence de Berlin)', 'Expliquer ce qu\'est la "mission civilisatrice" et pourquoi c\'est une justification idéologique', 'Identifier les principales régions colonisées par la France (Algérie, Indochine, Afrique sub-saharienne)'],
+      'fragile':    ['Mettre en lien colonisation et révolution industrielle (matières premières, marchés)'],
+    },
+    republique: {
+      'non-acquis': ['Connaître 1870 (Sedan → IIIe République), 1871 (Commune), 1881-82 (lois Ferry), 1905 (séparation)', 'Expliquer les lois Ferry et ce qu\'elles changent pour les enfants français', 'Raconter l\'affaire Dreyfus et ce qu\'elle révèle sur les tensions de l\'époque'],
+      'fragile':    ['Analyser la laïcité de 1905 comme aboutissement des combats républicains depuis 1789'],
+    },
+    reperes: {
+      'non-acquis': ['Placer sur une frise : 1789, 1799, 1804, 1815, 1830, 1848, 1870, 1885, 1905', 'Savoir associer chaque date à son événement sans hésitation', 'Distinguer les régimes : monarchie absolue, monarchie constitutionnelle, République, Empire'],
+      'fragile':    ['Retrouver le siècle d\'un événement (XVIIIe = 1700-1799, XIXe = 1800-1899)'],
+    },
+  },
+};
+
+// ── histoire-5.tsx ──
+// Source éditable — quiz histoire-5. Régénéré automatiquement dans index.html via build.sh.
+window.ALL_QUIZZES['histoire-5'] = {
+  SEARCH_SITES: 'site:lumni.fr OR site:francetveducation.fr OR site:fr.khanacademy.org',
+  YT_SUFFIX: 'histoire 5eme college moyen age renaissance',
+  SUMMER_TOPIC: 'Histoire médiévale et moderne',
+  SUBJECT: { id:'histoire-5', name:'Histoire', short:'Histoire', level:'Fin de 5ème', mark:'📜', tagline:'Évaluation diagnostique' },
+  DOMAINS: {
+    byzance:    { id:'byzance',    name:'Byzance et monde musulman (VIIe-XIIIe)', short:'Byz-Islam',  coef:2, color:'#065f46', icon:'☪',  search:'byzance empire byzantin islam 5eme' },
+    occident:   { id:'occident',   name:'L\'Occident féodal (seigneurs, paysans, Église)', short:'Féodal',    coef:3, color:'#78350f', icon:'🏰', search:'feodalite seigneurie moyen age 5eme' },
+    monarchie:  { id:'monarchie',  name:'L\'affirmation de l\'État monarchique en France', short:'Monarchie', coef:2, color:'#1e40af', icon:'♛',  search:'monarchie france capetiens guerre cent ans 5eme' },
+    decouvertes:{ id:'decouvertes',name:'Les Grandes Découvertes (XVe-XVIe)',    short:'Découv.',    coef:3, color:'#0369a1', icon:'⚓',  search:'grandes decouvertes colomb vasco de gama 5eme' },
+    renaissance:{ id:'renaissance',name:'Humanisme et Renaissance',              short:'Renaiss.',   coef:2, color:'#a16207', icon:'🖋',  search:'humanisme renaissance gutenberg 5eme' },
+    reformes:   { id:'reformes',   name:'Réformes protestantes et guerres de religion', short:'Réformes', coef:2, color:'#b91c1c', icon:'✠',  search:'luther calvin reforme protestante guerres religion 5eme' },
+    reperes:    { id:'reperes',    name:'Repères chronologiques',                short:'Repères',    coef:2, color:'#475569', icon:'⧗',  search:'reperes chronologiques moyen age 5eme' },
+  },
+  RESOURCES: [
+    { label:'Lumni — Histoire 5ème',        author:'France Télévisions éducation', url:'https://www.lumni.fr/college/cinquieme/histoire' },
+    { label:'France TV Éducation — Moyen Âge', author:'France TV éducation',       url:'https://www.lumni.fr/dossier/le-moyen-age' },
+    { label:'Khan Academy — Monde médiéval', author:'Cours + exercices',           url:'https://fr.khanacademy.org/humanities/world-history/medieval-times' },
+    { label:'Cours histoire 5ème vidéos',   author:'YouTube (collège)',             url:'https://www.youtube.com/results?search_query=histoire+5eme+cours' },
+  ],
+  POOL: {
+    byzance: [
+      { key:'byz-1', q:'Quelle est la capitale de l\'Empire byzantin ?', options:['Rome','Constantinople','Bagdad','Jérusalem'], correct:1, hint:'Constantinople = ancienne Byzance, fondée par l\'empereur Constantin en 330.' },
+      { key:'byz-2', q:'En quelle année Constantinople tombe-t-elle aux mains des Ottomans ?', options:['1096','1337','1453','1492'], correct:2, hint:'La prise de Constantinople par Mehmed II en 1453 marque la fin de l\'Empire byzantin.' },
+      { key:'byz-3', q:'L\'Hégire (début du calendrier musulman) correspond à la fuite de Mahomet de La Mecque vers Médine en :', options:['570','622','711','1095'], correct:1, hint:'622 = An 1 du calendrier hégirien. Mahomet fuit La Mecque et s\'installe à Médine.' },
+      { key:'byz-4', q:'Le livre sacré de l\'islam s\'appelle :', options:['La Torah','La Bible','Le Coran','Le Talmud'], correct:2, hint:'Le Coran recueille les révélations de Dieu (Allah) transmises à Mahomet.' },
+      { key:'byz-5', q:'Bagdad, grande capitale du califat abbasside, était réputée pour :', options:['Ses guerres constantes','Ses savants et sa Maison de la Sagesse','Sa pauvreté','Son isolement'], correct:1, hint:'La Maison de la Sagesse de Bagdad était un centre de traduction et de sciences au IXe siècle.' },
+      { key:'byz-6', q:'Al-Khwarizmi, savant musulman du IXe siècle, est à l\'origine :', options:['De la poudre à canon','De l\'algèbre (al-jabr)','De la boussole','De l\'imprimerie'], correct:1, hint:'Le mot "algèbre" vient du titre de son livre Al-Jabr. Son prénom latinisé a donné "algorithme".' },
+      { key:'byz-7', q:'La ville de Cordoue (Al-Andalus) était au Xe siècle :', options:['Une petite bourgade','L\'une des plus grandes villes d\'Europe, brillant foyer culturel','Conquise par les Francs','Une colonie byzantine'], correct:1, hint:'Cordoue comptait plus de 100 000 habitants et possédait bibliothèques et universités.' },
+    ],
+    occident: [
+      { key:'occ-1', q:'Dans la pyramide féodale, un vassal doit à son seigneur :', options:['Rien','Le service militaire et la fidélité en échange d\'un fief','Uniquement de l\'argent','Ses récoltes en totalité'], correct:1, hint:'Liens féodaux : le vassal rend l\'hommage et le service d\'ost (armée) ; il reçoit un fief (terre).' },
+      { key:'occ-2', q:'Les serfs au Moyen Âge étaient :', options:['Des chevaliers libres','Des paysans liés à la terre d\'un seigneur','Des moines','Des marchands'], correct:1, hint:'Les serfs (mainmortables, taillables) ne pouvaient quitter la seigneurie sans autorisation.' },
+      { key:'occ-3', q:'La cathédrale Notre-Dame de Paris a commencé à être construite en :', options:['800','987','1163','1337'], correct:2, hint:'Chantier lancé en 1163 sous Louis VII ; exemple parfait du style gothique (arcs-boutants, vitraux, ogives).' },
+      { key:'occ-4', q:'Le pape Urbain II prêche la 1re croisade en :', options:['987','1095','1163','1214'], correct:1, hint:'Au concile de Clermont (1095), Urbain II appelle les chrétiens à délivrer Jérusalem.' },
+      { key:'occ-5', q:'Jérusalem est prise par les croisés lors de la 1re croisade en :', options:['1054','1095','1099','1204'], correct:2, hint:'Les croisés prennent Jérusalem en 1099 et créent les États latins d\'Orient.' },
+      { key:'occ-6', q:'L\'ordre des Franciscains est fondé par :', options:['Dominique de Guzmán','François d\'Assise','Bernard de Clairvaux','Grégoire VII'], correct:1, hint:'François d\'Assise (début XIIIe) fonde les Frères mineurs (Franciscains), ordre mendiant voué à la pauvreté.' },
+      { key:'occ-7', q:'Le style architectural des cathédrales gothiques se caractérise par :', options:['Des murs épais et sombres','De grandes fenêtres, des arcs en ogive et des arcs-boutants','Des toits plats','Des coupoles dorées'], correct:1, hint:'Gothique = hauteur, lumière, ogives, rosaces — opposé au roman (murs massifs).' },
+    ],
+    monarchie: [
+      { key:'mon-1', q:'Hugues Capet devient roi de France en :', options:['768','843','987','1096'], correct:2, hint:'En 987, Hugues Capet est élu roi par les grands seigneurs ; il fonde la dynastie capétienne.' },
+      { key:'mon-2', q:'La bataille de Bouvines (1214) est remportée par :', options:['Richard Cœur de Lion','Philippe Auguste contre une coalition','Jean sans Peur','Louis IX'], correct:1, hint:'Philippe Auguste bat la coalition germano-anglaise à Bouvines, renforçant l\'autorité royale en France.' },
+      { key:'mon-3', q:'Louis IX (Saint Louis) est connu pour :', options:['Avoir perdu la guerre de Cent Ans','Avoir rendu la justice sous un chêne et participé aux croisades','Avoir inventé l\'imprimerie','Avoir découvert l\'Amérique'], correct:1, hint:'Saint Louis (1226-1270) symbolise le roi juste et pieux ; il part en croisade et instaure une justice royale.' },
+      { key:'mon-4', q:'La guerre de Cent Ans oppose principalement :', options:['La France et l\'Espagne','La France et l\'Angleterre (1337-1453)','La France et l\'Empire germanique','La France et le pape'], correct:1, hint:'Guerre de succession entre Valois (France) et Plantagenêts (Angleterre) : 1337-1453.' },
+      { key:'mon-5', q:'Jeanne d\'Arc lève le siège d\'Orléans en :', options:['1337','1415','1429','1453'], correct:2, hint:'En 1429, Jeanne d\'Arc fait lever le siège d\'Orléans, tournant décisif de la guerre de Cent Ans.' },
+      { key:'mon-6', q:'Philippe le Bel (1285-1314) est surtout connu pour avoir :', options:['Fondé Paris','Supprimé l\'ordre du Temple et renforcé le pouvoir royal','Perdu Bouvines','Lancé les croisades'], correct:1, hint:'Philippe le Bel démantèle l\'ordre des Templiers (1307) et affirme l\'autorité royale face au pape.' },
+    ],
+    decouvertes: [
+      { key:'dec-1', q:'Christophe Colomb arrive en Amérique en :', options:['1488','1492','1498','1519'], correct:1, hint:'12 octobre 1492 : Colomb, navigateur génois au service de l\'Espagne, aborde les Caraïbes.' },
+      { key:'dec-2', q:'Vasco de Gama atteint l\'Inde en contournant l\'Afrique en :', options:['1492','1498','1510','1522'], correct:1, hint:'1498 : Vasco de Gama ouvre la route maritime des épices vers l\'Inde via le cap de Bonne-Espérance.' },
+      { key:'dec-3', q:'La première circumnavigation (tour du monde) est réalisée par l\'expédition de :', options:['Christophe Colomb','Vasco de Gama','Magellan (1519-1522)','Bartolomeu Dias'], correct:2, hint:'Magellan part en 1519 ; tué aux Philippines, son équipage rentre en 1522 — premier tour du monde.' },
+      { key:'dec-4', q:'Hernán Cortés conquiert l\'empire aztèque (Mexique) au nom de :', options:['Portugal','France','Espagne','Angleterre'], correct:2, hint:'Cortés renverse l\'empire aztèque de Moctezuma II entre 1519 et 1521 pour la couronne espagnole.' },
+      { key:'dec-5', q:'La première traite atlantique désigne :', options:['Le commerce des épices','La déportation d\'Africains réduits en esclavage vers les Amériques','L\'échange de céréales','Le commerce de l\'or en Afrique du Nord'], correct:1, hint:'Dès le XVIe siècle, des millions d\'Africains sont déportés en esclavage vers les plantations américaines.' },
+      { key:'dec-6', q:'Francisco Pizarro conquiert l\'empire inca (Pérou) pour :', options:['Le Portugal','L\'Espagne','La France','L\'Angleterre'], correct:1, hint:'Pizarro renverse Atahualpa et l\'empire inca en 1532-1535 au profit de la couronne espagnole.' },
+      { key:'dec-7', q:'Quel cap africain Bartolomeu Dias double-t-il en 1488, ouvrant la route vers l\'Inde ?', options:['Cap Vert','Cap Horn','Cap de Bonne-Espérance','Cap Blanc'], correct:2, hint:'Le cap de Bonne-Espérance (pointe sud de l\'Afrique) est doublé par Dias en 1488, avant Vasco de Gama.' },
+    ],
+    renaissance: [
+      { key:'ren-1', q:'Gutenberg met au point l\'imprimerie à caractères mobiles vers :', options:['1350','1450','1517','1550'], correct:1, hint:'Vers 1450 à Mayence, Gutenberg invente la presse à imprimer ; la Bible de Gutenberg date de ~1455.' },
+      { key:'ren-2', q:'L\'humanisme est un courant intellectuel qui :', options:['Rejette l\'homme au profit de Dieu','Place l\'homme au centre de la réflexion et valorise l\'Antiquité gréco-romaine','Interdit les arts','Prône le retour au Moyen Âge'], correct:1, hint:'Les humanistes (Érasme, More, Montaigne) redécouvrent l\'Antiquité et croient au progrès par l\'éducation.' },
+      { key:'ren-3', q:'Léonard de Vinci est connu comme :', options:['Un explorateur espagnol','Un peintre, sculpteur et inventeur de la Renaissance italienne','Un roi de France','Un réformateur religieux'], correct:1, hint:'Léonard (1452-1519) peint La Joconde, dessine des machines, incarne l\'idéal humaniste de l\'homme universel.' },
+      { key:'ren-4', q:'La Renaissance naît d\'abord en :', options:['France','Espagne','Angleterre','Italie (Florence, Rome)'], correct:3, hint:'Florence, sous les Médicis, est le berceau de la Renaissance (XVe s.) avant que le mouvement se diffuse en Europe.' },
+      { key:'ren-5', q:'François Ier fait construire quel château de la Loire pour y installer la cour ?', options:['Versailles','Vincennes','Chambord','Fontainebleau'], correct:2, hint:'Chambord (1519) est le plus grand château de la Loire, commandé par François Ier, chef-d\'œuvre Renaissance.' },
+      { key:'ren-6', q:'Nicolas Copernic affirme que :', options:['La Terre est plate','La Terre tourne autour du Soleil (héliocentrisme)','Le Soleil tourne autour de la Terre','La Lune est habitée'], correct:1, hint:'Copernic (1543) renverse le géocentrisme de l\'Église : la Terre tourne autour du Soleil.' },
+    ],
+    reformes: [
+      { key:'ref-1', q:'En quelle année Martin Luther affiche ses 95 thèses à Wittenberg ?', options:['1492','1498','1517','1562'], correct:2, hint:'Le 31 octobre 1517, Luther cloue ses 95 thèses contre les indulgences — acte fondateur de la Réforme protestante.' },
+      { key:'ref-2', q:'Jean Calvin installe sa réforme dans quelle ville ?', options:['Rome','Paris','Wittenberg','Genève'], correct:3, hint:'Calvin s\'installe à Genève (1541) et y établit une théocratie calviniste, modèle pour d\'autres protestants.' },
+      { key:'ref-3', q:'Le massacre de la Saint-Barthélemy (1572) est :', options:['Une bataille navale','Le massacre de milliers de protestants (huguenots) en France','La prise de Jérusalem','Un tremblement de terre'], correct:1, hint:'La nuit du 23-24 août 1572, des milliers de protestants sont massacrés à Paris sur ordre de Catherine de Médicis.' },
+      { key:'ref-4', q:'L\'édit de Nantes (1598) est signé par :', options:['Charles IX','Henri III','Henri IV','Louis XIII'], correct:2, hint:'Henri IV (ancien protestant converti) signe l\'édit de Nantes en 1598 : il accorde la liberté de culte aux protestants.' },
+      { key:'ref-5', q:'Que reproche Luther à l\'Église catholique en 1517 ?', options:['De construire trop de cathédrales','De vendre des indulgences (pardon des péchés contre argent)','D\'organiser des croisades','De soutenir les rois'], correct:1, hint:'Les indulgences permettaient d\'acheter l\'absolution des péchés — Luther y voit une corruption de la foi chrétienne.' },
+      { key:'ref-6', q:'Les guerres de religion en France durent de :', options:['1095 à 1204','1337 à 1453','1562 à 1598','1618 à 1648'], correct:2, hint:'8 guerres de religion entre catholiques et protestants (huguenots) se succèdent de 1562 à la paix de 1598.' },
+    ],
+    reperes: [
+      { key:'rep-1', q:'Le XVe siècle correspond aux années :', options:['1300-1399','1400-1499','1500-1599','1600-1699'], correct:1, hint:'XVe siècle = années 1400-1499. Mémo : numéro du siècle = centaines + 1 → XVe commence en 1400.' },
+      { key:'rep-2', q:'En quelle année Hugues Capet devient-il roi de France ?', options:['768','843','987','1096'], correct:2, hint:'987 : Hugues Capet est élu roi, fondant la dynastie capétienne qui durera jusqu\'en 1328.' },
+      { key:'rep-3', q:'Qu\'est-ce que la féodalité ?', options:['Un régime de démocratie directe','Un système basé sur les liens de vassalité et le fief entre seigneurs','Une religion','Un type de commerce'], correct:1, hint:'Féodalité = réseau de liens personnels (hommage, fief) entre seigneurs de niveaux différents.' },
+      { key:'rep-4', q:'Une croisade est :', options:['Un pèlerinage pacifique','Une expédition militaire chrétienne pour défendre ou reprendre des lieux saints','Un concile religieux','Une révolte paysanne'], correct:1, hint:'Les croisades (1096-1291) sont des guerres saintes pour reprendre Jérusalem aux musulmans.' },
+      { key:'rep-5', q:'La seigneurie au Moyen Âge est :', options:['Une ville marchande','Un domaine où le seigneur exerce autorité sur les paysans (serfs et vilains)','Un monastère','Une cathédrale'], correct:1, hint:'La seigneurie = domaine + pouvoir banal (justice, taxes, moulin, four). Les paysans lui doivent redevances.' },
+      { key:'rep-6', q:'L\'humanisme, c\'est :', options:['La croyance que l\'homme est mauvais par nature','Un courant valorisant l\'homme, la raison et les lettres antiques','Un ordre religieux du Moyen Âge','Une technique agricole'], correct:1, hint:'Les humanistes (XVe-XVIe s.) croient en la valeur de l\'homme, redécouvrent le grec et le latin, défendent l\'éducation.' },
+      { key:'rep-7', q:'La Réforme protestante désigne :', options:['La réforme agricole du XVIIe siècle','Le mouvement religieux qui au XVIe s. conteste l\'autorité du pape et fonde de nouvelles Églises chrétiennes','La réforme de l\'armée royale','La restructuration des universités'], correct:1, hint:'Réforme = rupture avec Rome : Luther (luthéranisme), Calvin (calvinisme), Henri VIII (anglicanisme).' },
+    ],
+  },
+  PICK: {
+    byzance: 4, occident: 5, monarchie: 4, decouvertes: 5, renaissance: 4, reformes: 4, reperes: 4,
+  },
+  PLANS: {
+    byzance: {
+      'non-acquis': ['Apprendre les dates clés : Hégire 622, chute de Constantinople 1453', 'Distinguer les deux grandes civilisations : Empire byzantin (chrétien) et Islam (Mahomet, Coran)', 'Retenir les grandes villes : Constantinople, Bagdad, Cordoue et leur rôle culturel'],
+      'fragile':    ['Mémoriser les apports scientifiques arabes : algèbre (Al-Khwarizmi), astronomie, médecine (Avicenne)'],
+    },
+    occident: {
+      'non-acquis': ['Schéma de la pyramide féodale : roi → grands seigneurs → chevaliers → paysans', 'Retenir les conditions de vie des serfs (liés à la terre, redevances, droit de ban)', 'Connaître les grandes étapes des croisades (1095 Urbain II, prise de Jérusalem 1099)'],
+      'fragile':    ['Distinguer roman et gothique en architecture ; connaître Notre-Dame de Paris (1163)'],
+    },
+    monarchie: {
+      'non-acquis': ['Frise chronologique : Hugues Capet 987 → Bouvines 1214 → Jeanne d\'Arc 1429 → fin guerre 1453', 'Comprendre comment les rois capétiens renforcent leur pouvoir face aux seigneurs', 'Rôle de Jeanne d\'Arc dans la guerre de Cent Ans'],
+      'fragile':    ['Philippe le Bel et la suppression des Templiers ; tensions roi/pape'],
+    },
+    decouvertes: {
+      'non-acquis': ['Frise : Colomb 1492, Vasco de Gama 1498, Magellan 1519-1522', 'Distinguer les zones de conquête : Espagne (Amériques) / Portugal (Afrique, Inde)', 'Conséquences : choc des cultures, traite atlantique, afflux d\'or en Europe'],
+      'fragile':    ['Noms des conquérants et des peuples vaincus : Cortés/Aztèques, Pizarro/Incas'],
+    },
+    renaissance: {
+      'non-acquis': ['Retenir les idées clés de l\'humanisme : valeur de l\'homme, éducation, retour à l\'Antiquité', 'Gutenberg et l\'imprimerie (~1450) : révolution de la diffusion des idées', 'Artistes italiens : Léonard de Vinci, Michel-Ange, Raphaël'],
+      'fragile':    ['Copernic et l\'héliocentrisme ; François Ier et la Renaissance en France (Chambord)'],
+    },
+    reformes: {
+      'non-acquis': ['Luther 1517 (95 thèses, Wittenberg), Calvin (Genève) — causes de la rupture avec Rome', 'Guerres de religion en France 1562-1598 ; massacre de la Saint-Barthélemy 1572', 'Édit de Nantes 1598 : Henri IV accorde la tolérance religieuse'],
+      'fragile':    ['Distinguer luthéranisme, calvinisme, anglicanisme ; notion d\'indulgence'],
+    },
+    reperes: {
+      'non-acquis': ['Calculer le siècle depuis une année (ex. 1453 → XVe s.)', 'Vocabulaire essentiel : féodalité, vassal, serf, seigneurie, croisade, humanisme, réforme', 'Placer sur une frise les 7 dates : 987, 1095, 1214, 1337-1453, 1429, 1492, 1517, 1598'],
+      'fragile':    ['Distinguer Moyen Âge (Ve-XVe s.) et Renaissance/époque moderne (XVIe s.)'],
+    },
+  },
+};
+
+// ── histoire-6.tsx ──
+// Source éditable — quiz histoire-6. Régénéré automatiquement dans index.html via build.sh.
+window.ALL_QUIZZES['histoire-6'] = {
+  SEARCH_SITES: 'site:lumni.fr OR site:francetveducation.fr OR site:curiosphere.tv OR site:fr.khanacademy.org',
+  YT_SUFFIX: 'histoire 6eme college antiquite',
+  SUMMER_TOPIC: 'Histoire',
+  SUBJECT: { id:'histoire-6', name:'Histoire', short:'Histoire', level:'Fin de 6ème', mark:'📜', tagline:'Évaluation diagnostique' },
+  DOMAINS: {
+    prehistoire: { id:'prehistoire', name:'Préhistoire et Néolithique',                    short:'Préhist.',  coef:2, color:'#78350f', icon:'⛰',    search:'prehistoire neolithique 6eme' },
+    orient:      { id:'orient',      name:'Premières civilisations — Égypte & Mésopotamie', short:'Orient',    coef:2, color:'#b45309', icon:'𓂀',   search:'egypte mesopotamie 6eme' },
+    grece:       { id:'grece',       name:'La Grèce antique — Athènes, démocratie',         short:'Grèce',     coef:3, color:'#1e40af', icon:'Ω',    search:'grece antique democratie 6eme' },
+    rome:        { id:'rome',        name:'Rome — fondation, République, Empire',            short:'Rome',      coef:3, color:'#991b1b', icon:'SPQR', search:'rome antique republique empire 6eme' },
+    religions:   { id:'religions',   name:'Judaïsme et naissance du christianisme',          short:'Religions', coef:2, color:'#7c3aed', icon:'✡',    search:'judaisme christianisme 6eme' },
+    asie:        { id:'asie',        name:'Chine des Han et Inde des Gupta',                 short:'Asie',      coef:2, color:'#ca8a04', icon:'龍',   search:'chine han inde gupta 6eme' },
+    reperes:     { id:'reperes',     name:'Repères chronologiques et vocabulaire',           short:'Repères',   coef:2, color:'#475569', icon:'⧗',    search:'chronologie antiquite reperes 6eme' },
+  },
+  RESOURCES: [
+    { label:'Lumni — Histoire 6ème',         author:'France TV éducation',  url:'https://www.lumni.fr/college/sixieme/histoire-geographie' },
+    { label:'France TV Éducation — Antiquité',author:'France Télévisions',  url:'https://www.francetveducation.fr/thematique/histoire/' },
+    { label:'Curiosphère — Histoire antique', author:'France 5',            url:'https://www.curiosphere.tv/categories/histoire' },
+    { label:'Khan Academy — Histoire mondiale',author:'Cours + exercices',  url:'https://fr.khanacademy.org/humanities/world-history' },
+  ],
+  POOL: {
+    prehistoire: [
+      { key:'pre-1', q:'Lucy est un célèbre fossile découvert en Éthiopie. À quelle espèce appartient-elle ?', options:['Homo sapiens','Homo erectus','Australopithecus','Homo habilis'], correct:2, hint:'Lucy a vécu il y a environ 3,2 millions d\'années — bien avant Homo sapiens.' },
+      { key:'pre-2', q:'Homo sapiens est apparu il y a environ :', options:['500 000 ans','300 000 ans','10 000 ans','1 million d\'années'], correct:1, hint:'Les premiers Homo sapiens sont attestés en Afrique vers -300 000 ans.' },
+      { key:'pre-3', q:'Les peintures rupestres de Lascaux se trouvent dans quel département français ?', options:['Ariège','Dordogne','Lot','Ardèche'], correct:1, hint:'Lascaux est en Dordogne (Périgord). Elles datent d\'environ 17 000 ans av. J.-C.' },
+      { key:'pre-4', q:'Le Néolithique commence avec :', options:['L\'invention de l\'écriture','L\'agriculture, l\'élevage et la sédentarisation','La naissance de Rome','La construction des pyramides'], correct:1, hint:'Néolithique = «Pierre polie» : les humains deviennent agriculteurs et sédentaires vers -10 000.' },
+      { key:'pre-5', q:'Au Paléolithique, les hommes vivaient surtout :', options:['Dans des maisons en pierre','De manière nomade, de chasse et de cueillette','En cultivant le blé','Dans des cités'], correct:1, hint:'Paléolithique = «Pierre taillée» : vie nomade, pas d\'agriculture.' },
+      { key:'pre-6', q:'La sédentarisation signifie :', options:['Se déplacer selon les saisons','S\'installer de façon permanente dans un lieu fixe','Chasser de grands animaux','Sculpter des statues'], correct:1, hint:'Les premiers villages permanents apparaissent avec l\'agriculture au Néolithique.' },
+      { key:'pre-7', q:'L\'outil caractéristique du Paléolithique est :', options:['La poterie','La hache en bronze','Le silex taillé','La charrue'], correct:2, hint:'Paléolithique = «vieille pierre taillée». Le silex est frappé pour obtenir un tranchant.' },
+    ],
+    orient: [
+      { key:'ori-1', q:'En Égypte antique, le chef de l\'État s\'appelle :', options:['Consul','Pharaon','Roi','Sultan'], correct:1, hint:'Le pharaon est à la fois roi, chef militaire et dieu vivant en Égypte.' },
+      { key:'ori-2', q:'L\'écriture inventée en Mésopotamie vers -3300 s\'appelle :', options:['L\'alphabet','Les hiéroglyphes','L\'écriture cunéiforme','Les runes'], correct:2, hint:'Cunéiforme vient de «cuneus» = coin. On gravait des signes en forme de clous dans l\'argile.' },
+      { key:'ori-3', q:'Le fleuve essentiel à la civilisation égyptienne est :', options:['Le Tigre','L\'Euphrate','Le Nil','Le Jourdain'], correct:2, hint:'Le Nil fertilise ses rives lors des crues annuelles. Sans lui, l\'Égypte serait un désert.' },
+      { key:'ori-4', q:'Les hiéroglyphes sont :', options:['Des lettres comme l\'alphabet','Des signes d\'écriture égyptiens (dessins)','Des chiffres arabes','Une langue parlée'], correct:1, hint:'Hiéroglyphe = «écriture sacrée gravée» en grec. Déchiffrés grâce à la pierre de Rosette.' },
+      { key:'ori-5', q:'Le code d\'Hammourabi (vers -1750) est :', options:['Un temple babylonien','Un des premiers codes de lois écrits','Un récit mythologique','Une carte géographique'], correct:1, hint:'Hammourabi, roi de Babylone, a fait graver ses lois sur une stèle. Principe : œil pour œil.' },
+      { key:'ori-6', q:'Les pyramides de Gizeh ont été construites pour :', options:['Stocker des céréales','Servir de tombeaux aux pharaons','Abriter les soldats','Observer les étoiles'], correct:1, hint:'Les pyramides sont les tombes monumentales des pharaons. Kheops, Khephren, Mykérinos à Gizeh.' },
+      { key:'ori-7', q:'La Mésopotamie se trouve entre deux fleuves. Lesquels ?', options:['Nil et Congo','Tigre et Euphrate','Jourdain et Nil','Indus et Gange'], correct:1, hint:'«Mésopotamie» = «entre les fleuves» en grec : Tigre + Euphrate (actuel Irak).' },
+      { key:'ori-8', q:'Toutankhamon est célèbre parce que :', options:['Il a conquis la Grèce','Sa tombe découverte en 1922 était intacte, remplie de trésors','Il a construit la grande pyramide','Il a inventé les hiéroglyphes'], correct:1, hint:'La découverte de sa tombe par Howard Carter en 1922 est l\'une des plus grandes trouvailles archéologiques.' },
+    ],
+    grece: [
+      { key:'gre-1', q:'La cité-État grecque s\'appelle :', options:['L\'agora','La polis','L\'acropole','L\'amphithéâtre'], correct:1, hint:'Polis = cité-État. Chaque polis (Athènes, Sparte, Corinthe…) est indépendante.' },
+      { key:'gre-2', q:'La démocratie athénienne au Ve siècle av. J.-C. signifie que :', options:['Le roi décide seul','Tous les habitants votent','Les citoyens (hommes libres nés à Athènes) participent aux décisions','Toutes les cités grecques sont réunies'], correct:2, hint:'«Démocratie» = «pouvoir du peuple» en grec. Mais femmes, esclaves, étrangers exclus.' },
+      { key:'gre-3', q:'Périclès est un grand homme politique athénien du :', options:['VIIIe siècle av. J.-C.','Ve siècle av. J.-C.','IIIe siècle av. J.-C.','Ier siècle apr. J.-C.'], correct:1, hint:'Périclès dirige Athènes vers 461-429 av. J.-C. Il fait construire le Parthénon.' },
+      { key:'gre-4', q:'L\'Iliade et l\'Odyssée sont des poèmes épiques attribués à :', options:['Platon','Homère','Aristote','Hérodote'], correct:1, hint:'Homère : deux épopées fondatrices (guerre de Troie et voyage d\'Ulysse). VIIIe s. av. J.-C.' },
+      { key:'gre-5', q:'Les Jeux olympiques antiques se déroulaient à :', options:['Athènes','Sparte','Olympie','Corinthe'], correct:2, hint:'Olympie, dans le Péloponnèse. Jeux tous les 4 ans en l\'honneur de Zeus depuis -776.' },
+      { key:'gre-6', q:'Alexandre le Grand est :', options:['Un pharaon égyptien','Un roi macédonien qui conquiert un vaste empire jusqu\'en Inde','Un consul romain','Un philosophe athénien'], correct:1, hint:'Alexandre III de Macédoine (356-323 av. J.-C.) conquiert la Perse, l\'Égypte et atteint l\'Inde.' },
+      { key:'gre-7', q:'Le dieu suprême du panthéon grec est :', options:['Poséidon','Apollon','Zeus','Arès'], correct:2, hint:'Zeus règne sur l\'Olympe et sur tous les autres dieux. Maître du tonnerre.' },
+      { key:'gre-8', q:'Sparte est connue pour être une cité :', options:['Marchande et artistique','Militaire et guerrière, où les garçons s\'entraînent dès 7 ans','Démocratique','Pacifiste'], correct:1, hint:'À Sparte, les garçons entrent à l\'agogé à 7 ans pour devenir des guerriers. Cité rivale d\'Athènes.' },
+    ],
+    rome: [
+      { key:'rom-1', q:'Selon la légende, Rome a été fondée en -753 par :', options:['Jules César','Romulus et Rémus','Auguste','Virgile'], correct:1, hint:'Les jumeaux Romulus et Rémus, nourris par une louve. Romulus aurait fondé Rome et tué son frère.' },
+      { key:'rom-2', q:'La République romaine (509-27 av. J.-C.) est dirigée par :', options:['Un pharaon','Deux consuls élus chaque année','Un seul roi à vie','Un sultan'], correct:1, hint:'Res publica = «chose publique». Deux consuls élus pour 1 an avec le Sénat.' },
+      { key:'rom-3', q:'Jules César est assassiné en :', options:['-44 av. J.-C.','-27 av. J.-C.','476 apr. J.-C.','-753 av. J.-C.'], correct:0, hint:'Assassiné aux Ides de mars (-44). Son neveu Octave lui succède et devient Auguste.' },
+      { key:'rom-4', q:'Auguste devient le premier empereur romain en :', options:['-509 av. J.-C.','-44 av. J.-C.','-27 av. J.-C.','476 apr. J.-C.'], correct:2, hint:'-27 marque la fin de la République et le début de l\'Empire romain. Octave prend le titre d\'Augustus.' },
+      { key:'rom-5', q:'La Pax Romana désigne :', options:['Une guerre contre Carthage','Une longue période de paix et de prospérité dans l\'Empire romain','La chute de Rome','La fondation de Constantinople'], correct:1, hint:'Pax Romana = paix romaine. Environ 200 ans de stabilité (du règne d\'Auguste à la crise du IIIe s.).' },
+      { key:'rom-6', q:'L\'Empire romain d\'Occident prend fin en :', options:['-27 av. J.-C.','313 apr. J.-C.','476 apr. J.-C.','380 apr. J.-C.'], correct:2, hint:'476 : déposition du dernier empereur Romulus Augustule par Odoacre. Date symbolique de la fin de l\'Antiquité.' },
+      { key:'rom-7', q:'Le Colisée est un monument de Rome qui servait à :', options:['Stocker les archives de l\'État','Organiser des spectacles (combats de gladiateurs, combats d\'animaux)','Abriter le Sénat','Observer les astres'], correct:1, hint:'Le Colisée (Flavius) peut accueillir 50 000 spectateurs pour les jeux (munera, venationes).' },
+      { key:'rom-8', q:'L\'armée romaine est organisée en :', options:['Cavalerie uniquement','Légions','Phalanges','Croisades'], correct:1, hint:'La légion romaine (~5 000 soldats) est l\'unité de base. Discipline, génie civil, routes.' },
+    ],
+    religions: [
+      { key:'rel-1', q:'Le judaïsme est une religion :', options:['Polythéiste (plusieurs dieux)','Monothéiste (un seul Dieu)','Animiste','Sans dieu'], correct:1, hint:'Judaïsme = l\'une des premières religions monothéistes. Un seul Dieu (Yahvé), révélé à Moïse.' },
+      { key:'rel-2', q:'Le livre sacré du judaïsme est :', options:['La Bible chrétienne','La Torah','Le Coran','Les Vedas'], correct:1, hint:'La Torah = les 5 premiers livres de la Bible. Elle contient la Loi donnée à Moïse sur le Sinaï.' },
+      { key:'rel-3', q:'Jésus de Nazareth naît :', options:['Vers -753','Vers l\'an 0 (début de notre ère)','En 313','En 476'], correct:1, hint:'L\'ère chrétienne commence à la naissance supposée de Jésus (vers -4 à +6 selon les historiens).' },
+      { key:'rel-4', q:'L\'édit de Milan (313) est signé par l\'empereur Constantin pour :', options:['Interdire le christianisme','Autoriser la pratique du christianisme dans l\'Empire','Détruire Jérusalem','Expulser les juifs'], correct:1, hint:'En 313, Constantin accorde la liberté de culte aux chrétiens, qui étaient persécutés.' },
+      { key:'rel-5', q:'En 380, le christianisme devient :', options:['Interdit dans l\'Empire','La religion officielle de l\'Empire romain','Une religion mineure','Remplacé par le judaïsme'], correct:1, hint:'Édit de Thessalonique (380) : l\'empereur Théodose fait du christianisme la religion d\'État.' },
+      { key:'rel-6', q:'Moïse est surtout connu pour :', options:['Avoir fondé Rome','Avoir reçu les dix commandements et conduit les Hébreux hors d\'Égypte','Avoir construit Jérusalem','Avoir écrit la Torah seul'], correct:1, hint:'Moïse est le prophète fondateur du judaïsme. Il reçoit les Tables de la Loi sur le mont Sinaï.' },
+    ],
+    asie: [
+      { key:'asi-1', q:'La Grande Muraille de Chine a été construite à l\'origine pour :', options:['Délimiter les provinces','Protéger la Chine des invasions nomades du nord','Faciliter le commerce','Symboliser la puissance des empereurs'], correct:1, hint:'La muraille est renforcée sous les Han et surtout sous les Ming, pour stopper les raids des nomades.' },
+      { key:'asi-2', q:'La route de la Soie reliait :', options:['Rome et Carthage','La Chine à l\'Europe et au Moyen-Orient','L\'Inde à l\'Afrique','Athènes à Babylone'], correct:1, hint:'La route de la Soie (à partir des Han, IIe s. av. J.-C.) permettait l\'échange de soie, épices, or.' },
+      { key:'asi-3', q:'Confucius est un penseur chinois qui prône :', options:['La guerre permanente','Le respect des parents, des anciens et de l\'ordre social','La conquête militaire','L\'isolement de la Chine'], correct:1, hint:'Confucius (551-479 av. J.-C.) insiste sur la piété filiale, la vertu et l\'harmonie sociale.' },
+      { key:'asi-4', q:'La dynastie Han gouverne la Chine de :', options:['-221 à -206','-206 à 220 apr. J.-C.','IVe au VIe siècle','VIIe au Xe siècle'], correct:1, hint:'Les Han (-206 à 220 apr. J.-C.) : grand empire unifié, route de la Soie, confucianisme comme doctrine officielle.' },
+      { key:'asi-5', q:'Les chiffres que nous utilisons aujourd\'hui (1, 2, 3…) viennent de :', options:['La Grèce antique','Rome','L\'Inde (période Gupta)','La Chine Han'], correct:2, hint:'Les chiffres «arabes» ont été inventés en Inde, transmis par les Arabes à l\'Europe. Période Gupta (IVe-VIe s.).' },
+      { key:'asi-6', q:'L\'hindouisme et le bouddhisme sont des religions nées :', options:['En Chine','En Inde','Au Moyen-Orient','En Grèce'], correct:1, hint:'L\'hindouisme est l\'une des plus anciennes religions du monde. Le bouddhisme naît en Inde avec Bouddha (~Ve s. av. J.-C.).' },
+    ],
+    reperes: [
+      { key:'rep-1', q:'L\'abréviation «av. J.-C.» signifie :', options:['Avant les journées chrétiennes','Avant Jésus-Christ','Après Jésus-Christ','Avant le jugement chrétien'], correct:1, hint:'Av. J.-C. = avant Jésus-Christ. Les dates av. J.-C. se comptent à rebours (plus on recule, plus le chiffre est grand).' },
+      { key:'rep-2', q:'Le Ve siècle av. J.-C. correspond aux années :', options:['-600 à -501','-500 à -401','-400 à -301','-300 à -201'], correct:1, hint:'Le Ve siècle = les années 400 à 500 (comptées av. J.-C.) soit -500 à -401. Siècle = 100 ans.' },
+      { key:'rep-3', q:'L\'écriture apparaît en Mésopotamie vers :', options:['-10 000','-5000','-3300','-753'], correct:2, hint:'L\'écriture cunéiforme, inventée par les Sumériens, date d\'environ -3300 av. J.-C.' },
+      { key:'rep-4', q:'La date -27 marque :', options:['La fondation de Rome','La naissance de Jésus','Le début de l\'Empire romain avec Auguste','La chute de l\'Empire romain d\'Occident'], correct:2, hint:'-27 : Octave reçoit le titre d\'Augustus. Fin de la République, début de l\'Empire.' },
+      { key:'rep-5', q:'La date 476 marque :', options:['La naissance de Jésus','Le début de la Pax Romana','La chute de l\'Empire romain d\'Occident','L\'édit de Milan'], correct:2, hint:'476 apr. J.-C. : fin de l\'Antiquité. L\'Empire romain d\'Occident s\'effondre.' },
+      { key:'rep-6', q:'Le mot «chronologie» désigne :', options:['L\'étude des roches','L\'ordre des événements dans le temps','La géographie des civilisations','Le nom d\'un dieu grec'], correct:1, hint:'Chrono = temps (grec). La chronologie classe les événements du plus ancien au plus récent.' },
+      { key:'rep-7', q:'La République romaine dure de -509 à -27. Combien d\'années cela fait-il ?', options:['100 ans','300 ans','482 ans','753 ans'], correct:2, hint:'509 − 27 = 482 ans. La République romaine a duré presque 5 siècles.' },
+    ],
+  },
+  PICK: {
+    prehistoire: 3,
+    orient:      4,
+    grece:       6,
+    rome:        6,
+    religions:   3,
+    asie:        3,
+    reperes:     5,
+  },
+  PLANS: {
+    prehistoire: {
+      'non-acquis': ['Retenir Lucy (Australopithecus) et Homo sapiens (-300 000 ans)', 'Distinguer Paléolithique (chasse/cueillette nomade) et Néolithique (agriculture/sédentarisation)', 'Situer Lascaux dans le temps (environ -17 000)'],
+      'fragile':    ['Mémoriser -10 000 comme date approximative du début du Néolithique'],
+    },
+    orient: {
+      'non-acquis': ['Connaître les deux grandes civilisations : Égypte (Nil, pharaons, hiéroglyphes) et Mésopotamie (Tigre/Euphrate, cunéiforme)', 'Retenir -3300 pour l\'écriture cunéiforme et les pyramides de Gizeh', 'Distinguer hiéroglyphes (Égypte) et cunéiforme (Mésopotamie)'],
+      'fragile':    ['Noms clés : Hammourabi (lois), Toutankhamon (tombe), Ramsès (grand pharaon)'],
+    },
+    grece: {
+      'non-acquis': ['Comprendre ce qu\'est une polis (cité-État indépendante)', 'Définir la démocratie athénienne et ses limites (citoyens uniquement)', 'Connaître Périclès (Ve s.), les Jeux olympiques (Olympie), Homère (Iliade/Odyssée)'],
+      'fragile':    ['Situer Alexandre le Grand et ses conquêtes (-336 à -323)'],
+    },
+    rome: {
+      'non-acquis': ['Retenir -753 (fondation), -509 (République), -27 (Empire), 476 (fin Empire Occident)', 'Distinguer République (consuls, Sénat) et Empire (un seul chef)', 'Connaître Jules César et Auguste'],
+      'fragile':    ['Le rôle des légions et la Pax Romana'],
+    },
+    religions: {
+      'non-acquis': ['Définir le monothéisme (un seul Dieu)', 'Connaître Moïse et la Torah (judaïsme)', 'Retenir 313 (édit de Milan) et 380 (christianisme religion d\'État)'],
+      'fragile':    ['Lien entre judaïsme et christianisme (Jésus est juif, ses disciples fondent une nouvelle religion)'],
+    },
+    asie: {
+      'non-acquis': ['Connaître la route de la Soie (Chine → Europe) et son rôle commercial', 'Associer Confucius à la Chine Han et ses valeurs', 'Savoir que les chiffres arabes viennent d\'Inde (Gupta)'],
+      'fragile':    ['Période Gupta (IVe-VIe s.) : hindouisme, bouddhisme, sciences'],
+    },
+    reperes: {
+      'non-acquis': ['Maîtriser av. J.-C. / apr. J.-C. et le sens du comptage', 'Savoir calculer un siècle (Ve s. av. J.-C. = -500 à -401)', 'Mémoriser les 4 dates clés : -3300, -753, -27, 476'],
+      'fragile':    ['Calculer une durée entre deux dates (avec ou sans changement d\'ère)'],
+    },
+  },
+};
+
 // ── maths-3.tsx ──
 // Source éditable — quiz maths-3. Régénéré automatiquement dans index.html via build.sh.
 window.ALL_QUIZZES['maths-3'] = {

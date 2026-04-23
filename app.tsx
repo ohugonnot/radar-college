@@ -191,7 +191,7 @@ const storageKey = () => 'quiz-' + SUBJECT.id + '-history-v1';
 function slugName(s) {
   return (s || '').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/\s+/g,' ');
 }
-function loadHistory() {
+function loadHistory(): Record<string, Profile> {
   try { const raw = localStorage.getItem(storageKey()); return raw ? JSON.parse(raw) : {}; } catch { return {}; }
 }
 function saveHistoryFor(name, klass, attempt) {
@@ -206,7 +206,7 @@ function saveHistoryFor(name, klass, attempt) {
     localStorage.setItem(storageKey(), JSON.stringify(hist));
   } catch {}
 }
-function getProfile(name) {
+function getProfile(name: string): Profile | null {
   if (!name) return null;
   const hist = loadHistory();
   return hist[slugName(name)] || null;
@@ -215,7 +215,7 @@ function getProfile(name) {
 // ============================================================
 // BUILD QUIZ
 // ============================================================
-function shuffle(arr) {
+function shuffle<T>(arr: T[]): T[] {
   const a = arr.slice();
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -260,9 +260,9 @@ function weightedSampleWithoutReplacement(items, count, weightFn) {
   return out;
 }
 
-function buildQuiz(forceKeys?): Question[] {
-  const questions = [];
-  const pushQuestion = (src, did) => {
+function buildQuiz(forceKeys?: string[]): Question[] {
+  const questions: Question[] = [];
+  const pushQuestion = (src: SourceQuestion, did: string) => {
     const order = shuffle(src.options.map((_, i) => i)); // ordre shuffle stocké
     const options = order.map(i => src.options[i]);
     const correct = order.indexOf(src.correct);
@@ -300,9 +300,9 @@ function buildQuiz(forceKeys?): Question[] {
 // → incite à passer plutôt que répondre au hasard (voir message sur HomeScreen).
 const WRONG_PENALTY = 0.5;
 
-function analyze(questions, answers): AnalyzeResult {
-  const byDomain = {};
-  Object.keys(DOMAINS).forEach(d => { byDomain[d] = { correct:0, total:0, errors:[], skipped:0, wrong:0, wrongWeighted:0 }; });
+function analyze(questions: Question[], answers: AnswersMap): AnalyzeResult {
+  const byDomain: Record<string, DomainAnalysis> = {};
+  Object.keys(DOMAINS).forEach(d => { byDomain[d] = { correct:0, total:0, errors:[], skipped:0, wrong:0, wrongWeighted:0, pct:0, level:'non-acquis' }; });
   let correct = 0, total = 0, skipped = 0, wrong = 0, weighted = 0, weightedMax = 0, wrongWeighted = 0;
   questions.forEach(q => {
     const ans = answers[q.key];
@@ -346,7 +346,7 @@ function analyze(questions, answers): AnalyzeResult {
   return { total, correct, wrong, skipped, penaltyPoints, noteSur20, noteWeighted, byDomain, forces, lacunes, appreciation, levelLabel, levelColor };
 }
 function planOf(domainId, level) { return PLANS?.[domainId]?.[level] || []; }
-function getFinalAdvice(r) {
+function getFinalAdvice(r: AnalyzeResult): string {
   const n = r.noteWeighted;
   if (n >= 17) return 'Continue comme ça — maintenir le rythme sera la meilleure stratégie.';
   if (n >= 14) return 'Un été bien utilisé sur les points fragiles te mettra en très bonne position.';
@@ -354,7 +354,7 @@ function getFinalAdvice(r) {
   if (n >= 8)  return 'La situation demande une reprise sérieuse des bases dès maintenant.';
   return 'Un accompagnement structuré est vivement conseillé pour ne pas accumuler du retard.';
 }
-function getFinalDetail(r) {
+function getFinalDetail(r: AnalyzeResult): string {
   const n = r.noteWeighted, lac = r.lacunes.length;
   if (n >= 17) return `Excellent travail sur l'ensemble du programme. Pour maintenir ce niveau, quelques exercices réguliers suffiront.`;
   if (n >= 14) return `Le socle est là. ${lac>0?`Il reste ${lac} chapitre${lac>1?'s':''} à consolider`:'Tout est solide'}. 30-45 min de ${SUMMER_TOPIC} par jour sur 2-3 semaines de vacances suffiront.`;
@@ -362,7 +362,7 @@ function getFinalDetail(r) {
   if (n >= 8)  return `Plusieurs chapitres doivent être repris à la base, pas juste révisés. Envisage un stage de remise à niveau ou des cours particuliers.`;
   return `Un soutien régulier (école, cours particuliers, famille, plateforme) est essentiel pour reconstruire progressivement.`;
 }
-function getSummerTime(r) {
+function getSummerTime(r: AnalyzeResult): string {
   const n = r.noteWeighted;
   if (n >= 17) return '20-30 min, 2 fois par semaine';
   if (n >= 14) return '30-45 min par jour, 3 semaines';
@@ -370,7 +370,7 @@ function getSummerTime(r) {
   if (n >= 8)  return '1h par jour + stage de révision';
   return '1h30 par jour + accompagnement régulier';
 }
-async function saveAttemptToServer(student, attempt) {
+async function saveAttemptToServer(student: StudentInfo, attempt: Attempt): Promise<void> {
   if (location.protocol === 'file:') return;
   try {
     await fetch('save.php', {
@@ -421,7 +421,7 @@ async function syncFromServer(studentName) {
 // ============================================================
 // UI COMPOSANTS COMMUNS
 // ============================================================
-function SubjectMark({ size = 40 }) {
+function SubjectMark({ size = 40 }: SubjectMarkProps) {
   return (
     <div className="flex items-center justify-center font-display font-bold"
       style={{ width:size, height:size, borderRadius:Math.round(size*0.22), background:'var(--ink)', color:'var(--paper)', fontSize:size*0.55, lineHeight:1 }}>
@@ -429,7 +429,7 @@ function SubjectMark({ size = 40 }) {
     </div>
   );
 }
-function Chip({ children, color, className='' }) {
+function Chip({ children, color, className='' }: ChipProps) {
   return (
     <span className={`chip ${className}`} style={color ? { background:`${color}14`, color, borderColor:`${color}55` } : undefined}>
       {color && <span className="dotmark" />}
@@ -437,7 +437,7 @@ function Chip({ children, color, className='' }) {
     </span>
   );
 }
-function CompetenceRadar({ byDomain, previousDomains }) {
+function CompetenceRadar({ byDomain, previousDomains }: CompetenceRadarProps) {
   const ids = Object.keys(byDomain);
   const n = ids.length;
   // ViewBox plus large que haut pour donner de l'air aux labels gauche/droite
@@ -531,7 +531,7 @@ function CompetenceRadar({ byDomain, previousDomains }) {
   );
 }
 
-function ProgressCurve({ attempts }) {
+function ProgressCurve({ attempts }: ProgressCurveProps) {
   const W = 640, H = 220, padL = 40, padR = 16, padT = 18, padB = 34;
   const iw = W - padL - padR, ih = H - padT - padB;
   const n = attempts.length;
@@ -924,12 +924,12 @@ function QuizScreen({ student, quiz, onFinish, mode }: QuizScreenProps) {
   const skip   = () => { if (selected === undefined) select(null); next(); };
 
   useEffect(() => {
-    const handler = (e) => {
+    const handler = (e: KeyboardEvent) => {
       if (showConfirm) return;
       if (e.key === 'ArrowRight' || e.key === 'Enter') next();
       else if (e.key === 'ArrowLeft') prev();
       else {
-        const map = {'1':0,'2':1,'3':2,'4':3,'a':0,'b':1,'c':2,'d':3,'A':0,'B':1,'C':2,'D':3};
+        const map: Record<string, number> = {'1':0,'2':1,'3':2,'4':3,'a':0,'b':1,'c':2,'d':3,'A':0,'B':1,'C':2,'D':3};
         if (map[e.key] !== undefined && map[e.key] < q.options.length) select(map[e.key]);
       }
     };
@@ -1100,7 +1100,7 @@ function QuizScreen({ student, quiz, onFinish, mode }: QuizScreenProps) {
   );
 }
 
-function ConfirmScreen({ quiz, answers, onValidate, onCancel, onGoBack }) {
+function ConfirmScreen({ quiz, answers, onValidate, onCancel, onGoBack }: ConfirmScreenProps) {
   const skipped = [];
   quiz.forEach((qq, i) => { const a = answers[qq.key]; if (a === undefined || a === null) skipped.push(i); });
   const answeredCount = quiz.length - skipped.length;

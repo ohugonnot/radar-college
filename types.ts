@@ -174,6 +174,35 @@ interface Celebration {
 
 // ─── Props des composants React (app.tsx) ────────────────────────────────────
 
+interface SubjectMarkProps {
+  size?: number;
+}
+
+interface ChipProps {
+  children?: React.ReactNode;
+  color?: string;
+  className?: string;
+}
+
+interface CompetenceRadarProps {
+  byDomain: Record<string, DomainAnalysis>;
+  previousDomains?: Attempt['domains'] | null;
+}
+
+interface ProgressCurveProps {
+  attempts: Attempt[];
+}
+
+interface ConfirmScreenProps {
+  quiz: Question[];
+  answers: AnswersMap;
+  onValidate: () => void;
+  onCancel: () => void;
+  onGoBack: (index: number) => void;
+}
+
+
+
 interface HomeScreenProps {
   onStart: (info: StudentInfo, mode: Mode) => void;
 }

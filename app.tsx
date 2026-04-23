@@ -264,18 +264,56 @@ const wrongTrackerKey = () => 'quiz-' + SUBJECT.id + '-wrong-tracker-v1';
 function getWrongTracker() {
   try { return JSON.parse(localStorage.getItem(wrongTrackerKey())) || {}; } catch { return {}; }
 }
+// Courbe d'oubli (SM-2 light) : une question est « due » quand le délai depuis sa dernière
+// vue dépasse l'intervalle indexé par streak (succès consécutifs). Après un échec, streak=0.
+const SM2_INTERVALS_DAYS = [1, 3, 7, 21, 60, 120];
+const DAY_MS = 24 * 3600 * 1000;
+function intervalForStreak(streak: number): number {
+  const s = Math.max(0, Math.min(streak, SM2_INTERVALS_DAYS.length - 1));
+  return SM2_INTERVALS_DAYS[s] * DAY_MS;
+}
+function isDueEntry(entry, now: number): boolean {
+  if (!entry || !entry.seen) return false;
+  const last = entry.lastSeenAt || 0;
+  return (now - last) >= intervalForStreak(entry.streak || 0);
+}
+
 function recordWrongAnswers(questions: Question[], answers: AnswersMap): void {
   try {
     const tracker = getWrongTracker();
+    const now = Date.now();
     questions.forEach(q => {
       const a = answers[q.key];
       const wrong = a === undefined || a === null || a !== q.correct;
-      if (!tracker[q.key]) tracker[q.key] = { wrong: 0, seen: 0 };
+      if (!tracker[q.key]) tracker[q.key] = { wrong: 0, seen: 0, streak: 0, lastSeenAt: 0 };
       tracker[q.key].seen += 1;
-      if (wrong) tracker[q.key].wrong += 1;
+      if (wrong) {
+        tracker[q.key].wrong += 1;
+        tracker[q.key].streak = 0;
+      } else {
+        tracker[q.key].streak = (tracker[q.key].streak || 0) + 1;
+      }
+      tracker[q.key].lastSeenAt = now;
     });
     localStorage.setItem(wrongTrackerKey(), JSON.stringify(tracker));
   } catch {}
+}
+
+// Retourne les keys du quiz actif dont la fenêtre d'oubli est écoulée,
+// triées par urgence décroissante (les plus en retard d'abord).
+function getDueKeys(): string[] {
+  if (!POOL || Object.keys(POOL).length === 0) return [];
+  const tracker = getWrongTracker();
+  const now = Date.now();
+  const due: { key: string; overdue: number }[] = [];
+  Object.keys(POOL).forEach(did => (POOL[did] || []).forEach(q => {
+    const e = tracker[q.key];
+    if (!isDueEntry(e, now)) return;
+    const overdue = (now - (e.lastSeenAt || 0)) - intervalForStreak(e.streak || 0);
+    due.push({ key: q.key, overdue });
+  }));
+  due.sort((a, b) => b.overdue - a.overdue);
+  return due.map(d => d.key);
 }
 
 // Tire aléatoirement dans un tableau avec pondération : les questions
@@ -338,7 +376,10 @@ const WRONG_PENALTY = 0.5;
 
 function analyze(questions: Question[], answers: AnswersMap): AnalyzeResult {
   const byDomain: Record<string, DomainAnalysis> = {};
-  Object.keys(DOMAINS).forEach(d => { byDomain[d] = { correct:0, total:0, errors:[], skipped:0, wrong:0, wrongWeighted:0, pct:0, level:'non-acquis' }; });
+  // N'inclure que les domaines présents dans le quiz : un quiz partiel (révision, retry-wrong)
+  // ne doit pas afficher en "non-acquis" les domaines non testés cette fois-ci.
+  const domainsInQuiz = new Set(questions.map(q => q.domain));
+  Object.keys(DOMAINS).forEach(d => { if (domainsInQuiz.has(d)) byDomain[d] = { correct:0, total:0, errors:[], skipped:0, wrong:0, wrongWeighted:0, pct:0, level:'non-acquis' }; });
   let correct = 0, total = 0, skipped = 0, wrong = 0, weighted = 0, weightedMax = 0, wrongWeighted = 0;
   questions.forEach(q => {
     const ans = answers[q.key];
@@ -830,6 +871,7 @@ function HomeScreen({ onStart }: HomeScreenProps) {
   const [name, setName] = useState(activeStudent?.name || '');
   const [klass, setKlass] = useState(initialKlass);
   const [mode, setMode] = useState(initialMode);
+  const dueKeys = useMemo(() => getDueKeys(), []);
   const canStart = name.trim().length >= 2;
   const profile = useMemo(() => getProfile(name), [name]);
   useEffect(() => { if (profile && profile.klass && !klass) setKlass(profile.klass); }, [profile]);
@@ -957,6 +999,21 @@ function HomeScreen({ onStart }: HomeScreenProps) {
           </button>
           {!canStart && <p className="mt-3 text-sm" style={{color:'var(--muted)'}}>Renseigne ton prénom pour commencer.</p>}
         </div>
+
+        {dueKeys.length > 0 && (
+          <div className="mt-6 fade-up" style={{animationDelay:'0.28s'}}>
+            <div className="p-4 sm:p-5" style={{border:'1.5px dashed var(--sea)', borderRadius:12, background:'rgba(15,94,107,0.06)'}}>
+              <div className="font-mono text-[10px] uppercase tracking-[0.22em] mb-1" style={{color:'var(--sea)'}}>Mémoire long terme</div>
+              <div className="text-[15px] mb-3" style={{color:'var(--ink-soft)'}}>
+                <strong style={{color:'var(--ink)'}}>{dueKeys.length} question{dueKeys.length>1?'s':''}</strong> à revoir aujourd'hui — revenir sur ce que tu as déjà vu avant de l'oublier.
+              </div>
+              <button onClick={() => canStart && onStart({ name: name.trim(), klass: klass.trim() }, 'training', dueKeys)} disabled={!canStart}
+                style={{padding:'10px 16px', borderRadius:10, border:'2px solid var(--sea)', background:'var(--sea)', color:'#fff', cursor: canStart ? 'pointer' : 'not-allowed', opacity: canStart ? 1 : 0.5, fontWeight:600}}>
+                📚 Lancer la révision ({Math.min(dueKeys.length, 20)} questions)
+              </button>
+            </div>
+          </div>
+        )}
 
       </div>
     </div>
@@ -1720,10 +1777,12 @@ function App() {
     setScreen('report');
   }, []);
 
-  const handleStart = (info, chosenMode) => {
+  const handleStart = (info: StudentInfo, chosenMode: Mode, revisionKeys?: string[]) => {
     setStudent(info);
     setMode(chosenMode || 'training');
-    setQuiz(buildQuiz());
+    // Révision : on plafonne à 20 questions pour rester sous ~15 min (mémoire long terme = quotidien court).
+    const revKeys = Array.isArray(revisionKeys) && revisionKeys.length ? revisionKeys.slice(0, 20) : null;
+    setQuiz(revKeys ? buildQuiz(revKeys) : buildQuiz());
     setAnswers({}); setTimings({}); setHintsUsed({}); setTotalMs(0);
     setHistoryMode(false);
     setScreen('quiz');

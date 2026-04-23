@@ -49,7 +49,7 @@ Modifier les questions d'un quiz = éditer `quizzes/{matière}-{niveau}.jsx` + `
 
 **localStorage** (source de vérité offline/file://) :
 - `quiz-{matière}-{niveau}-history-v1` : profils par slug avec leurs attempts
-- `quiz-{matière}-{niveau}-wrong-tracker-v1` : tracker d'erreurs par question-key (pondération buildQuiz)
+- `quiz-{matière}-{niveau}-wrong-tracker-v1` : tracker d'erreurs par question-key `{wrong, seen, streak, lastSeenAt}` (pondération buildQuiz + révision SM-2 light J+1/3/7/21/60/120)
 - `quiz-active-student` : { name, slug } — pseudo actif partagé
 - `quiz-active-level` : niveau actif (6/5/4/3)
 - `quiz-theme`, `quiz-dyslexia` : préférences

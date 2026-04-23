@@ -204,7 +204,7 @@ interface ConfirmScreenProps {
 
 
 interface HomeScreenProps {
-  onStart: (info: StudentInfo, mode: Mode) => void;
+  onStart: (info: StudentInfo, mode: Mode, revisionKeys?: string[]) => void;
 }
 
 interface QuizScreenProps {

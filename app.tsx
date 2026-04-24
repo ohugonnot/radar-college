@@ -1726,6 +1726,28 @@ function ReportScreen({ student, quiz, answers, timings, totalMs, hintsUsed, mod
             <div className="flex gap-2 no-print flex-wrap">
               <a href="index.html" className="btn-secondary" style={{textDecoration:'none'}}>Accueil</a>
               <button onClick={() => window.print()} className="btn-secondary" title="Imprime ou enregistre en PDF (choix dans la boîte de dialogue du navigateur)">Exporter PDF / Imprimer</button>
+              <button
+                onClick={async () => {
+                  const url = 'https://www.web-developpeur.com/quizz/';
+                  const text = `J'ai testé mes connaissances en ${SUBJECT.name.toLowerCase()} (${SUBJECT.level}) : note ${result.noteWeighted.toFixed(1)}/20.`;
+                  try {
+                    if (typeof navigator !== 'undefined' && 'share' in navigator) {
+                      await (navigator as any).share({ title: 'Quiz Collège', text, url });
+                      return;
+                    }
+                  } catch { /* user cancelled or share failed */ }
+                  try {
+                    await navigator.clipboard.writeText(`${text} ${url}`);
+                    showToast('Lien + score copiés dans le presse-papier', '🔗');
+                  } catch {
+                    showToast('Impossible de partager depuis ce navigateur', '⚠️');
+                  }
+                }}
+                className="btn-secondary"
+                title="Partager l'app (web share ou copie du lien)"
+              >
+                🔗 Partager
+              </button>
               {(() => {
                 const wrongKeys = quiz.filter(q => answers[q.key] !== q.correct).map(q => q.key);
                 if (wrongKeys.length === 0) return null;

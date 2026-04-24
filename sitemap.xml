@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://www.web-developpeur.com/quizz/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url><loc>https://www.web-developpeur.com/quizz/#/apropos</loc><priority>0.6</priority></url>
+  <url><loc>https://www.web-developpeur.com/quizz/#/6eme/maths</loc><priority>0.8</priority></url>
+  <url><loc>https://www.web-developpeur.com/quizz/#/6eme/physique</loc><priority>0.8</priority></url>
+  <url><loc>https://www.web-developpeur.com/quizz/#/6eme/svt</loc><priority>0.8</priority></url>
+  <url><loc>https://www.web-developpeur.com/quizz/#/6eme/histoire</loc><priority>0.8</priority></url>
+  <url><loc>https://www.web-developpeur.com/quizz/#/6eme/geo</loc><priority>0.8</priority></url>
+  <url><loc>https://www.web-developpeur.com/quizz/#/5eme/maths</loc><priority>0.8</priority></url>
+  <url><loc>https://www.web-developpeur.com/quizz/#/5eme/physique</loc><priority>0.8</priority></url>
+  <url><loc>https://www.web-developpeur.com/quizz/#/5eme/svt</loc><priority>0.8</priority></url>
+  <url><loc>https://www.web-developpeur.com/quizz/#/5eme/histoire</loc><priority>0.8</priority></url>
+  <url><loc>https://www.web-developpeur.com/quizz/#/5eme/geo</loc><priority>0.8</priority></url>
+  <url><loc>https://www.web-developpeur.com/quizz/#/4eme/maths</loc><priority>0.8</priority></url>
+  <url><loc>https://www.web-developpeur.com/quizz/#/4eme/physique</loc><priority>0.8</priority></url>
+  <url><loc>https://www.web-developpeur.com/quizz/#/4eme/svt</loc><priority>0.8</priority></url>
+  <url><loc>https://www.web-developpeur.com/quizz/#/4eme/histoire</loc><priority>0.8</priority></url>
+  <url><loc>https://www.web-developpeur.com/quizz/#/4eme/geo</loc><priority>0.8</priority></url>
+  <url><loc>https://www.web-developpeur.com/quizz/#/3eme/maths</loc><priority>0.9</priority></url>
+  <url><loc>https://www.web-developpeur.com/quizz/#/3eme/physique</loc><priority>0.9</priority></url>
+  <url><loc>https://www.web-developpeur.com/quizz/#/3eme/svt</loc><priority>0.9</priority></url>
+  <url><loc>https://www.web-developpeur.com/quizz/#/3eme/histoire</loc><priority>0.9</priority></url>
+  <url><loc>https://www.web-developpeur.com/quizz/#/3eme/geo</loc><priority>0.9</priority></url>
+</urlset>

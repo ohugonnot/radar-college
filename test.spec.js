@@ -620,6 +620,27 @@ test.describe('Parcours utilisateur', () => {
     expect(bg).toMatch(/rgb\(255, ?255, ?255\)|white/);
   });
 
+  test('page À propos accessible sans pseudo et affiche les sections clés', async ({ page }) => {
+    await page.goto(BASE + '/index.html#/apropos');
+    await page.waitForTimeout(500);
+    await expect(page.locator('#step-apropos')).toBeVisible();
+    await expect(page.locator('#step-apropos').getByText(/Pour qui/)).toBeVisible();
+    await expect(page.locator('#step-apropos').getByText(/Vie privée/)).toBeVisible();
+    await expect(page.locator('#step-apropos').getByText(/Open source/)).toBeVisible();
+    // Les autres étapes doivent être masquées
+    await expect(page.locator('#step-name')).toBeHidden();
+    // Le titre de la page doit être mis à jour
+    await expect(page).toHaveTitle(/À propos/);
+  });
+
+  test('lien footer "À propos" mène vers #/apropos', async ({ page }) => {
+    await page.goto(BASE + '/index.html');
+    await page.locator('#apropos-link').click();
+    await page.waitForTimeout(300);
+    await expect(page.locator('#step-apropos')).toBeVisible();
+    expect(page.url()).toMatch(/#\/apropos$/);
+  });
+
   test('transition quiz A → wizard → quiz B sans remount foireux', async ({ page }) => {
     // Stress-test de l'unmount/remount du React app entre deux quizzes différents.
     await completeWizard(page, 'Henri Transition', '5ème');

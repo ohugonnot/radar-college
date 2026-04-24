@@ -746,10 +746,52 @@ window.addEventListener('error', function(ev) {
     </div>
   </section>
 
+  <!-- Étape : À propos -->
+  <section class="step" id="step-apropos" style="display:none;">
+    <div class="step-eyebrow">— À propos</div>
+    <h1 class="step-title">Un outil <em>gratuit</em>, sans pub<br/>et sans inscription.</h1>
+    <p class="step-desc">
+      20 quiz diagnostiques pour les 6ème, 5ème, 4ème et 3ème : maths, physique-chimie, SVT, histoire et géographie. 30 questions tirées au hasard dans une grande banque, un rapport par chapitre avec plan de révision, et une mémoire long terme qui te ressert les notions moins acquises.
+    </p>
+    <div style="display:grid; gap:16px; margin-top:28px;">
+      <div style="padding:16px 18px; border:1.5px solid var(--line); border-radius:12px; background:rgba(255,255,255,0.55);">
+        <div style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:var(--accent); margin-bottom:6px;">Pour qui ?</div>
+        <div style="font-weight:600; margin-bottom:4px;">Collégiens, parents, enseignants.</div>
+        <div style="color:var(--ink-soft); font-size:15px;">Utile pour préparer un contrôle, combler les lacunes avant une rentrée, ou réviser le brevet. Les schémas et fiches mémo permettent aussi de découvrir une notion (analogie eau pour l'électricité, triangle rectangle pour Pythagore, rose des compétences par domaine).</div>
+      </div>
+      <div style="padding:16px 18px; border:1.5px solid var(--line); border-radius:12px; background:rgba(255,255,255,0.55);">
+        <div style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:var(--accent); margin-bottom:6px;">Vie privée</div>
+        <div style="font-weight:600; margin-bottom:4px;">Tes données restent sur ton appareil.</div>
+        <div style="color:var(--ink-soft); font-size:15px;">Les résultats sont enregistrés en local (localStorage). Une sauvegarde serveur optionnelle permet de retrouver sa progression sur un autre appareil, indexée uniquement par pseudo (pas d'email, pas d'inscription, pas de tracking tiers).</div>
+      </div>
+      <div style="padding:16px 18px; border:1.5px solid var(--line); border-radius:12px; background:rgba(255,255,255,0.55);">
+        <div style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:var(--accent); margin-bottom:6px;">Open source</div>
+        <div style="font-weight:600; margin-bottom:4px;">Code ouvert, contributions bienvenues.</div>
+        <div style="color:var(--ink-soft); font-size:15px;">
+          <a href="https://github.com/ohugonnot/radar-college" style="color:var(--accent); text-decoration:underline;" target="_blank" rel="noopener">github.com/ohugonnot/radar-college</a> — une issue ou une PR pour proposer un chapitre, corriger une question, ou suggérer une nouvelle matière.
+        </div>
+      </div>
+      <div style="padding:16px 18px; border:1.5px solid var(--line); border-radius:12px; background:rgba(255,255,255,0.55);">
+        <div style="font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:var(--accent); margin-bottom:6px;">Comment ça marche</div>
+        <div style="color:var(--ink-soft); font-size:15px; line-height:1.6;">
+          <strong>1.</strong> Tape ton prénom (il te permet de retrouver tes résultats).<br/>
+          <strong>2.</strong> Choisis ton niveau (6ème → 3ème) et ta matière.<br/>
+          <strong>3.</strong> Lance un test en mode Entraînement (avec aide progressive) ou Interrogation (sans aide).<br/>
+          <strong>4.</strong> Consulte le rapport détaillé : note sur 20 (barème brevet), bilan chapitre par chapitre, plan de révision.<br/>
+          <strong>5.</strong> Reviens régulièrement : l'app te propose les notions qui méritent d'être revues.
+        </div>
+      </div>
+    </div>
+    <div class="step-footer" style="display:flex; gap:10px; flex-wrap:wrap; margin-top:24px;">
+      <button class="btn-link" id="apropos-back" style="padding:12px 4px;">← Commencer</button>
+    </div>
+  </section>
+
   <!-- Footer accessibilité (tout en bas, toutes étapes confondues) -->
   <div id="access-footer" style="margin-top: auto; padding-top: 30px; display:flex; justify-content:center; gap:10px; flex-wrap:wrap; font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--muted);">
     <button id="toggle-dyslexia" style="background:transparent; border:1px solid var(--line); border-radius:999px; padding:6px 12px; cursor:pointer; color:var(--muted); font-family:inherit; font-size:11px; letter-spacing:0.08em;">Ab  Police dyslexie</button>
     <button id="toggle-theme" style="background:transparent; border:1px solid var(--line); border-radius:999px; padding:6px 12px; cursor:pointer; color:var(--muted); font-family:inherit; font-size:11px; letter-spacing:0.08em;">☾ Mode sombre</button>
+    <a href="#/apropos" id="apropos-link" style="background:transparent; border:1px solid var(--line); border-radius:999px; padding:6px 12px; color:var(--muted); font-family:inherit; font-size:11px; letter-spacing:0.08em; text-decoration:none;">ⓘ À propos</a>
   </div>
 
 </div>
@@ -913,6 +955,7 @@ const stepEls = {
   level:   document.getElementById('step-level'),
   subject: document.getElementById('step-subject'),
   results: document.getElementById('step-results'),
+  apropos: document.getElementById('step-apropos'),
 };
 
 // Router sémantique — URLs hash-based pour rester compatibles file:// (pushState interdit)
@@ -922,6 +965,7 @@ function hashForStep(name, lvl) {
   if (name === 'level')   return '#/niveau';
   if (name === 'subject') return '#/' + (lvl || getLevel() || '') + 'eme';
   if (name === 'results') return '#/dashboard';
+  if (name === 'apropos') return '#/apropos';
   return '';
 }
 function parseHash(h) {
@@ -930,6 +974,7 @@ function parseHash(h) {
   if (s === '/prenom')    return { step: 'name' };
   if (s === '/niveau')    return { step: 'level' };
   if (s === '/dashboard') return { step: 'results' };
+  if (s === '/apropos')   return { step: 'apropos' };
   // Match : /5eme  |  /5eme/maths  |  /5eme/maths/report/<ISOdate>
   const m = s.match(/^\/([3-6])eme(?:\/(maths|physique|svt|histoire|geo)(?:\/report\/(.+))?)?\/?$/);
   if (!m) return null;
@@ -989,7 +1034,7 @@ function showStep(name, fromHashChange) {
   if (name === 'subject') renderSubjects();
   if (name === 'results') renderResults();
   if (!fromHashChange) setHash(hashForStep(name));
-  const titles = { name:'Prénom — Quiz Collège', level:'Choisis ton niveau — Quiz Collège', subject:'Choisis ta matière — Quiz Collège', results:'Mes résultats — Quiz Collège' };
+  const titles = { name:'Prénom — Quiz Collège', level:'Choisis ton niveau — Quiz Collège', subject:'Choisis ta matière — Quiz Collège', results:'Mes résultats — Quiz Collège', apropos:'À propos — Quiz Collège' };
   document.title = titles[name] || 'Quiz Collège';
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
@@ -1006,7 +1051,8 @@ window.addEventListener('hashchange', () => {
     return;
   }
   // Prérequis : pseudo obligatoire pour level/subject/results, niveau pour subject
-  if (r.step !== 'name' && !getActive()) { showStep('name', true); return; }
+  // (apropos est accessible sans pseudo — page d'info)
+  if (r.step !== 'name' && r.step !== 'apropos' && !getActive()) { showStep('name', true); return; }
   if (r.step === 'subject') {
     if (r.level) setLevel(r.level);
     if (!getLevel()) { showStep('level', true); return; }
@@ -1235,6 +1281,8 @@ document.getElementById('results-back').onclick = () => {
   }
 };
 document.getElementById('progress-banner').onclick = () => showStep('results');
+document.getElementById('apropos-back').onclick = () => decideStep();
+document.getElementById('apropos-link').onclick = (e) => { e.preventDefault(); showStep('apropos'); };
 
 // Étape résultats : rend les stats, la courbe et la liste des quiz
 function renderResults() {
@@ -1554,7 +1602,7 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     showQuiz(r.level, r.subject, r.reportAt);
     return;
   }
-  if (r.step !== 'name' && !getActive()) { decideStep(); return; }
+  if (r.step !== 'name' && r.step !== 'apropos' && !getActive()) { decideStep(); return; }
   if (r.step === 'subject') {
     if (r.level) setLevel(r.level);
     if (!getLevel()) { showStep('level', true); return; }
@@ -28821,7 +28869,30 @@ window.ALL_QUIZZES['svt-6'] = {
       onClick: () => window.print(),
       className: "btn-secondary",
       title: "Imprime ou enregistre en PDF (choix dans la bo\xEEte de dialogue du navigateur)"
-    }, "Exporter PDF / Imprimer"), (() => {
+    }, "Exporter PDF / Imprimer"), React.createElement("button", {
+      onClick: async () => {
+        const url = 'https://www.web-developpeur.com/quizz/';
+        const text = `J'ai testé mes connaissances en ${SUBJECT.name.toLowerCase()} (${SUBJECT.level}) : note ${result.noteWeighted.toFixed(1)}/20.`;
+        try {
+          if (typeof navigator !== 'undefined' && 'share' in navigator) {
+            await navigator.share({
+              title: 'Quiz Collège',
+              text,
+              url
+            });
+            return;
+          }
+        } catch {}
+        try {
+          await navigator.clipboard.writeText(`${text} ${url}`);
+          showToast('Lien + score copiés dans le presse-papier', '🔗');
+        } catch {
+          showToast('Impossible de partager depuis ce navigateur', '⚠️');
+        }
+      },
+      className: "btn-secondary",
+      title: "Partager l'app (web share ou copie du lien)"
+    }, "\uD83D\uDD17 Partager"), (() => {
       const wrongKeys = quiz.filter(q => answers[q.key] !== q.correct).map(q => q.key);
       if (wrongKeys.length === 0) return null;
       return React.createElement("button", {

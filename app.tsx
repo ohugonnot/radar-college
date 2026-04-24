@@ -93,18 +93,44 @@ function youtubeSearchUrl(domainId) {
   return 'https://www.youtube.com/results?search_query=' + encodeURIComponent(q);
 }
 
+// Kit SVG circuits — défini dans quizzes/_circuits.tsx (bundle quizzes) et
+// exposé via window.CircuitKit pour que MEMO_BANK puisse y accéder ici.
+// Les quizzes/*.tsx utilisent directement les symboles (même portée).
+const { CircuitSerie, CircuitParallele, CircuitAmperemetreSerie, CircuitVoltmetreDerivation, CircuitCourtCircuit, GrapheOhm, TriangleRectangle, ConfigThales, TriangleTrigo, GrapheAffine } = (window as any).CircuitKit;
+
 // ============================================================
 // FICHES MÉMO par ID de chapitre (partagées entre niveaux quand l'ID est identique)
 // ============================================================
-const MEMO_BANK = {
+// Chaque entrée est une liste de `string` (puce texte) ou de ReactNode (schéma
+// rendu sans puce, pleine largeur). Voir rendering dans MemoSection & quiz.
+const MEMO_BANK: Record<string, Array<string | React.ReactNode>> = {
   // Maths
   relatifs: ['Règle des signes : + × + = + ; − × − = + ; + × − = −', 'Opposé de n : même valeur, signe contraire', 'Soustraire c\'est ajouter l\'opposé : a − b = a + (−b)'],
   fractions: ['a/b + c/d : dénominateur commun (plus petit multiple)', 'a/b × c/d = (a×c)/(b×d)', 'Diviser = multiplier par l\'inverse : a/b ÷ c/d = a/b × d/c', 'Simplifier : diviser haut et bas par un même nombre (PGCD)'],
   puissances: ['aⁿ = a × a × … × a (n fois)', 'aⁿ × aᵐ = aⁿ⁺ᵐ ; aⁿ / aᵐ = aⁿ⁻ᵐ ; (aⁿ)ᵐ = aⁿᵐ', 'a⁻ⁿ = 1/aⁿ ; a⁰ = 1', 'Écriture scientifique : un seul chiffre non nul avant la virgule × 10ⁿ'],
   litteral: ['Distributivité : k(a+b) = ka + kb', 'Réduction : regroupe les termes avec la même lettre', 'Résoudre : isoler x étape par étape, vérifier en remplaçant x'],
-  pythagore: ['ABC rectangle en A : BC² = AB² + AC² (BC = hypoténuse)', 'Réciproque : si AB² + AC² = BC², alors ABC est rectangle en A', 'Triplets à connaître : 3-4-5, 5-12-13, 6-8-10, 8-15-17'],
-  thales: ['Config Thalès : (MN) // (BC) → AM/AB = AN/AC = MN/BC', 'Réciproque : si rapports égaux ET points alignés dans le même ordre → parallèles', 'Attention à l\'ordre des points dans les rapports'],
-  trigo: ['SOH CAH TOA : Sin = O/H, Cos = A/H, Tan = O/A', 'L\'hypoténuse est toujours le côté opposé à l\'angle droit', 'Sur la calculette : cos⁻¹ (acos) pour obtenir un angle depuis un rapport'],
+  pythagore: [
+    'ABC rectangle en A : BC² = AB² + AC² (BC = hypoténuse, face à l\'angle droit).',
+    <TriangleRectangle key="schema-pyth" />,
+    'Réciproque : si AB² + AC² = BC², alors ABC est rectangle en A.',
+    '🔑 Astuce : l\'hypoténuse est toujours le plus grand côté, situé en face de l\'angle droit.',
+    'Triplets à connaître : 3-4-5 · 5-12-13 · 6-8-10 · 8-15-17.',
+  ],
+  thales: [
+    'Config Thalès (triangles emboîtés) : M sur [AB], N sur [AC], (MN) // (BC).',
+    <ConfigThales key="schema-thales" />,
+    'Alors AM/AB = AN/AC = MN/BC (les 3 rapports sont égaux).',
+    'Réciproque : si AM/AB = AN/AC ET les points M, N sont placés dans le même ordre → (MN) // (BC).',
+    '🔑 Attention à l\'ordre des points dans les rapports : on part toujours de A (le sommet commun).',
+  ],
+  trigo: [
+    'Dans un triangle rectangle, on choisit un angle aigu (pas l\'angle droit) — appelons-le x.',
+    <TriangleTrigo key="schema-trigo" />,
+    '🔑 Les 3 côtés par rapport à x : hypoténuse (face à l\'angle droit), opposé (face à x), adjacent (à côté de x).',
+    'SOH CAH TOA : sin x = Opposé / Hypoténuse · cos x = Adjacent / Hypoténuse · tan x = Opposé / Adjacent.',
+    'Sur la calculatrice : sin⁻¹ (asin), cos⁻¹ (acos), tan⁻¹ (atan) pour retrouver un angle à partir d\'un rapport.',
+    '⚠️ Vérifier que la calculette est en mode DEG (degrés), pas RAD.',
+  ],
   grandeurs: ['V cube = a³ · V pavé = L × l × h · V cylindre = π r² h · V pyramide/cône = B × h / 3', 'v = d / t (distance ÷ temps)', '1 L = 1 dm³ = 1000 cm³ ; attention : 1h30 = 1,5h'],
   proportion: ['Produit en croix : si a/b = c/d alors a×d = b×c', 'x % de N = x/100 × N', 'Réduction de 20 % = multiplier par 0,80 ; augmentation de 20 % = ×1,20'],
   probas: ['P(A) = cas favorables / cas possibles (entre 0 et 1)', 'Moyenne = somme / nombre de valeurs', 'Médiane = valeur centrale d\'une série triée'],
@@ -113,7 +139,14 @@ const MEMO_BANK = {
   arithmetique: ['PGCD par algorithme d\'Euclide : pgcd(a,b) = pgcd(b, a mod b)', 'Fraction irréductible : simplifier par le PGCD', 'Premiers entre eux ⇔ PGCD = 1'],
   remarquables: ['(a + b)² = a² + 2ab + b²', '(a − b)² = a² − 2ab + b²', '(a + b)(a − b) = a² − b²'],
   equations: ['Isoler x des deux côtés, faire passer les x à gauche, les nombres à droite', 'Équation produit nul : (A)(B) = 0 ⇔ A = 0 OU B = 0', 'Inéquation : multiplier/diviser par négatif INVERSE le sens'],
-  fonctions: ['Fonction linéaire : f(x) = ax (droite par l\'origine)', 'Fonction affine : f(x) = ax + b (droite, ordonnée à l\'origine b)', 'Image de x : f(x). Antécédent de y : résoudre f(x) = y'],
+  fonctions: [
+    'Fonction affine : f(x) = a·x + b. Sa courbe est une DROITE dans un repère.',
+    <GrapheAffine key="schema-affine" />,
+    '📐 a = pente (inclinaison de la droite) · b = ordonnée à l\'origine (là où la droite coupe l\'axe y).',
+    'Fonction linéaire = cas particulier avec b = 0 : la droite passe par l\'origine (0, 0).',
+    '🔑 Image de x : on calcule f(x) — lecture verticale sur le graphe.',
+    '🔑 Antécédent de y : on résout f(x) = y — lecture horizontale, puis on redescend sur l\'axe x.',
+  ],
   geomespace: ['V sphère = (4/3) π r³', 'V cône = V pyramide = (B × h) / 3', 'Agrandissement k : longueurs ×k, aires ×k², volumes ×k³'],
   stats: ['Médiane : valeur du milieu (série triée)', 'Étendue = max − min', 'Fréquence = effectif / total (souvent en %)'],
   // Maths 6ème
@@ -130,8 +163,28 @@ const MEMO_BANK = {
   volumes: ['V prisme droit = B × h (B = aire de la base)', 'V cylindre = π r² h', '1 L = 1 dm³ = 1000 cm³'],
 
   // Physique-Chimie
-  electricite: ['Série : un seul chemin, intensité identique partout', 'Dérivation : plusieurs branches, tensions égales', 'Ampèremètre en série · Voltmètre en dérivation'],
-  loiOhm: ['U = R × I (U en V, R en Ω, I en A)', 'I = U / R · R = U / I'],
+  electricite: [
+    '💧 Analogie eau : la tension U = différence de pression (dénivelé qui pousse l\'eau), l\'intensité I = débit (quantité qui passe par seconde), la résistance R = étranglement du tuyau. La pile = pompe qui maintient la pression.',
+    '🔗 Circuit en série (un seul chemin) : l\'eau traverse chaque étranglement à la suite — même débit partout, et chaque étranglement "mange" de la pression.',
+    <CircuitSerie key="schema-serie" />,
+    '🔀 Circuit en dérivation (plusieurs chemins) : l\'eau se partage entre les branches qui ont le même dénivelé aux bornes — même tension, et les débits s\'additionnent.',
+    <CircuitParallele key="schema-parallele" />,
+    '🧠 Mnémo : en série ce qui traverse est pareil (I) ; en dérivation ce qui est aux bornes est pareil (U).',
+    '📏 Ampèremètre en série (il mesure ce qui traverse) · Voltmètre en dérivation (il mesure ce qui est aux bornes).',
+    '⚡ Puissance P = U × I (en watts W) : en eau, c\'est pression × débit = énergie transportée par seconde. Plus tu pousses fort (U) et plus ça coule (I), plus la pompe travaille.',
+    '🔋 Énergie E = P × t (en joules J, ou en kWh). 1 kWh = 1000 W pendant 1 h = 3,6 × 10⁶ J. Comme un grand réservoir rempli : c\'est la quantité totale d\'eau déplacée sur la durée.',
+    '🛡️ Court-circuit = tuyau sans étranglement : débit énorme, tout chauffe (le disjoncteur coupe comme une vanne de sécurité).',
+  ],
+  loiOhm: [
+    '💧 Rappel analogie eau : U = pression (le dénivelé qui pousse), I = débit (ce qui passe), R = étranglement du tuyau.',
+    '📐 Loi d\'Ohm : U = R × I (U en volts V, R en ohms Ω, I en ampères A).',
+    '🧠 En eau : pression = étranglement × débit. Pour un même tuyau, plus tu pousses fort, plus ça coule.',
+    '🔄 Les 3 formulations : U = R × I · I = U / R · R = U / I (triangle magique, on cache ce qu\'on cherche).',
+    '📈 Effet U fixée, R qui double → I divisé par 2 (tuyau plus étroit, même pression, moitié moins de débit).',
+    '📉 Effet R fixée, U qui double → I qui double (même tuyau, 2× plus de pression, 2× plus de débit).',
+    '📊 Conducteur ohmique : la courbe U = f(I) est une droite qui passe par l\'origine, de pente R.',
+    <GrapheOhm key="graphe-ohm" />,
+  ],
   optique: ['Lumière = ligne droite dans un milieu transparent homogène', 'c ≈ 300 000 km/s = 3 × 10⁸ m/s', 'Source primaire (émet) vs secondaire (diffuse)'],
   couleurs: ['Additive (lumières RVB) : R+V = jaune, R+V+B = blanc', 'Soustractive (peinture CMJ) : cyan-magenta-jaune', 'Objet rouge en lumière verte → paraît noir'],
   matiere: ['ρ = m / V (g/cm³ ou kg/m³) · eau = 1 g/cm³', 'ρ_obj < ρ_eau → flotte', 'Conservation de la masse aux changements d\'état'],
@@ -188,6 +241,63 @@ const MEMO_BANK = {
   hygiene: ['Alimentation variée · sommeil · activité · hygiène corporelle'],
   sol: ['Sol = minéral + matière organique + êtres vivants', 'Vers de terre : brassage et aération'],
   alimentation: ['Plantes = autotrophes (photosynthèse à partir d\'eau + CO₂ + lumière)', 'Herbivore / Carnivore / Omnivore', 'Chaîne alimentaire : la flèche signifie "est mangé par"'],
+
+  // ─── Histoire ───────────────────────────────────────────────
+  // 6e (Antiquité)
+  prehistoire: ['Préhistoire = avant l\'écriture (~-3300)', 'Paléolithique : chasse-cueillette nomade', 'Néolithique (~-10000) : agriculture + sédentarisation'],
+  orient: ['2 civilisations : Égypte (Nil, pharaons, hiéroglyphes) et Mésopotamie (Tigre/Euphrate, cunéiforme)', 'Pyramides de Gizeh : -2500 environ', 'Hammourabi : code de lois (-1750)'],
+  grece: ['Cités-États (polis) : Athènes, Sparte', 'Démocratie athénienne (Ve s. av. J.-C., Périclès)', 'Guerres médiques : Marathon -490, Salamine -480'],
+  rome: ['Fondation -753 · République -509 · Empire -27 · Chute Rome 476', 'Jules César (-44) · Auguste 1er empereur', 'Citoyenneté romaine, Pax Romana, christianisation (Constantin 313)'],
+  religions: ['Monothéisme : un seul Dieu (judaïsme, christianisme, islam)', 'Édit de Milan (313) : tolère le christianisme', 'Théodose (380) : christianisme religion d\'État'],
+  asie: ['Route de la soie : Chine ↔ Europe', 'Chine des Han : Confucius, papier, soie', 'Inde Gupta (IVe-VIe s.) : mathématiques, zéro'],
+  // 5e (Moyen Âge + Renaissance)
+  byzance: ['Empire byzantin : Constantinople, chrétien orthodoxe', 'Justinien (VIe s.) : Corpus juris civilis', 'Islam : Hégire 622, Mahomet, califats'],
+  occident: ['Charles Martel / Poitiers 732', 'Charlemagne couronné empereur 800', 'Traité de Verdun 843 : 3 petits-fils se partagent l\'empire'],
+  monarchie: ['Hugues Capet 987 : début des Capétiens', 'Philippe Auguste : Bouvines 1214', 'Guerre de 100 ans (1337-1453) · Jeanne d\'Arc (Orléans 1429)'],
+  decouvertes: ['Christophe Colomb 1492 : Amérique', 'Vasco de Gama 1498 : Indes', 'Magellan 1519-1522 : 1re circumnavigation · Traité de Tordesillas 1494'],
+  renaissance: ['Florence, Italie, XVe s.', 'Gutenberg ~1450 : imprimerie', 'Léonard de Vinci, Michel-Ange · Humanisme (Érasme)'],
+  reformes: ['Luther 1517 (95 thèses) : Réforme protestante', 'Calvin, anglicanisme', 'Guerres de religion en France · Édit de Nantes 1598 (Henri IV)'],
+  // 4e (XVIIIe-XIXe)
+  lumieres: ['Philosophes : Voltaire, Rousseau, Montesquieu, Diderot', 'Encyclopédie (1751-1772)', 'Révolution américaine 1776 (indépendance)'],
+  revolution: ['États généraux 5 mai 1789 · DDHC 26 août 1789', 'Prise de la Bastille 14 juillet 1789', 'Ire République 1792 · Terreur 1793-94'],
+  empire: ['Napoléon Bonaparte : sacré empereur 1804', 'Code civil 1804 · Waterloo 1815', 'Restauration · Trois Glorieuses 1830 · 1848 IIe République'],
+  industrielle: ['Révolution industrielle : Angleterre XVIIIe-XIXe', 'Machine à vapeur, chemin de fer, sidérurgie', 'Naissance du prolétariat · Syndicats (lois 1884 en France)'],
+  republique: ['IIIe République proclamée 1870', 'Jules Ferry : école gratuite, laïque, obligatoire (1881-82)', 'Affaire Dreyfus (1894-1906) · Laïcité 1905'],
+  // 3e (XXe)
+  gm1: ['28 juin 1914 : Sarajevo · Guerre 1914-1918', 'Verdun 1916 · Armistice 11 nov 1918', 'Traité de Versailles 1919'],
+  entredeux: ['Révolution russe 1917 · URSS · Lénine, Staline', 'Crise de 1929', 'Hitler chancelier 1933 · Lois de Nuremberg 1935'],
+  gm2: ['1er sept 1939 : invasion Pologne', '18 juin 1940 : appel de De Gaulle · Vichy/Pétain', 'D-Day 6 juin 1944 · Shoah : 6 millions de Juifs · 8 mai 1945 victoire'],
+  guerrefroide: ['Rideau de fer (Churchill, Fulton 1946)', 'Plan Marshall 1947 · OTAN 1949 · Pacte de Varsovie 1955', 'Mur de Berlin : 1961 construction / 9 nov 1989 chute'],
+  decolonisation: ['Inde 1947 : Gandhi, Nehru', 'Indochine Dien Bien Phu 1954', 'Algérie 1954-1962 (accords d\'Évian) · Mandela élu 1994'],
+  france45: ['IVe République 1946 · Ve République 1958 (de Gaulle)', 'Trente Glorieuses 1945-1975', 'Mai 68 · Mitterrand élu 1981 · Chirac 1995-2007'],
+  europe: ['CECA 1951 · Traité de Rome 1957', 'Maastricht 1992 : UE + euro (circulation 2002)', 'Schengen 1985 · 27 membres (Brexit 2020)'],
+
+  // ─── Géographie ─────────────────────────────────────────────
+  // 6e
+  metropole: ['Métropole = grande ville concentrant emplois/services/population', 'Centre (CBD, monuments) + banlieues + périurbain', 'Top mondial : Tokyo, Delhi, Shanghai, Paris'],
+  faible: ['Faible densité = < 30 hab/km² (campagnes, montagnes, déserts, taïga)', 'Diagonale du vide française : Ardennes → Pyrénées', 'Atouts : tourisme vert, agriculture'],
+  littoraux: ['Littoral = contact terre/mer', '3 types : industriel (ZIP), touristique (balnéaire), mixte', 'Menaces : érosion, montée des eaux, pollution'],
+  mondeHab: ['8 milliards d\'humains · 60 % urbains', '3 gros foyers : Asie de l\'Est/Sud + Europe + NE États-Unis', 'Déserts humains : pôles, hauts massifs, grands déserts'],
+  vocab: ['Échelle : 1/100 000 → 1 cm = 1 km · grande échelle = détail', 'Méditerranéen : étés chauds secs / hivers doux humides', 'Développement durable : 3 piliers éco/social/environnement'],
+  // 5e
+  demographie: ['Transition démographique : baisse mortalité puis natalité', 'Fécondité : seuil 2,1 enfants/femme', '8 Md en 2026 → 10 Md en 2100 (projection ONU)'],
+  inegalites: ['IDH = santé + éducation + niveau de vie (0 à 1)', 'Nords riches vs Suds divers (Chine ≠ Tchad)', '17 ODD ONU pour 2030'],
+  ressources: ['Eau douce = 3 % de l\'eau totale · stress hydrique', 'Fossiles (pétrole/charbon/gaz) vs renouvelables', '~735 M de personnes en faim, défi 2050 : 10 Md à nourrir'],
+  urbanisation: ['55 % urbains (2020) · 68 % projeté 2050', 'Croissance urbaine rapide Afrique/Asie', 'Métropolisation + bidonvilles au Sud'],
+  risquesEnv: ['Risque = aléa × enjeux humains', 'GES : CO₂, méthane, vapeur d\'eau · +1,1 °C depuis 1900', 'Atténuation (réduire émissions) ≠ Adaptation'],
+  // 4e
+  urbanMonde: ['Métropolisation : concentration dans les grandes villes', 'Villes mondiales : New York, Londres, Tokyo, Paris, Shanghai', 'Fragmentation : gated communities vs bidonvilles'],
+  mobilites: ['280 M migrants (ONU 2023), majorité Sud-Sud', '1,5 Md touristes/an · France 1re destination (~89 M)', 'Remises de fonds >600 Md $/an'],
+  mondialisation: ['Flux : marchandises (mer, 80 %), capitaux, info, personnes', 'FTN (Apple, Toyota, LVMH…) · OMC, FMI, banque mondiale', 'Paradis fiscaux et inégalités Nord-Sud'],
+  mers: ['Océans = 71 % de la surface terrestre', 'Passages clés : Suez, Panama, Malacca, Ormuz, Gibraltar', 'ZEE = 200 milles marins (~370 km)'],
+  ensembles: ['USA : 1re puissance (PIB, militaire, culture)', 'Chine 2ᵉ, Inde émergente (1,43 Md)', 'UE à 27 · BRICS élargis'],
+  // 3e
+  airesUrb: ['Aire urbaine = ville-centre + banlieue + périurbain', 'Paris = 1re (~12 M) · Lyon (~2,3 M) · Marseille (~1,9 M)', 'Périurbanisation + gentrification'],
+  productifs: ['Agriculture française = 1re UE · Bordeaux vignoble', 'Aéronautique Toulouse (Airbus) · Tourisme ~8 % PIB', 'Pôles de compétitivité, friches industrielles reconverties'],
+  transports: ['TGV depuis 1981 · réseau en étoile Paris', 'Marseille-Fos 1er port · Paris-CDG 2ᵉ aéroport européen', 'Grand Paris Express : 200 km, 68 gares, horizon 2030'],
+  amenagement: ['SCoT (intercommunal) + PLU (communal)', 'ZAN : zéro artificialisation nette d\'ici 2050', '5 DROM : Guadeloupe, Martinique, Guyane, Réunion, Mayotte'],
+  france_ue: ['France fondatrice CEE 1957', 'UE = 27 États · zone euro = 20 · Schengen', 'Bruxelles (Commission) · Strasbourg (Parlement)'],
+  influence: ['7ᵉ PIB mondial · membre permanent ONU (veto)', 'ZEE française = 2ᵉ mondiale grâce à l\'outre-mer', 'Francophonie ~320 M de locuteurs (88 États OIF)'],
 };
 
 // ============================================================
@@ -299,6 +409,51 @@ function recordWrongAnswers(questions: Question[], answers: AnswersMap): void {
   } catch {}
 }
 
+// Reconstruit le tracker d'erreurs depuis l'historique complet d'attempts.
+// Appelé après une sync serveur : la mémoire long terme (SM-2) suit l'élève
+// entre appareils sans nécessiter de POST fréquents (le tracker est dérivable
+// des attempts, qui eux sont sync en JSON).
+function rebuildTrackerFromAttempts(attempts): void {
+  if (!Array.isArray(attempts) || !attempts.length) return;
+  try {
+    // Tri par date croissante pour rejouer l'évolution streak/wrong dans l'ordre.
+    const sorted = attempts.slice().sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    const tracker = {};
+    for (const att of sorted) {
+      if (!Array.isArray(att.log)) continue;
+      const ts = new Date(att.date).getTime();
+      for (const entry of att.log) {
+        if (!entry || typeof entry.key !== 'string') continue;
+        if (!tracker[entry.key]) tracker[entry.key] = { wrong: 0, seen: 0, streak: 0, lastSeenAt: 0 };
+        const t = tracker[entry.key];
+        t.seen += 1;
+        const wrong = entry.ok === false || (entry.ok === undefined && entry.given !== entry.correct);
+        if (wrong) { t.wrong += 1; t.streak = 0; } else { t.streak = (t.streak || 0) + 1; }
+        t.lastSeenAt = ts;
+      }
+    }
+    localStorage.setItem(wrongTrackerKey(), JSON.stringify(tracker));
+  } catch {}
+}
+
+// Retourne les keys récemment ratées (tracker.wrong > 0 et vues < 30 jours).
+// Utilisé pour le mode "Réviser mes erreurs récentes".
+function getRecentWrongKeys(maxDays: number = 30): string[] {
+  if (!POOL || Object.keys(POOL).length === 0) return [];
+  const tracker = getWrongTracker();
+  const now = Date.now();
+  const cutoff = now - maxDays * 24 * 3600 * 1000;
+  const out: { key: string; wrong: number }[] = [];
+  Object.keys(POOL).forEach(did => (POOL[did] || []).forEach(q => {
+    const e = tracker[q.key];
+    if (!e || !e.wrong) return;
+    if ((e.lastSeenAt || 0) < cutoff) return;
+    out.push({ key: q.key, wrong: e.wrong });
+  }));
+  out.sort((a, b) => b.wrong - a.wrong);
+  return out.map(d => d.key);
+}
+
 // Retourne les keys du quiz actif dont la fenêtre d'oubli est écoulée,
 // triées par urgence décroissante (les plus en retard d'abord).
 function getDueKeys(): string[] {
@@ -334,23 +489,89 @@ function weightedSampleWithoutReplacement<T>(items: T[], count: number, weightFn
   return out;
 }
 
-function buildQuiz(forceKeys?: string[]): Question[] {
+// PRNG seedé (Mulberry32) — déterministe : même seed → même suite de nombres.
+// Permet aux questions paramétriques (gen) d'être rejouables à l'identique pour
+// la relecture d'un bilan archivé (rebuildFromAttempt).
+function mulberry32(seed: number): () => number {
+  let t = seed >>> 0;
+  return function () {
+    t = (t + 0x6D2B79F5) >>> 0;
+    let r = Math.imul(t ^ (t >>> 15), 1 | t);
+    r = (r + Math.imul(r ^ (r >>> 7), 61 | r)) ^ r;
+    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// Normalise les décimaux à la française (point → virgule entre deux chiffres).
+// Appliqué aux sorties des générateurs : corrige sans toucher aux gens qui oublient
+// la conversion `.` → `,` sur leurs distracteurs/hints.
+const FRENCH_DEC_RE = /(\d)\.(\d)/g;
+function frenchifyDecimals(node) {
+  if (typeof node === 'string') return node.replace(FRENCH_DEC_RE, '$1,$2');
+  if (typeof node === 'number') return String(node).replace(FRENCH_DEC_RE, '$1,$2');
+  if (Array.isArray(node)) return node.map(frenchifyDecimals);
+  if (React.isValidElement(node)) {
+    // @ts-ignore — accès props.children sans cast `as`, pour compat Babel Standalone
+    const props = node.props || {};
+    if (!Object.prototype.hasOwnProperty.call(props, 'children')) return node;
+    // @ts-ignore
+    const newChildren = React.Children.map(props.children, frenchifyDecimals);
+    // @ts-ignore
+    return React.cloneElement(node, { children: newChildren });
+  }
+  return node;
+}
+
+function buildQuiz(forceKeys?: string[], forceSeeds?: Record<string, number>, onlyDomain?: string): Question[] {
   const questions: Question[] = [];
   const pushQuestion = (src: SourceQuestion, did: string) => {
-    const order = shuffle(src.options.map((_, i) => i)); // ordre shuffle stocké
-    const options = order.map(i => src.options[i]);
-    const correct = order.indexOf(src.correct);
-    questions.push({ key: src.key, domain: did, q: src.q, options, correct, hint: src.hint, order });
+    // Instancier le contenu : générateur paramétrique OU question statique.
+    let content: QuestionContent;
+    let seed: number | undefined;
+    if (typeof src.gen === 'function') {
+      seed = (forceSeeds && forceSeeds[src.key] != null)
+        ? forceSeeds[src.key]
+        : (Math.random() * 0xFFFFFFFF) >>> 0;
+      const raw = src.gen(mulberry32(seed));
+      content = {
+        q: frenchifyDecimals(raw.q),
+        options: raw.options.map(frenchifyDecimals),
+        correct: raw.correct,
+        hint: typeof raw.hint === 'string' ? raw.hint.replace(FRENCH_DEC_RE, '$1,$2') : raw.hint,
+      };
+    } else {
+      content = { q: src.q, options: src.options, correct: src.correct, hint: src.hint };
+    }
+    const order = shuffle(content.options.map((_, i) => i));
+    const options = order.map(i => content.options[i]);
+    const correct = order.indexOf(content.correct);
+    const out: Question = { key: src.key, domain: did, q: content.q, options, correct, hint: content.hint, order };
+    if (seed !== undefined) out.seed = seed;
+    questions.push(out);
   };
 
   if (Array.isArray(forceKeys) && forceKeys.length) {
-    const byKey = {};
+    const byKey: Record<string, SourceQuestion & { domain: string }> = {};
     Object.keys(POOL).forEach(did => (POOL[did] || []).forEach(q => byKey[q.key] = { ...q, domain: did }));
     forceKeys.forEach(k => { const src = byKey[k]; if (src) pushQuestion(src, src.domain); });
     return questions.map((q, i) => ({ ...q, num: i + 1 }));
   }
 
   const tracker = getWrongTracker();
+  // Mode "par chapitre" : ne tire qu'un seul domaine, 10 questions max.
+  if (onlyDomain && POOL[onlyDomain]) {
+    const pool: SourceQuestion[] = POOL[onlyDomain];
+    const picks = weightedSampleWithoutReplacement(
+      pool, Math.min(10, pool.length),
+      (q) => {
+        const t = tracker[q.key];
+        if (!t || t.seen === 0) return 1;
+        return 1 + (t.wrong / t.seen) * 2;
+      }
+    );
+    picks.forEach(src => pushQuestion(src, onlyDomain));
+    return questions.map((q, i) => ({ ...q, num: i + 1 }));
+  }
   Object.keys(DOMAINS).forEach(did => {
     const pool: SourceQuestion[] = POOL[did] || [];
     const picks = weightedSampleWithoutReplacement(
@@ -611,7 +832,7 @@ function CompetenceRadar({ byDomain, previousDomains }: CompetenceRadarProps) {
         )}
       </div>
 
-      <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="auto" style={{maxWidth:640, display:'block', margin:'0 auto'}}>
+      <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{height:'auto', maxWidth:640, display:'block', margin:'0 auto'}}>
         {/* Grille concentrique */}
         {levels.map(lv => {
           const poly = ids.map((_, i) => {
@@ -666,7 +887,7 @@ function CompetenceRadar({ byDomain, previousDomains }: CompetenceRadarProps) {
 }
 
 function ProgressCurve({ attempts }: ProgressCurveProps) {
-  const W = 640, H = 220, padL = 40, padR = 16, padT = 18, padB = 34;
+  const W = 640, H = 240, padL = 40, padR = 20, padT = 28, padB = 38;
   const iw = W - padL - padR, ih = H - padT - padB;
   const n = attempts.length;
   const xs = (i) => padL + (n === 1 ? iw/2 : (i / (n - 1)) * iw);
@@ -677,7 +898,36 @@ function ProgressCurve({ attempts }: ProgressCurveProps) {
   const last = attempts[attempts.length - 1];
   const prev = attempts.length >= 2 ? attempts[attempts.length - 2] : null;
   const delta = prev ? last.note - prev.note : 0;
-  const fmtDate = (iso) => new Date(iso).toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit' });
+  // fmtDate : ajoute l'heure uniquement si ≥ 2 tests le même jour (évite "24/04 / 24/04" identique).
+  const dayKeys = attempts.map(a => new Date(a.date).toDateString());
+  const dayCounts = {};
+  dayKeys.forEach(k => { dayCounts[k] = (dayCounts[k] || 0) + 1; });
+  const fmtDate = (iso) => {
+    const d = new Date(iso);
+    const day = d.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit' });
+    if ((dayCounts[d.toDateString()] || 0) > 1) {
+      return day + ' ' + d.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' }).replace(':', 'h');
+    }
+    return day;
+  };
+  // Label de note : strategy anti-chevauchement.
+  // - Si ≤ 5 tests : label visible sur chaque point, alterné haut/bas si points trop serrés.
+  // - Si > 5 : label seulement sur premier, dernier, min, max.
+  const MIN_DX = 45; // espacement mini X entre deux labels au même niveau
+  const noteLabelPlan = pts.map((p, i) => {
+    if (n > 5) {
+      const noteI = p.a.note;
+      const maxN = Math.max(...attempts.map(a => a.note));
+      const minN = Math.min(...attempts.map(a => a.note));
+      const show = i === 0 || i === n-1 || noteI === maxN || noteI === minN;
+      return { show, above: true };
+    }
+    // Si proche du voisin ± MIN_DX, alterner
+    const tooCloseLeft  = i > 0     && Math.abs(p.x - pts[i-1].x) < MIN_DX;
+    const tooCloseRight = i < n - 1 && Math.abs(p.x - pts[i+1].x) < MIN_DX;
+    const above = i % 2 === 0 || !tooCloseLeft && !tooCloseRight;
+    return { show: true, above };
+  });
   return (
     <div className="p-5 md:p-6 rounded-xl" style={{border:'1px solid var(--line)', background:'rgba(255,255,255,0.55)'}}>
       <div className="flex items-baseline justify-between flex-wrap gap-3 mb-4">
@@ -694,7 +944,7 @@ function ProgressCurve({ attempts }: ProgressCurveProps) {
           </div>
         )}
       </div>
-      <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="auto" style={{maxWidth:'100%', display:'block'}}>
+      <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{height:'auto', maxWidth:'100%', display:'block'}}>
         {[0,5,10,15,20].map(v => (
           <g key={v}>
             <line x1={padL} x2={W-padR} y1={ys(v)} y2={ys(v)} stroke="var(--line)" strokeDasharray={v===10?'0':'2 4'} strokeWidth="1" />
@@ -705,12 +955,25 @@ function ProgressCurve({ attempts }: ProgressCurveProps) {
         <path d={path} fill="none" stroke="var(--accent)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
         {pts.map(p => {
           const isLast = p.i === pts.length - 1;
+          const plan = noteLabelPlan[p.i];
+          const dy = plan.above ? -(isLast?14:10) : (isLast?20:16);
+          // Label de date : décalage X si voisin trop proche pour éviter chevauchement
+          const prevX = p.i > 0 ? pts[p.i-1].x : -999;
+          const nextX = p.i < n - 1 ? pts[p.i+1].x : 9999;
+          let dateDx = 0;
+          if (p.x - prevX < MIN_DX) dateDx = 8;        // décale à droite
+          else if (nextX - p.x < MIN_DX) dateDx = -8;  // décale à gauche
           return (
             <g key={p.i}>
               <circle cx={p.x} cy={p.y} r={isLast?7:4.5} fill={isLast?'var(--accent)':'var(--paper)'} stroke="var(--accent)" strokeWidth="2" />
               {isLast && <circle cx={p.x} cy={p.y} r="12" fill="none" stroke="var(--accent)" strokeWidth="1.2" opacity="0.4" />}
-              <text x={p.x} y={p.y-(isLast?14:10)} fontSize={isLast?13:11} textAnchor="middle" fill="var(--ink)" fontFamily="Fraunces, serif" fontWeight={isLast?700:500}>{p.a.note.toFixed(1)}</text>
-              <text x={p.x} y={H-padB+18} fontSize="10" textAnchor="middle" fill="var(--muted)" fontFamily="JetBrains Mono, monospace">{fmtDate(p.a.date)}</text>
+              {plan.show && (
+                <text x={p.x} y={p.y+dy} fontSize={isLast?13:11} textAnchor="middle" fill="var(--ink)" fontFamily="Figtree, system-ui, sans-serif" fontWeight={isLast?700:500}
+                  style={{paintOrder:'stroke', stroke:'var(--paper)', strokeWidth:4, strokeLinejoin:'round'}}>
+                  {p.a.note.toFixed(1)}
+                </text>
+              )}
+              <text x={p.x + dateDx} y={H-padB+18} fontSize="10" textAnchor="middle" fill="var(--muted)" fontFamily="JetBrains Mono, monospace">{fmtDate(p.a.date)}</text>
             </g>
           );
         })}
@@ -753,7 +1016,7 @@ function MemoSection() {
             return (
               <div key={id} style={{border:'1px solid var(--line)', borderRadius:10, background:'rgba(255,255,255,0.55)', overflow:'hidden'}}>
                 <button onClick={() => setActive(isOpen ? null : id)} className="w-full flex items-center gap-3" style={{padding:'12px 14px', textAlign:'left', cursor:'pointer', background:'transparent', border:0}}>
-                  <span style={{width:36, height:36, display:'inline-flex', alignItems:'center', justifyContent:'center', borderRadius:8, background:`${dom.color}1a`, color:dom.color, fontFamily:'Fraunces, serif', fontWeight:700, fontSize:16, flexShrink:0}}>{dom.icon}</span>
+                  <span style={{width:36, height:36, display:'inline-flex', alignItems:'center', justifyContent:'center', borderRadius:8, background:`${dom.color}1a`, color:dom.color, fontFamily:'Figtree, system-ui, sans-serif', fontWeight:700, fontSize:16, flexShrink:0}}>{dom.icon}</span>
                   <span className="flex-1 font-display font-semibold text-[15px] leading-tight">{dom.name}</span>
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{transform: isOpen ? 'rotate(180deg)' : '', transition:'transform .2s', color:'var(--muted)'}}>
                     <path d="M4 5.5l3 3 3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
@@ -761,11 +1024,13 @@ function MemoSection() {
                 </button>
                 {isOpen && (
                   <ul className="fade-up" style={{padding:'0 14px 14px 60px', margin:0, listStyle:'none', fontSize:15, lineHeight:1.55, color:'var(--ink-soft)'}}>
-                    {MEMO_BANK[id].map((line, i) => (
+                    {MEMO_BANK[id].map((line, i) => typeof line === 'string' ? (
                       <li key={i} style={{display:'flex', gap:10, marginBottom:6}}>
                         <span style={{color:dom.color, flexShrink:0, fontWeight:700}}>·</span>
                         <span>{line}</span>
                       </li>
+                    ) : (
+                      <li key={i} style={{listStyle:'none', margin:'10px 0'}}>{line}</li>
                     ))}
                   </ul>
                 )}
@@ -784,7 +1049,7 @@ function MemoSection() {
 function allAttemptsForStudent(slug) {
   const out = [];
   const levels = [6,5,4,3];
-  const subjects = ['maths','physique','svt'];
+  const subjects = ['maths','physique','svt','histoire','geo'];
   levels.forEach(lvl => {
     subjects.forEach(sk => {
       try {
@@ -872,6 +1137,8 @@ function HomeScreen({ onStart }: HomeScreenProps) {
   const [klass, setKlass] = useState(initialKlass);
   const [mode, setMode] = useState(initialMode);
   const dueKeys = useMemo(() => getDueKeys(), []);
+  const recentWrongKeys = useMemo(() => getRecentWrongKeys(30), []);
+  const [onlyDomain, setOnlyDomain] = useState('');
   const canStart = name.trim().length >= 2;
   const profile = useMemo(() => getProfile(name), [name]);
   useEffect(() => { if (profile && profile.klass && !klass) setKlass(profile.klass); }, [profile]);
@@ -992,8 +1259,19 @@ function HomeScreen({ onStart }: HomeScreenProps) {
           </div>
         </div>
 
+        <div className="fade-up mb-5" style={{animationDelay:'0.23s'}}>
+          <label className="font-mono text-[10px] uppercase tracking-[0.22em] mb-2 block" style={{color:'var(--muted)'}}>Chapitre (optionnel)</label>
+          <select value={onlyDomain} onChange={e => setOnlyDomain(e.target.value)}
+            style={{padding:'10px 14px', borderRadius:10, border:'1.5px solid var(--line)', background:'rgba(255,255,255,0.7)', minWidth:220, fontSize:15}}>
+            <option value="">Tous les chapitres (30 questions)</option>
+            {Object.keys(DOMAINS).map(did => (
+              <option key={did} value={did}>{DOMAINS[did].name} (10 questions)</option>
+            ))}
+          </select>
+        </div>
+
         <div className="fade-up" style={{animationDelay:'0.25s'}}>
-          <button onClick={() => canStart && onStart({ name: name.trim(), klass: klass.trim() }, mode)} disabled={!canStart} className="btn-primary w-full sm:w-auto">
+          <button onClick={() => canStart && onStart({ name: name.trim(), klass: klass.trim() }, mode, undefined, onlyDomain || undefined)} disabled={!canStart} className="btn-primary w-full sm:w-auto">
             <span>{mode === 'training' ? 'Commencer l\'entraînement' : 'Commencer l\'interrogation'}</span>
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10h12m0 0l-5-5m5 5l-5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </button>
@@ -1010,6 +1288,21 @@ function HomeScreen({ onStart }: HomeScreenProps) {
               <button onClick={() => canStart && onStart({ name: name.trim(), klass: klass.trim() }, 'training', dueKeys)} disabled={!canStart}
                 style={{padding:'10px 16px', borderRadius:10, border:'2px solid var(--sea)', background:'var(--sea)', color:'#fff', cursor: canStart ? 'pointer' : 'not-allowed', opacity: canStart ? 1 : 0.5, fontWeight:600}}>
                 📚 Lancer la révision ({Math.min(dueKeys.length, 20)} questions)
+              </button>
+            </div>
+          </div>
+        )}
+
+        {recentWrongKeys.length > 0 && (
+          <div className="mt-4 fade-up" style={{animationDelay:'0.3s'}}>
+            <div className="p-4 sm:p-5" style={{border:'1.5px dashed var(--ochre)', borderRadius:12, background:'rgba(199,138,29,0.06)'}}>
+              <div className="font-mono text-[10px] uppercase tracking-[0.22em] mb-1" style={{color:'var(--ochre)'}}>Erreurs récentes (30 j.)</div>
+              <div className="text-[15px] mb-3" style={{color:'var(--ink-soft)'}}>
+                <strong style={{color:'var(--ink)'}}>{recentWrongKeys.length} question{recentWrongKeys.length>1?'s':''}</strong> déjà raté{recentWrongKeys.length>1?'es':'e'} — rejoue celles-ci pour verrouiller.
+              </div>
+              <button onClick={() => canStart && onStart({ name: name.trim(), klass: klass.trim() }, 'training', recentWrongKeys)} disabled={!canStart}
+                style={{padding:'10px 16px', borderRadius:10, border:'2px solid var(--ochre)', background:'var(--ochre)', color:'#fff', cursor: canStart ? 'pointer' : 'not-allowed', opacity: canStart ? 1 : 0.5, fontWeight:600}}>
+                🎯 Rejouer mes erreurs ({Math.min(recentWrongKeys.length, 20)})
               </button>
             </div>
           </div>
@@ -1180,11 +1473,13 @@ function QuizScreen({ student, quiz, onFinish, mode }: QuizScreenProps) {
             <div className="mb-4 slide-in" style={{padding:'14px 16px', background:'rgba(199,138,29,0.08)', border:'1.5px dashed var(--ochre)', borderRadius:10, fontSize:15, lineHeight:1.55, color:'var(--ink-soft)'}}>
               <span className="font-mono text-[10px] uppercase tracking-[0.18em]" style={{color:'var(--ochre)', fontWeight:700}}>💡 Méthode — {domain.name}</span>
               <ul style={{margin:'6px 0 0 0', padding:0, listStyle:'none'}}>
-                {MEMO_BANK[q.domain].map((line, i) => (
+                {MEMO_BANK[q.domain].map((line, i) => typeof line === 'string' ? (
                   <li key={i} style={{display:'flex', gap:10, marginTop:4}}>
                     <span style={{color:'var(--ochre)', fontWeight:700, flexShrink:0}}>·</span>
                     <span>{line}</span>
                   </li>
+                ) : (
+                  <li key={i} style={{listStyle:'none', margin:'8px 0'}}>{line}</li>
                 ))}
               </ul>
             </div>
@@ -1322,17 +1617,22 @@ function ReportScreen({ student, quiz, answers, timings, totalMs, hintsUsed, mod
       totalMs: totalMs || 0,
       domains: Object.fromEntries(Object.entries(result.byDomain).map(([k,v]) => [k, { level:v.level, pct:Math.round(v.pct) }])),
       // Détail question par question pour relecture et analyse ultérieure (exploitable par IA)
-      log: quiz.map((q, i) => ({
-        pos: i + 1,
-        key: q.key,
-        domain: q.domain,
-        given: answers[q.key] === undefined ? null : answers[q.key],
-        correct: q.correct,
-        ok: answers[q.key] === q.correct,
-        ms: timings?.[q.key] ?? null,
-        hinted: !!hintsUsed?.[q.key],
-        order: q.order || null, // ordre du shuffle pour relecture exacte
-      })),
+      log: quiz.map((q, i) => {
+        const entry: LogEntry = {
+          pos: i + 1,
+          key: q.key,
+          domain: q.domain,
+          given: answers[q.key] === undefined ? null : answers[q.key],
+          correct: q.correct,
+          ok: answers[q.key] === q.correct,
+          ms: timings?.[q.key] ?? null,
+          hinted: !!hintsUsed?.[q.key],
+          order: q.order || null,
+        };
+        // Seed du générateur paramétrique (pour relecture exacte du contenu dynamique).
+        if (q.seed !== undefined) entry.seed = q.seed;
+        return entry;
+      }),
     };
     saveHistoryFor(student.name, student.klass, attempt);
     recordWrongAnswers(quiz, answers);
@@ -1691,17 +1991,34 @@ function rebuildFromAttempt(attempt) {
   (attempt.log || []).forEach((entry) => {
     const src = byKey[entry.key];
     if (!src) return;
-    let options, correctIdx;
-    if (Array.isArray(entry.order) && entry.order.length === src.options.length) {
-      options = entry.order.map(i => src.options[i]);
-      correctIdx = entry.order.indexOf(src.correct);
+    // Question paramétrique : re-exécuter le générateur avec le seed stocké
+    // pour retrouver exactement les mêmes valeurs (énoncé + options + correct).
+    // Fallback sur seed 0 pour anciens bilans (avant infra gen) dont l'entry n'a pas de seed :
+    // l'instance ne sera pas celle vue par l'élève, mais le quiz reste affichable.
+    let content;
+    if (typeof src.gen === 'function') {
+      const s = typeof entry.seed === 'number' ? entry.seed : 0;
+      const raw = src.gen(mulberry32(s));
+      content = {
+        q: frenchifyDecimals(raw.q),
+        options: raw.options.map(frenchifyDecimals),
+        correct: raw.correct,
+        hint: typeof raw.hint === 'string' ? raw.hint.replace(FRENCH_DEC_RE, '$1,$2') : raw.hint,
+      };
     } else {
-      options = src.options;
-      correctIdx = src.correct;
+      content = { q: src.q, options: src.options, correct: src.correct, hint: src.hint };
+    }
+    let options, correctIdx;
+    if (Array.isArray(entry.order) && entry.order.length === content.options.length) {
+      options = entry.order.map(i => content.options[i]);
+      correctIdx = entry.order.indexOf(content.correct);
+    } else {
+      options = content.options;
+      correctIdx = content.correct;
     }
     quizArr.push({
-      key: src.key, domain: src.domain, q: src.q,
-      options, correct: correctIdx, hint: src.hint,
+      key: src.key, domain: src.domain, q: content.q,
+      options, correct: correctIdx, hint: content.hint,
     });
     if (entry.given === null || entry.given === undefined) {
       ans[src.key] = null;
@@ -1777,12 +2094,13 @@ function App() {
     setScreen('report');
   }, []);
 
-  const handleStart = (info: StudentInfo, chosenMode: Mode, revisionKeys?: string[]) => {
+  const handleStart = (info: StudentInfo, chosenMode: Mode, revisionKeys?: string[], onlyDomain?: string) => {
     setStudent(info);
     setMode(chosenMode || 'training');
     // Révision : on plafonne à 20 questions pour rester sous ~15 min (mémoire long terme = quotidien court).
     const revKeys = Array.isArray(revisionKeys) && revisionKeys.length ? revisionKeys.slice(0, 20) : null;
-    setQuiz(revKeys ? buildQuiz(revKeys) : buildQuiz());
+    const dom = (typeof onlyDomain === 'string' && POOL[onlyDomain]) ? onlyDomain : undefined;
+    setQuiz(revKeys ? buildQuiz(revKeys) : buildQuiz(undefined, undefined, dom));
     setAnswers({}); setTimings({}); setHintsUsed({}); setTotalMs(0);
     setHistoryMode(false);
     setScreen('quiz');

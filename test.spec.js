@@ -511,6 +511,53 @@ test.describe('Parcours utilisateur', () => {
     await expect(input).toHaveValue('Gaston Prefill', { timeout: 5000 });
   });
 
+  test('MEMO électricité physique-4 affiche les schémas SVG série et parallèle', async ({ page }) => {
+    // Régression : les schémas SVG de circuits doivent être rendus dans la fiche
+    // mémo "Électricité & circuits" depuis le HomeScreen du quiz. Couvre le
+    // rendu ReactNode dans MEMO_BANK (clé `electricite`) + extraction depuis
+    // window.CircuitKit (bundle quizzes/_circuits.tsx partagé avec app.tsx).
+    await completeWizard(page, 'Sophie Memo', '4ème');
+    await page.goto(BASE + '/index.html#/4eme/physique');
+    await page.waitForTimeout(2000);
+    await page.locator('#root').getByText('Fiches mémo').click();
+    await page.locator('#root').getByRole('button', { name: /Électricité & circuits/ }).click();
+    await expect(page.locator('#root svg[data-circuit="serie"]')).toBeVisible();
+    await expect(page.locator('#root svg[data-circuit="parallele"]')).toBeVisible();
+    await expect(page.locator('#root').getByText(/Analogie eau/)).toBeVisible();
+  });
+
+  test('MEMO maths-4 affiche les schémas Pythagore et Thalès', async ({ page }) => {
+    await completeWizard(page, 'Léa Maths', '4ème');
+    await page.goto(BASE + '/index.html#/4eme/maths');
+    await page.waitForTimeout(2000);
+    await page.locator('#root').getByText('Fiches mémo').click();
+    await page.locator('#root').getByRole('button', { name: /Théorème de Pythagore|Pythagore/ }).click();
+    await expect(page.locator('#root svg[data-schema="triangle-rectangle"]')).toBeVisible();
+    // Refermer puis ouvrir Thalès
+    await page.locator('#root').getByRole('button', { name: /Théorème de Thalès|Thalès/ }).click();
+    await expect(page.locator('#root svg[data-schema="config-thales"]')).toBeVisible();
+  });
+
+  test('MEMO maths-3 affiche les schémas Trigo et Fonctions', async ({ page }) => {
+    await completeWizard(page, 'Yanis Trigo', '3ème');
+    await page.goto(BASE + '/index.html#/3eme/maths');
+    await page.waitForTimeout(2000);
+    await page.locator('#root').getByText('Fiches mémo').click();
+    await page.locator('#root').getByRole('button', { name: /Trigonométrie/ }).click();
+    await expect(page.locator('#root svg[data-schema="triangle-trigo"]')).toBeVisible();
+    await page.locator('#root').getByRole('button', { name: /Fonctions/ }).click();
+    await expect(page.locator('#root svg[data-schema="graphe-affine"]')).toBeVisible();
+  });
+
+  test('MEMO loiOhm physique-4 affiche le graphe U=f(I)', async ({ page }) => {
+    await completeWizard(page, 'Théo Ohm', '4ème');
+    await page.goto(BASE + '/index.html#/4eme/physique');
+    await page.waitForTimeout(2000);
+    await page.locator('#root').getByText('Fiches mémo').click();
+    await page.locator('#root').getByRole('button', { name: /Loi d'Ohm/ }).click();
+    await expect(page.locator('#root svg[data-circuit="graphe-ohm"]')).toBeVisible();
+  });
+
   test('transition quiz A → wizard → quiz B sans remount foireux', async ({ page }) => {
     // Stress-test de l'unmount/remount du React app entre deux quizzes différents.
     await completeWizard(page, 'Henri Transition', '5ème');

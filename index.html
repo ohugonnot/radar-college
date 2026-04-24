@@ -13396,14 +13396,21 @@ window.ALL_QUIZZES['maths-5'] = {
     }, {
       key: 'pro-10',
       gen: rnd => {
-        const pcts = [5, 10, 15, 20, 25, 30];
+        const pcts = [2, 4, 5, 8, 10, 12, 15, 18, 20, 22, 25, 28, 30, 35, 40, 50];
         const pct = pcts[Math.floor(rnd() * pcts.length)];
         const mult = 1 + pct / 100;
         const multStr = String(mult).replace('.', ',');
-        const wrongA = 1 - pct / 100;
-        const wrongAStr = String(wrongA).replace('.', ',');
-        const wrongB = String(pct / 100).replace('.', ',');
-        const wrongC = pct < 10 ? `1,${pct}0` : String(1 + pct).replace('.', ',');
+        const wrongAStr = String(1 - pct / 100).replace('.', ',');
+        const seen = new Set([multStr, wrongAStr]);
+        const pick = cands => {
+          for (const c of cands) if (!seen.has(c)) {
+            seen.add(c);
+            return c;
+          }
+          return cands[0] + '0';
+        };
+        const wrongB = pick([String(pct / 100).replace('.', ','), String(pct).replace('.', ',')]);
+        const wrongC = pick([pct < 10 ? `1,${pct}0` : String(1 + pct).replace('.', ','), String(1 + pct / 10).replace('.', ',')]);
         return {
           q: `Un prix augmente de ${pct} %. Le coefficient multiplicateur est :`,
           options: [multStr, wrongAStr, wrongB, wrongC],
@@ -14051,7 +14058,7 @@ window.ALL_QUIZZES['maths-5'] = {
     }, {
       key: 'air-9',
       gen: rnd => {
-        const r = 2 + Math.floor(rnd() * 9);
+        const r = 2 + Math.floor(rnd() * 24);
         const perim = Math.round(2 * 3.14 * r * 10) / 10;
         const fr = v => String(v).replace('.', ',');
         const used = new Set([r]);
@@ -14106,7 +14113,7 @@ window.ALL_QUIZZES['maths-5'] = {
     }, {
       key: 'air-11',
       gen: rnd => {
-        const r = 3 + Math.floor(rnd() * 8);
+        const r = 3 + Math.floor(rnd() * 23);
         const halfPerim = Math.round(3.14 * r * 100) / 100;
         const diam = 2 * r;
         const good = Math.round((halfPerim + diam) * 100) / 100;
@@ -14177,7 +14184,7 @@ window.ALL_QUIZZES['maths-5'] = {
     }, {
       key: 'air-14',
       gen: rnd => {
-        const m2 = 1 + Math.floor(rnd() * 8);
+        const m2 = 1 + Math.floor(rnd() * 24);
         const good = m2 * 10000;
         const piege1 = m2 * 100;
         const piege2 = m2 * 1000;
@@ -16009,8 +16016,8 @@ window.ALL_QUIZZES['maths-6'] = {
         function gcd(a, b) {
           return b === 0 ? a : gcd(b, a % b);
         }
-        const d1 = [2, 3, 4][Math.floor(rnd() * 3)];
-        const d2 = [2, 3, 4][Math.floor(rnd() * 3)];
+        const d1 = [2, 3, 4, 5, 6, 7, 8][Math.floor(rnd() * 7)];
+        const d2 = [2, 3, 4, 5, 6, 7, 8][Math.floor(rnd() * 7)];
         const n1 = 1,
           n2 = 1;
         const rn = n1 * n2,
@@ -16917,7 +16924,7 @@ window.ALL_QUIZZES['maths-6'] = {
     }, {
       key: 'air-12',
       gen: rnd => {
-        const m2 = 1 + Math.floor(rnd() * 9);
+        const m2 = 1 + Math.floor(rnd() * 24);
         const good = m2 * 100;
         const p1 = m2 * 10;
         const p2 = m2 * 1000;
@@ -17012,7 +17019,7 @@ window.ALL_QUIZZES['maths-6'] = {
     }, {
       key: 'air-16',
       gen: rnd => {
-        let c = 4 + Math.floor(rnd() * 9);
+        let c = 3 + Math.floor(rnd() * 23);
         if (c === 4) c = 5;
         const aire = c * c;
         let perim = 4 * c;
@@ -19502,6 +19509,42 @@ window.ALL_QUIZZES['physique-4'] = {
           U: 15,
           R1: 5,
           R2: 15
+        }, {
+          U: 20,
+          R1: 4,
+          R2: 5
+        }, {
+          U: 30,
+          R1: 10,
+          R2: 15
+        }, {
+          U: 24,
+          R1: 6,
+          R2: 8
+        }, {
+          U: 36,
+          R1: 12,
+          R2: 18
+        }, {
+          U: 40,
+          R1: 8,
+          R2: 10
+        }, {
+          U: 16,
+          R1: 4,
+          R2: 8
+        }, {
+          U: 48,
+          R1: 12,
+          R2: 16
+        }, {
+          U: 50,
+          R1: 10,
+          R2: 25
+        }, {
+          U: 8,
+          R1: 4,
+          R2: 8
         }];
         const c = combos[Math.floor(rnd() * combos.length)];
         const I1 = +(c.U / c.R1).toFixed(2);

@@ -691,16 +691,15 @@ window.ALL_QUIZZES['maths-5'] = {
       } },
       // pro-10 : taux de variation / coefficient multiplicateur
       { key:'pro-10', gen: (rnd) => {
-        const pcts = [5, 10, 15, 20, 25, 30];
+        const pcts = [2, 4, 5, 8, 10, 12, 15, 18, 20, 22, 25, 28, 30, 35, 40, 50];
         const pct = pcts[Math.floor(rnd() * pcts.length)];
         const mult = 1 + pct / 100;
         const multStr = String(mult).replace('.', ',');
-        const wrongA = 1 - pct / 100;
-        const wrongAStr = String(wrongA).replace('.', ',');
-        const wrongB = String(pct / 100).replace('.', ',');
-        // Distracteur "1 + pct" (confusion pct ↔ coef). Évite la collision
-        // avec multStr quand pct est à 2 chiffres (ex 25 → 1,25 = mult).
-        const wrongC = pct < 10 ? `1,${pct}0` : String(1 + pct).replace('.', ',');
+        const wrongAStr = String(1 - pct / 100).replace('.', ',');
+        const seen = new Set([multStr, wrongAStr]);
+        const pick = (cands: string[]) => { for (const c of cands) if (!seen.has(c)) { seen.add(c); return c; } return cands[0] + '0'; };
+        const wrongB = pick([String(pct / 100).replace('.', ','), String(pct).replace('.', ',')]);
+        const wrongC = pick([pct < 10 ? `1,${pct}0` : String(1 + pct).replace('.', ','), String(1 + pct / 10).replace('.', ',')]);
         return {
           q: `Un prix augmente de ${pct} %. Le coefficient multiplicateur est :`,
           options: [multStr, wrongAStr, wrongB, wrongC],
@@ -1160,7 +1159,7 @@ window.ALL_QUIZZES['maths-5'] = {
       } },
       // air-9 : disque — retrouver le rayon à partir du périmètre (approx)
       { key:'air-9', gen: (rnd) => {
-        const r = 2 + Math.floor(rnd() * 9);   // 2..10 cm
+        const r = 2 + Math.floor(rnd() * 24);   // 2..25 cm
         const perim = Math.round(2 * 3.14 * r * 10) / 10;
         const fr = (v: number) => String(v).replace('.', ',');
         const used = new Set([r]);
@@ -1195,7 +1194,7 @@ window.ALL_QUIZZES['maths-5'] = {
       } },
       // air-11 : périmètre d'un demi-disque (diamètre + demi-cercle)
       { key:'air-11', gen: (rnd) => {
-        const r = 3 + Math.floor(rnd() * 8);   // 3..10 cm
+        const r = 3 + Math.floor(rnd() * 23);   // 3..25 cm
         const halfPerim = Math.round(3.14 * r * 100) / 100;
         const diam = 2 * r;
         const good = Math.round((halfPerim + diam) * 100) / 100;
@@ -1246,7 +1245,7 @@ window.ALL_QUIZZES['maths-5'] = {
       } },
       // air-14 : conversion d'unités d'aire (cm² ↔ m²)
       { key:'air-14', gen: (rnd) => {
-        const m2 = 1 + Math.floor(rnd() * 8);
+        const m2 = 1 + Math.floor(rnd() * 24);
         const good = m2 * 10000;
         const piege1 = m2 * 100;   // oublie que 1m² = 10000 cm²
         const piege2 = m2 * 1000;

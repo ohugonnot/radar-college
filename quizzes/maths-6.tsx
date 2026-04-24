@@ -865,8 +865,8 @@ window.ALL_QUIZZES['maths-6'] = {
       // fra-16 : fraction d'une fraction (intro — 1/2 de 1/4)
       { key:'fra-16', gen: (rnd) => {
         function gcd(a: number, b: number): number { return b === 0 ? a : gcd(b, a % b); }
-        const d1 = [2,3,4][Math.floor(rnd() * 3)];
-        const d2 = [2,3,4][Math.floor(rnd() * 3)];
+        const d1 = [2,3,4,5,6,7,8][Math.floor(rnd() * 7)];
+        const d2 = [2,3,4,5,6,7,8][Math.floor(rnd() * 7)];
         const n1 = 1, n2 = 1;
         const rn = n1 * n2, rd = d1 * d2;
         const g = gcd(rn, rd);
@@ -1446,7 +1446,7 @@ window.ALL_QUIZZES['maths-6'] = {
       } },
       // air-12 : unité d'aire — conversion m² ↔ dm²
       { key:'air-12', gen: (rnd) => {
-        const m2 = 1 + Math.floor(rnd() * 9);
+        const m2 = 1 + Math.floor(rnd() * 24);
         const good = m2 * 100;  // 1 m² = 100 dm²
         const p1 = m2 * 10;
         const p2 = m2 * 1000;
@@ -1510,8 +1510,8 @@ window.ALL_QUIZZES['maths-6'] = {
       } },
       // air-16 : aire d'un carré — côté donné par fraction entière
       { key:'air-16', gen: (rnd) => {
-        let c = 4 + Math.floor(rnd() * 9); // côté 4..12 cm
-        if (c === 4) c = 5;                // évite aire=perim=16
+        let c = 3 + Math.floor(rnd() * 23); // côté 3..25 cm
+        if (c === 4) c = 5;                 // évite aire=perim=16
         const aire = c * c;
         let perim = 4 * c;
         let demi = 2 * c;

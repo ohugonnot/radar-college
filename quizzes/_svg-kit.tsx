@@ -191,7 +191,14 @@ function GrapheOhm() {
 
 // ── Compositions géométrie ──────────────────────────────────────────────────
 
-function TriangleRectangle() {
+// Triangle rectangle en A. Props optionnelles pour afficher des valeurs
+// spécifiques — si omises, affiche les labels génériques (AB, AC, BC).
+// Un côté passé à "?" indique la mesure à trouver.
+function TriangleRectangle({ ab, ac, bc }: { ab?: string | number; ac?: string | number; bc?: string | number } = {}) {
+  const lAB = ab !== undefined ? `AB = ${ab}` : 'AB';
+  const lAC = ac !== undefined ? `AC = ${ac}` : 'AC';
+  const lBC = bc !== undefined ? `BC = ${bc}` : 'BC (hypoténuse)';
+  const hasValues = ab !== undefined || ac !== undefined || bc !== undefined;
   return (
     <svg viewBox="0 0 250 160" style={CIRCUIT_SVG_STYLE} role="img" aria-label="Triangle rectangle en A : côtés AB, AC, hypoténuse BC" data-schema="triangle-rectangle">
       <polygon points="50,30 50,130 200,130" fill="rgba(199,138,29,0.08)" stroke="currentColor" strokeWidth={1.8} strokeLinejoin="round" />
@@ -199,17 +206,22 @@ function TriangleRectangle() {
       <text x={42} y={26} fontSize={13} textAnchor="end" fill="currentColor" fontWeight={700}>A</text>
       <text x={42} y={138} fontSize={13} textAnchor="end" fill="currentColor" fontWeight={700}>B</text>
       <text x={208} y={138} fontSize={13} fill="currentColor" fontWeight={700}>C</text>
-      <text x={40} y={85} fontSize={11.5} textAnchor="end" fill="#b45309" fontWeight={600} fontStyle="italic">AB</text>
-      <text x={125} y={148} fontSize={11.5} textAnchor="middle" fill="#b45309" fontWeight={600} fontStyle="italic">AC</text>
-      <text x={135} y={72} fontSize={11.5} fill="#b45309" fontWeight={600} fontStyle="italic">BC (hypoténuse)</text>
-      <text x={125} y={14} fontSize={10.5} textAnchor="middle" fill="#b45309" fontWeight={700}>BC² = AB² + AC²</text>
+      <text x={40} y={85} fontSize={11.5} textAnchor="end" fill="#b45309" fontWeight={600} fontStyle="italic">{lAB}</text>
+      <text x={125} y={148} fontSize={11.5} textAnchor="middle" fill="#b45309" fontWeight={600} fontStyle="italic">{lAC}</text>
+      <text x={135} y={72} fontSize={11.5} fill="#b45309" fontWeight={600} fontStyle="italic">{lBC}</text>
+      {!hasValues && <text x={125} y={14} fontSize={10.5} textAnchor="middle" fill="#b45309" fontWeight={700}>BC² = AB² + AC²</text>}
     </svg>
   );
 }
 
-function ConfigThales() {
+// ConfigThales avec valeurs optionnelles (am, ab, an, ac, mn, bc). Un
+// paramètre passé à "?" désigne la longueur à calculer. Sans paramètre,
+// affiche la formule générique.
+function ConfigThales({ am, ab, an, ac, mn, bc }: { am?: string | number; ab?: string | number; an?: string | number; ac?: string | number; mn?: string | number; bc?: string | number } = {}) {
+  const hasValues = [am, ab, an, ac, mn, bc].some(v => v !== undefined);
+  const L = (v: string | number | undefined) => v !== undefined ? String(v) : '';
   return (
-    <svg viewBox="0 0 260 170" style={CIRCUIT_SVG_STYLE} role="img" aria-label="Configuration Thalès : triangles ABC et AMN avec (MN) parallèle à (BC)" data-schema="config-thales">
+    <svg viewBox="0 0 260 180" style={CIRCUIT_SVG_STYLE} role="img" aria-label="Configuration Thalès : triangles ABC et AMN avec (MN) parallèle à (BC)" data-schema="config-thales">
       <polygon points="125,20 40,140 220,140" fill="rgba(199,138,29,0.05)" stroke="currentColor" strokeWidth={1.7} strokeLinejoin="round" />
       <line x1={78} y1={86} x2={177} y2={86} stroke="#b45309" strokeWidth={2.2} />
       <text x={125} y={14} fontSize={13} textAnchor="middle" fill="currentColor" fontWeight={700}>A</text>
@@ -219,7 +231,14 @@ function ConfigThales() {
       <text x={185} y={80} fontSize={13} fill="#b45309" fontWeight={700}>N</text>
       <text x={125} y={82} fontSize={12} textAnchor="middle" fill="#b45309" fontWeight={700}>»</text>
       <text x={130} y={137} fontSize={12} textAnchor="middle" fill="currentColor" fontWeight={700}>»</text>
-      <text x={130} y={163} fontSize={10.5} textAnchor="middle" fill="#b45309" fontWeight={700}>(MN) // (BC)  ⇒  AM/AB = AN/AC = MN/BC</text>
+      {/* Valeurs optionnelles sur les segments */}
+      {am !== undefined && <text x={96} y={56} fontSize={10.5} fill="#b45309" fontWeight={600} fontStyle="italic" textAnchor="end">AM = {L(am)}</text>}
+      {ab !== undefined && <text x={65} y={115} fontSize={10.5} fill="#b45309" fontWeight={600} fontStyle="italic" textAnchor="end">AB = {L(ab)}</text>}
+      {an !== undefined && <text x={155} y={56} fontSize={10.5} fill="#b45309" fontWeight={600} fontStyle="italic">AN = {L(an)}</text>}
+      {ac !== undefined && <text x={190} y={115} fontSize={10.5} fill="#b45309" fontWeight={600} fontStyle="italic">AC = {L(ac)}</text>}
+      {mn !== undefined && <text x={125} y={78} fontSize={10.5} textAnchor="middle" fill="#b45309" fontWeight={600} fontStyle="italic">MN = {L(mn)}</text>}
+      {bc !== undefined && <text x={130} y={155} fontSize={10.5} textAnchor="middle" fill="#b45309" fontWeight={600} fontStyle="italic">BC = {L(bc)}</text>}
+      {!hasValues && <text x={130} y={172} fontSize={10.5} textAnchor="middle" fill="#b45309" fontWeight={700}>(MN) // (BC)  ⇒  AM/AB = AN/AC = MN/BC</text>}
     </svg>
   );
 }

@@ -1029,10 +1029,10 @@ window.ALL_QUIZZES['maths-4'] = {
       if (w3f <= 0) w3f = c + 2;
       while (used.has(w3f)) w3f++;
       return {
-        q: `Triangle rectangle en A avec les deux cathètes ${a} cm et ${b} cm. L'hypoténuse mesure :`,
+        q: <>Calcule l'hypoténuse BC de ce triangle rectangle en A :<TriangleRectangle ab={`${a} cm`} ac={`${b} cm`} bc="?" /></>,
         options: [`${c} cm`, `${w1} cm`, `${w2} cm`, `${w3f} cm`],
         correct: 0,
-        hint: `c² = ${a}² + ${b}² = ${a*a} + ${b*b} = ${a*a+b*b} → c = ${c} cm.`,
+        hint: `BC² = ${a}² + ${b}² = ${a*a} + ${b*b} = ${a*a+b*b} → BC = ${c} cm.`,
       };
     }},
     { key:'pyt-2', gen: (rnd) => {
@@ -1075,10 +1075,10 @@ window.ALL_QUIZZES['maths-4'] = {
       let w3f = w3;
       while (used.has(w3f)) w3f++;
       return {
-        q: `Dans un triangle rectangle, l'hypoténuse mesure ${c} cm et un côté ${known} cm. L'autre côté mesure :`,
+        q: <>Dans ce triangle rectangle en A, calcule le côté manquant :<TriangleRectangle ab={`${known} cm`} ac="?" bc={`${c} cm`} /></>,
         options: [`${missing} cm`, `${w1} cm`, `${w2} cm`, `${w3f} cm`],
         correct: 0,
-        hint: `c² = ${c}² − ${known}² = ${c*c} − ${known*known} = ${missing*missing} → c = ${missing} cm.`,
+        hint: `AC² = BC² − AB² = ${c}² − ${known}² = ${c*c} − ${known*known} = ${missing*missing} → AC = ${missing} cm.`,
       };
     }},
     { key:'pyt-4', q:<>Sur ce triangle rectangle en A, l'hypoténuse est :<TriangleRectangle /></>,
@@ -1142,10 +1142,10 @@ window.ALL_QUIZZES['maths-4'] = {
       let w3 = missing + 2;
       while (used.has(w3)) w3++;
       return {
-        q: `Dans un triangle rectangle, l'hypoténuse mesure ${c} cm et un côté vaut ${known} cm. L'autre côté ?`,
+        q: <>Dans ce triangle rectangle en A, calcule l'autre côté :<TriangleRectangle ab={`${known} cm`} ac="?" bc={`${c} cm`} /></>,
         options: [`${missing} cm`, `${w1} cm`, `${w2} cm`, `${w3} cm`],
         correct: 0,
-        hint: `c² = ${c*c} − ${known*known} = ${missing*missing} → c = ${missing} cm.`,
+        hint: `AC² = BC² − AB² = ${c}² − ${known}² = ${c*c} − ${known*known} = ${missing*missing} → AC = ${missing} cm.`,
       };
     }},
   ],
@@ -1166,7 +1166,7 @@ window.ALL_QUIZZES['maths-4'] = {
       let w3 = AC + 1;
       while (used.has(w3)) w3++;
       return {
-        q: <>Dans la configuration de Thalès, si <M>(MN) // (BC)</M> avec AM = {AM}, AB = {AB} et AN = {AN}, alors AC vaut :</>,
+        q: <>Dans cette configuration de Thalès avec <M>(MN) // (BC)</M>, calcule AC :<ConfigThales am={AM} ab={AB} an={AN} ac="?" /></>,
         options: [String(AC), String(w1), String(w2), String(w3)],
         correct: 0,
         hint: `AM/AB = AN/AC → ${AM}/${AB} = ${AN}/AC → AC = ${AN} × ${AB}/${AM} = ${AC}.`,
@@ -1191,7 +1191,7 @@ window.ALL_QUIZZES['maths-4'] = {
       if (w3 <= 0) w3 = BC + 3;
       while (used.has(w3)) w3++;
       return {
-        q: <>Dans un triangle ABC, M ∈ [AB] et N ∈ [AC] avec <M>(MN) // (BC)</M>. Si AM = {AM}, AB = {AB} et MN = {MN}, alors BC vaut :</>,
+        q: <>Dans ce triangle avec <M>(MN) // (BC)</M>, calcule BC :<ConfigThales am={AM} ab={AB} mn={MN} bc="?" /></>,
         options: [String(BC), String(w1), String(w2), String(w3)],
         correct: 0,
         hint: `AM/AB = MN/BC → ${AM}/${AB} = ${MN}/BC → BC = ${MN} × ${factor} = ${BC}.`,
@@ -1215,7 +1215,7 @@ window.ALL_QUIZZES['maths-4'] = {
       if (w3 <= 0) w3 = AC + 3;
       while (used.has(w3)) w3++;
       return {
-        q: <>Dans la configuration de Thalès, AM = {AM}, AB = {AB}, AN = {AN}. Combien vaut AC ?</>,
+        q: <>Dans cette configuration de Thalès, combien vaut AC ?<ConfigThales am={AM} ab={AB} an={AN} ac="?" /></>,
         options: [String(AC), String(w1), String(w2), String(w3)],
         correct: 0,
         hint: `AM/AB = AN/AC → ${AM}/${AB} = ${AN}/AC → AC = ${AN} × ${factor} = ${AC}.`,

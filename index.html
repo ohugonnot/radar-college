@@ -2021,7 +2021,15 @@ function GrapheOhm() {
     fontWeight: 600
   }, "U = R \xD7 I"));
 }
-function TriangleRectangle() {
+function TriangleRectangle({
+  ab,
+  ac,
+  bc
+} = {}) {
+  const lAB = ab !== undefined ? `AB = ${ab}` : 'AB';
+  const lAC = ac !== undefined ? `AC = ${ac}` : 'AC';
+  const lBC = bc !== undefined ? `BC = ${bc}` : 'BC (hypoténuse)';
+  const hasValues = ab !== undefined || ac !== undefined || bc !== undefined;
   return React.createElement("svg", {
     viewBox: "0 0 250 160",
     style: CIRCUIT_SVG_STYLE,
@@ -2070,7 +2078,7 @@ function TriangleRectangle() {
     fill: "#b45309",
     fontWeight: 600,
     fontStyle: "italic"
-  }, "AB"), React.createElement("text", {
+  }, lAB), React.createElement("text", {
     x: 125,
     y: 148,
     fontSize: 11.5,
@@ -2078,14 +2086,14 @@ function TriangleRectangle() {
     fill: "#b45309",
     fontWeight: 600,
     fontStyle: "italic"
-  }, "AC"), React.createElement("text", {
+  }, lAC), React.createElement("text", {
     x: 135,
     y: 72,
     fontSize: 11.5,
     fill: "#b45309",
     fontWeight: 600,
     fontStyle: "italic"
-  }, "BC (hypot\xE9nuse)"), React.createElement("text", {
+  }, lBC), !hasValues && React.createElement("text", {
     x: 125,
     y: 14,
     fontSize: 10.5,
@@ -2094,9 +2102,18 @@ function TriangleRectangle() {
     fontWeight: 700
   }, "BC\xB2 = AB\xB2 + AC\xB2"));
 }
-function ConfigThales() {
+function ConfigThales({
+  am,
+  ab,
+  an,
+  ac,
+  mn,
+  bc
+} = {}) {
+  const hasValues = [am, ab, an, ac, mn, bc].some(v => v !== undefined);
+  const L = v => v !== undefined ? String(v) : '';
   return React.createElement("svg", {
-    viewBox: "0 0 260 170",
+    viewBox: "0 0 260 180",
     style: CIRCUIT_SVG_STYLE,
     role: "img",
     "aria-label": "Configuration Thal\xE8s : triangles ABC et AMN avec (MN) parall\xE8le \xE0 (BC)",
@@ -2161,9 +2178,55 @@ function ConfigThales() {
     textAnchor: "middle",
     fill: "currentColor",
     fontWeight: 700
-  }, "\xBB"), React.createElement("text", {
+  }, "\xBB"), am !== undefined && React.createElement("text", {
+    x: 96,
+    y: 56,
+    fontSize: 10.5,
+    fill: "#b45309",
+    fontWeight: 600,
+    fontStyle: "italic",
+    textAnchor: "end"
+  }, "AM = ", L(am)), ab !== undefined && React.createElement("text", {
+    x: 65,
+    y: 115,
+    fontSize: 10.5,
+    fill: "#b45309",
+    fontWeight: 600,
+    fontStyle: "italic",
+    textAnchor: "end"
+  }, "AB = ", L(ab)), an !== undefined && React.createElement("text", {
+    x: 155,
+    y: 56,
+    fontSize: 10.5,
+    fill: "#b45309",
+    fontWeight: 600,
+    fontStyle: "italic"
+  }, "AN = ", L(an)), ac !== undefined && React.createElement("text", {
+    x: 190,
+    y: 115,
+    fontSize: 10.5,
+    fill: "#b45309",
+    fontWeight: 600,
+    fontStyle: "italic"
+  }, "AC = ", L(ac)), mn !== undefined && React.createElement("text", {
+    x: 125,
+    y: 78,
+    fontSize: 10.5,
+    textAnchor: "middle",
+    fill: "#b45309",
+    fontWeight: 600,
+    fontStyle: "italic"
+  }, "MN = ", L(mn)), bc !== undefined && React.createElement("text", {
     x: 130,
-    y: 163,
+    y: 155,
+    fontSize: 10.5,
+    textAnchor: "middle",
+    fill: "#b45309",
+    fontWeight: 600,
+    fontStyle: "italic"
+  }, "BC = ", L(bc)), !hasValues && React.createElement("text", {
+    x: 130,
+    y: 172,
     fontSize: 10.5,
     textAnchor: "middle",
     fill: "#b45309",
@@ -11946,10 +12009,14 @@ window.ALL_QUIZZES['maths-4'] = {
         if (w3f <= 0) w3f = c + 2;
         while (used.has(w3f)) w3f++;
         return {
-          q: `Triangle rectangle en A avec les deux cathètes ${a} cm et ${b} cm. L'hypoténuse mesure :`,
+          q: React.createElement(React.Fragment, null, "Calcule l'hypot\xE9nuse BC de ce triangle rectangle en A :", React.createElement(TriangleRectangle, {
+            ab: `${a} cm`,
+            ac: `${b} cm`,
+            bc: "?"
+          })),
           options: [`${c} cm`, `${w1} cm`, `${w2} cm`, `${w3f} cm`],
           correct: 0,
-          hint: `c² = ${a}² + ${b}² = ${a * a} + ${b * b} = ${a * a + b * b} → c = ${c} cm.`
+          hint: `BC² = ${a}² + ${b}² = ${a * a} + ${b * b} = ${a * a + b * b} → BC = ${c} cm.`
         };
       }
     }, {
@@ -11992,10 +12059,14 @@ window.ALL_QUIZZES['maths-4'] = {
         let w3f = w3;
         while (used.has(w3f)) w3f++;
         return {
-          q: `Dans un triangle rectangle, l'hypoténuse mesure ${c} cm et un côté ${known} cm. L'autre côté mesure :`,
+          q: React.createElement(React.Fragment, null, "Dans ce triangle rectangle en A, calcule le c\xF4t\xE9 manquant :", React.createElement(TriangleRectangle, {
+            ab: `${known} cm`,
+            ac: "?",
+            bc: `${c} cm`
+          })),
           options: [`${missing} cm`, `${w1} cm`, `${w2} cm`, `${w3f} cm`],
           correct: 0,
-          hint: `c² = ${c}² − ${known}² = ${c * c} − ${known * known} = ${missing * missing} → c = ${missing} cm.`
+          hint: `AC² = BC² − AB² = ${c}² − ${known}² = ${c * c} − ${known * known} = ${missing * missing} → AC = ${missing} cm.`
         };
       }
     }, {
@@ -12072,10 +12143,14 @@ window.ALL_QUIZZES['maths-4'] = {
         let w3 = missing + 2;
         while (used.has(w3)) w3++;
         return {
-          q: `Dans un triangle rectangle, l'hypoténuse mesure ${c} cm et un côté vaut ${known} cm. L'autre côté ?`,
+          q: React.createElement(React.Fragment, null, "Dans ce triangle rectangle en A, calcule l'autre c\xF4t\xE9 :", React.createElement(TriangleRectangle, {
+            ab: `${known} cm`,
+            ac: "?",
+            bc: `${c} cm`
+          })),
           options: [`${missing} cm`, `${w1} cm`, `${w2} cm`, `${w3} cm`],
           correct: 0,
-          hint: `c² = ${c * c} − ${known * known} = ${missing * missing} → c = ${missing} cm.`
+          hint: `AC² = BC² − AB² = ${c}² − ${known}² = ${c * c} − ${known * known} = ${missing * missing} → AC = ${missing} cm.`
         };
       }
     }],
@@ -12097,7 +12172,12 @@ window.ALL_QUIZZES['maths-4'] = {
         let w3 = AC + 1;
         while (used.has(w3)) w3++;
         return {
-          q: React.createElement(React.Fragment, null, "Dans la configuration de Thal\xE8s, si ", React.createElement(M, null, "(MN) // (BC)"), " avec AM = ", AM, ", AB = ", AB, " et AN = ", AN, ", alors AC vaut :"),
+          q: React.createElement(React.Fragment, null, "Dans cette configuration de Thal\xE8s avec ", React.createElement(M, null, "(MN) // (BC)"), ", calcule AC :", React.createElement(ConfigThales, {
+            am: AM,
+            ab: AB,
+            an: AN,
+            ac: "?"
+          })),
           options: [String(AC), String(w1), String(w2), String(w3)],
           correct: 0,
           hint: `AM/AB = AN/AC → ${AM}/${AB} = ${AN}/AC → AC = ${AN} × ${AB}/${AM} = ${AC}.`
@@ -12128,7 +12208,12 @@ window.ALL_QUIZZES['maths-4'] = {
         if (w3 <= 0) w3 = BC + 3;
         while (used.has(w3)) w3++;
         return {
-          q: React.createElement(React.Fragment, null, "Dans un triangle ABC, M \u2208 [AB] et N \u2208 [AC] avec ", React.createElement(M, null, "(MN) // (BC)"), ". Si AM = ", AM, ", AB = ", AB, " et MN = ", MN, ", alors BC vaut :"),
+          q: React.createElement(React.Fragment, null, "Dans ce triangle avec ", React.createElement(M, null, "(MN) // (BC)"), ", calcule BC :", React.createElement(ConfigThales, {
+            am: AM,
+            ab: AB,
+            mn: MN,
+            bc: "?"
+          })),
           options: [String(BC), String(w1), String(w2), String(w3)],
           correct: 0,
           hint: `AM/AB = MN/BC → ${AM}/${AB} = ${MN}/BC → BC = ${MN} × ${factor} = ${BC}.`
@@ -12159,7 +12244,12 @@ window.ALL_QUIZZES['maths-4'] = {
         if (w3 <= 0) w3 = AC + 3;
         while (used.has(w3)) w3++;
         return {
-          q: React.createElement(React.Fragment, null, "Dans la configuration de Thal\xE8s, AM = ", AM, ", AB = ", AB, ", AN = ", AN, ". Combien vaut AC ?"),
+          q: React.createElement(React.Fragment, null, "Dans cette configuration de Thal\xE8s, combien vaut AC ?", React.createElement(ConfigThales, {
+            am: AM,
+            ab: AB,
+            an: AN,
+            ac: "?"
+          })),
           options: [String(AC), String(w1), String(w2), String(w3)],
           correct: 0,
           hint: `AM/AB = AN/AC → ${AM}/${AB} = ${AN}/AC → AC = ${AN} × ${factor} = ${AC}.`

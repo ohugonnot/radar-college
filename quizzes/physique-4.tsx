@@ -183,7 +183,7 @@ window.ALL_QUIZZES['physique-4'] = {
       let d1 = +(U / R1).toFixed(3), d2 = +(U / R2).toFixed(3), d3 = +(U / (R1 + R2) * 10).toFixed(3);
       [d1, d2, d3] = [d1, d2, d3].map(x => { while (used.has(x)) x = +(x + 0.1).toFixed(3); used.add(x); return x; });
       return {
-        q: <>Deux résistances R₁ = {R1} Ω et R₂ = {R2} Ω en série. Tension totale = {U} V. Intensité :</>,
+        q: <>Dans ce circuit série, calcule l'intensité I :<CircuitSerie r1={`${R1} Ω`} r2={`${R2} Ω`} u={`${U} V`} /></>,
         options: [`${fmt(I)} A`, `${fmt(d1)} A`, `${fmt(d2)} A`, `${fmt(d3)} A`],
         correct: 0,
         hint: `En série, R_total = R₁ + R₂ = ${R1 + R2} Ω. I = U / R_total = ${U} / ${R1 + R2} = ${fmt(I)} A.`,
@@ -335,7 +335,7 @@ window.ALL_QUIZZES['physique-4'] = {
       let d1 = +(Math.abs(I1 - I2)).toFixed(2), d2 = +I1.toFixed(2), d3 = +(Itot + 1).toFixed(2);
       [d1, d2, d3] = [d1, d2, d3].map(x => { while (used.has(x)) x = +(x + 0.5).toFixed(2); used.add(x); return x; });
       return {
-        q: <>R₁ = {c.R1} Ω et R₂ = {c.R2} Ω en parallèle sous {c.U} V. L'intensité totale débitée par la pile est :</>,
+        q: <>Dans ce circuit en dérivation, calcule l'intensité totale I débitée par la pile :<CircuitParallele r1={`${c.R1} Ω`} r2={`${c.R2} Ω`} u={`${c.U} V`} /></>,
         options: [`${fmt(Itot)} A`, `${fmt(d1)} A`, `${fmt(d2)} A`, `${fmt(d3)} A`], correct: 0,
         hint: `I₁ = ${c.U}/${c.R1} = ${fmt(I1)} A ; I₂ = ${c.U}/${c.R2} = ${fmt(I2)} A. I_tot = ${fmt(I1)} + ${fmt(I2)} = ${fmt(Itot)} A.`,
       };

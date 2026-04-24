@@ -84,22 +84,29 @@ const CIRCUIT_SVG_STYLE: React.CSSProperties = { maxWidth: 280, width: '100%', d
 
 // ── Compositions électricité ────────────────────────────────────────────────
 
-function CircuitSerie() {
+function CircuitSerie({ r1, r2, u }: { r1?: string | number; r2?: string | number; u?: string | number } = {}) {
+  const lR1 = r1 !== undefined ? `R₁ = ${r1}` : 'R₁';
+  const lR2 = r2 !== undefined ? `R₂ = ${r2}` : 'R₂';
+  const hasValues = r1 !== undefined || r2 !== undefined || u !== undefined;
   return (
     <svg viewBox="0 0 240 115" style={CIRCUIT_SVG_STYLE} role="img" aria-label="Circuit en série : pile et deux résistances" data-circuit="serie">
       <Fil points={[[30,85],[30,30],[210,30],[210,85],[30,85]]} />
       <Pile cx={30} cy={58} />
-      <Resistance cx={100} cy={30} label="R₁" />
-      <Resistance cx={170} cy={30} label="R₂" />
+      <Resistance cx={100} cy={30} label={lR1} />
+      <Resistance cx={170} cy={30} label={lR2} />
       <FlecheI x={65} y={30} />
       <FlecheI x={135} y={30} />
       <FlecheI x={208} y={58} />
-      <text x={120} y={105} fontSize={10.5} textAnchor="middle" fill="#b45309" fontWeight={600}>même I partout · U = U₁ + U₂</text>
+      {u !== undefined && <text x={15} y={62} fontSize={10.5} fill="#b45309" fontWeight={700} textAnchor="end">U = {u}</text>}
+      {!hasValues && <text x={120} y={105} fontSize={10.5} textAnchor="middle" fill="#b45309" fontWeight={600}>même I partout · U = U₁ + U₂</text>}
     </svg>
   );
 }
 
-function CircuitParallele() {
+function CircuitParallele({ r1, r2, u }: { r1?: string | number; r2?: string | number; u?: string | number } = {}) {
+  const lR1 = r1 !== undefined ? `R₁ = ${r1}` : 'R₁';
+  const lR2 = r2 !== undefined ? `R₂ = ${r2}` : 'R₂';
+  const hasValues = r1 !== undefined || r2 !== undefined || u !== undefined;
   return (
     <svg viewBox="0 0 240 125" style={CIRCUIT_SVG_STYLE} role="img" aria-label="Circuit en dérivation : pile et deux résistances en parallèle" data-circuit="parallele">
       <Fil points={[[30,95],[30,30],[90,30]]} />
@@ -108,8 +115,8 @@ function CircuitParallele() {
       <Fil points={[[90,95],[200,95]]} />
       <Fil points={[[200,30],[200,95]]} />
       <Pile cx={30} cy={62} />
-      <Resistance cx={145} cy={30} label="R₁" />
-      <Resistance cx={145} cy={95} label="R₂" />
+      <Resistance cx={145} cy={30} label={lR1} />
+      <Resistance cx={145} cy={95} label={lR2} />
       <Noeud cx={90} cy={30} />
       <Noeud cx={90} cy={95} />
       <Noeud cx={200} cy={30} />
@@ -117,7 +124,8 @@ function CircuitParallele() {
       <FlecheI x={115} y={30} />
       <FlecheI x={115} y={95} />
       <FlecheI x={60} y={30} />
-      <text x={120} y={117} fontSize={10.5} textAnchor="middle" fill="#b45309" fontWeight={600}>même U aux bornes · I = I₁ + I₂</text>
+      {u !== undefined && <text x={15} y={66} fontSize={10.5} fill="#b45309" fontWeight={700} textAnchor="end">U = {u}</text>}
+      {!hasValues && <text x={120} y={117} fontSize={10.5} textAnchor="middle" fill="#b45309" fontWeight={600}>même U aux bornes · I = I₁ + I₂</text>}
     </svg>
   );
 }

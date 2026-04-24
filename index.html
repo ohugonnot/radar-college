@@ -1728,7 +1728,14 @@ const CIRCUIT_SVG_STYLE = {
   margin: '6px auto',
   color: 'var(--ink-soft)'
 };
-function CircuitSerie() {
+function CircuitSerie({
+  r1,
+  r2,
+  u
+} = {}) {
+  const lR1 = r1 !== undefined ? `R₁ = ${r1}` : 'R₁';
+  const lR2 = r2 !== undefined ? `R₂ = ${r2}` : 'R₂';
+  const hasValues = r1 !== undefined || r2 !== undefined || u !== undefined;
   return React.createElement("svg", {
     viewBox: "0 0 240 115",
     style: CIRCUIT_SVG_STYLE,
@@ -1743,11 +1750,11 @@ function CircuitSerie() {
   }), React.createElement(Resistance, {
     cx: 100,
     cy: 30,
-    label: "R\u2081"
+    label: lR1
   }), React.createElement(Resistance, {
     cx: 170,
     cy: 30,
-    label: "R\u2082"
+    label: lR2
   }), React.createElement(FlecheI, {
     x: 65,
     y: 30
@@ -1757,7 +1764,14 @@ function CircuitSerie() {
   }), React.createElement(FlecheI, {
     x: 208,
     y: 58
-  }), React.createElement("text", {
+  }), u !== undefined && React.createElement("text", {
+    x: 15,
+    y: 62,
+    fontSize: 10.5,
+    fill: "#b45309",
+    fontWeight: 700,
+    textAnchor: "end"
+  }, "U = ", u), !hasValues && React.createElement("text", {
     x: 120,
     y: 105,
     fontSize: 10.5,
@@ -1766,7 +1780,14 @@ function CircuitSerie() {
     fontWeight: 600
   }, "m\xEAme I partout \xB7 U = U\u2081 + U\u2082"));
 }
-function CircuitParallele() {
+function CircuitParallele({
+  r1,
+  r2,
+  u
+} = {}) {
+  const lR1 = r1 !== undefined ? `R₁ = ${r1}` : 'R₁';
+  const lR2 = r2 !== undefined ? `R₂ = ${r2}` : 'R₂';
+  const hasValues = r1 !== undefined || r2 !== undefined || u !== undefined;
   return React.createElement("svg", {
     viewBox: "0 0 240 125",
     style: CIRCUIT_SVG_STYLE,
@@ -1789,11 +1810,11 @@ function CircuitParallele() {
   }), React.createElement(Resistance, {
     cx: 145,
     cy: 30,
-    label: "R\u2081"
+    label: lR1
   }), React.createElement(Resistance, {
     cx: 145,
     cy: 95,
-    label: "R\u2082"
+    label: lR2
   }), React.createElement(Noeud, {
     cx: 90,
     cy: 30
@@ -1815,7 +1836,14 @@ function CircuitParallele() {
   }), React.createElement(FlecheI, {
     x: 60,
     y: 30
-  }), React.createElement("text", {
+  }), u !== undefined && React.createElement("text", {
+    x: 15,
+    y: 66,
+    fontSize: 10.5,
+    fill: "#b45309",
+    fontWeight: 700,
+    textAnchor: "end"
+  }, "U = ", u), !hasValues && React.createElement("text", {
     x: 120,
     y: 117,
     fontSize: 10.5,
@@ -19998,7 +20026,11 @@ window.ALL_QUIZZES['physique-4'] = {
           return x;
         });
         return {
-          q: React.createElement(React.Fragment, null, "Deux r\xE9sistances R\u2081 = ", R1, " \u03A9 et R\u2082 = ", R2, " \u03A9 en s\xE9rie. Tension totale = ", U, " V. Intensit\xE9 :"),
+          q: React.createElement(React.Fragment, null, "Dans ce circuit s\xE9rie, calcule l'intensit\xE9 I :", React.createElement(CircuitSerie, {
+            r1: `${R1} Ω`,
+            r2: `${R2} Ω`,
+            u: `${U} V`
+          })),
           options: [`${fmt(I)} A`, `${fmt(d1)} A`, `${fmt(d2)} A`, `${fmt(d3)} A`],
           correct: 0,
           hint: `En série, R_total = R₁ + R₂ = ${R1 + R2} Ω. I = U / R_total = ${U} / ${R1 + R2} = ${fmt(I)} A.`
@@ -20364,7 +20396,11 @@ window.ALL_QUIZZES['physique-4'] = {
           return x;
         });
         return {
-          q: React.createElement(React.Fragment, null, "R\u2081 = ", c.R1, " \u03A9 et R\u2082 = ", c.R2, " \u03A9 en parall\xE8le sous ", c.U, " V. L'intensit\xE9 totale d\xE9bit\xE9e par la pile est :"),
+          q: React.createElement(React.Fragment, null, "Dans ce circuit en d\xE9rivation, calcule l'intensit\xE9 totale I d\xE9bit\xE9e par la pile :", React.createElement(CircuitParallele, {
+            r1: `${c.R1} Ω`,
+            r2: `${c.R2} Ω`,
+            u: `${c.U} V`
+          })),
           options: [`${fmt(Itot)} A`, `${fmt(d1)} A`, `${fmt(d2)} A`, `${fmt(d3)} A`],
           correct: 0,
           hint: `I₁ = ${c.U}/${c.R1} = ${fmt(I1)} A ; I₂ = ${c.U}/${c.R2} = ${fmt(I2)} A. I_tot = ${fmt(I1)} + ${fmt(I2)} = ${fmt(Itot)} A.`

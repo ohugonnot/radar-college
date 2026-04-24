@@ -39,7 +39,7 @@ $slug = sanitizeSlug($payload['slug'] ?? '');
 if (!$slug || strlen($slug) > 60) { http_response_code(400); exit(json_encode(['error'=>'invalid_slug'])); }
 
 $quizId = (string)($payload['quizId'] ?? '');
-if (!preg_match('/^(maths|physique|svt)-[3456]$/', $quizId)) {
+if (!preg_match('/^(maths|physique|svt|histoire|geo)-[3456]$/', $quizId)) {
     http_response_code(400); exit(json_encode(['error'=>'invalid_quiz']));
 }
 

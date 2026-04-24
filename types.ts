@@ -16,9 +16,8 @@ type Level = 3 | 4 | 5 | 6;
 /** Identifiant composite matière-niveau, ex: 'maths-4', 'svt-6'. */
 type QuizKey = `${Subject}-${Level}`;
 
-/** Question brute dans POOL (sans domain — le domain est la clé du POOL parent). */
-interface SourceQuestion {
-  key: string;
+/** Contenu instancié d'une question (statique ou produit par un générateur). */
+interface QuestionContent {
   q: React.ReactNode;
   options: React.ReactNode[];
   /** Index 0..3 de la bonne réponse dans les options (ordre original, pré-shuffle). */
@@ -26,11 +25,36 @@ interface SourceQuestion {
   hint?: string;
 }
 
+/**
+ * Générateur paramétrique : reçoit un RNG seedé (Mulberry32) et renvoie le contenu.
+ * Déterministe à seed égal → relecture exacte via rebuildFromAttempt.
+ */
+type QuestionGenerator = (rnd: () => number) => QuestionContent;
+
+/** Question brute dans POOL (sans domain — le domain est la clé du POOL parent). */
+interface SourceQuestion {
+  key: string;
+  /** Questions statiques : q/options/correct définis inline. */
+  q?: React.ReactNode;
+  options?: React.ReactNode[];
+  correct?: number;
+  hint?: string;
+  /** Questions paramétriques : `gen(rnd)` renvoie le contenu instancié. */
+  gen?: QuestionGenerator;
+}
+
 /** Question post-buildQuiz : domain ajouté, options shuffled, correct réindexé. */
-interface Question extends SourceQuestion {
+interface Question {
+  key: string;
   domain: string;
+  q: React.ReactNode;
+  options: React.ReactNode[];
+  correct: number;
+  hint?: string;
   /** Permutation d'ordre appliquée pour shuffler les options (pour relecture exacte). */
   order: number[];
+  /** Seed du générateur si la question est paramétrique (pour relecture exacte). */
+  seed?: number;
 }
 
 interface Domain {
@@ -88,6 +112,8 @@ interface LogEntry {
   ms: number;
   hinted: boolean;
   order: number[];
+  /** Seed du générateur paramétrique (si la question est dynamique). */
+  seed?: number;
 }
 
 interface Attempt {
@@ -204,7 +230,7 @@ interface ConfirmScreenProps {
 
 
 interface HomeScreenProps {
-  onStart: (info: StudentInfo, mode: Mode, revisionKeys?: string[]) => void;
+  onStart: (info: StudentInfo, mode: Mode, revisionKeys?: string[], onlyDomain?: string) => void;
 }
 
 interface QuizScreenProps {

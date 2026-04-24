@@ -37,7 +37,7 @@ const presetTs = (() => {
 // SPA : les pools sont maintenant dans quizzes/*.tsx (un fichier par quiz).
 const quizDir = path.join(__dirname, 'quizzes');
 const files = fs.existsSync(quizDir)
-  ? fs.readdirSync(quizDir).filter(f => /^(maths|physique|svt|histoire)-\d\.tsx$/.test(f)).sort().map(f => path.join('quizzes', f))
+  ? fs.readdirSync(quizDir).filter(f => /^(maths|physique|svt|histoire|geo)-\d\.tsx$/.test(f)).sort().map(f => path.join('quizzes', f))
   : [];
 
 if (files.length === 0) {

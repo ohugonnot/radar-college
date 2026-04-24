@@ -66,7 +66,7 @@ Zéro friction : pas d'inscription au dépôt, les modifications de questions se
 | PWA           | Service Worker (cache-first, CACHE_NAME versionné), manifest.webmanifest       |
 | Persistance   | `localStorage` (source de vérité) + PHP plat (JSON par slug élève)             |
 | Build         | `build.sh` : pré-compile TSX + inline CSS + bump CACHE_NAME SW                 |
-| Tests         | Playwright (Chromium) — 56 scénarios E2E · `test-generators.js` (200 seeds)    |
+| Tests         | Playwright (Chromium) — 61 scénarios E2E · `test-generators.js` (200 seeds)    |
 
 ## Contraintes techniques volontaires
 
@@ -143,7 +143,7 @@ Questions paramétriques (gens) : testées par `node test-generators.js` qui lan
 ## Tests
 
 ```bash
-npm test                 # 56 scénarios Playwright (~2 min, headless Chromium)
+npm test                 # 61 scénarios Playwright (~2 min, headless Chromium)
 npm run test:headed      # visible (debug)
 node test-generators.js  # 200 seeds par gen, signale options doublons et variabilité faible
 ```
@@ -159,6 +159,43 @@ Pre-commit hook : lance `validate.js` + `test-generators.js` sur les fichiers st
 ```
 
 C'est tout : pas de process Node, pas de rewrite rules, pas de base de données.
+
+## TODO / idées futures
+
+Pistes identifiées, par ordre d'effort croissant. Rien d'urgent — ajouts à faire au fil de l'usage.
+
+### Petit (10-15 min chacun)
+
+- **Bandeau visuel « mode Examen »** sur le brevet blanc : liseré rouge, pas d'indices accessibles, décompte visible en permanence.
+- **Timer strict 90 min** sur la simulation brevet blanc (actuellement le timer 3ème de 30 min hérite — pas adapté au composite).
+- **Progression brevet blanc sur le dashboard** : carte « Tu as fait N brevets blancs · dernière note X/20 · meilleure Y/20 ».
+- **Lien « Fiche révise globale »** depuis le dashboard : agrège les wrong-trackers de tous les quizzes actifs (pas seulement le courant).
+- **Révision ciblée d'un chapitre** depuis le rapport : bouton « Refaire 10 questions de {chapitre fragile} » en un clic.
+
+### Moyen (30-60 min)
+
+- **Stats anonymes self-hosted** (Plausible ou Umami) pour mesurer l'adoption sans tracker tiers.
+- **Export PDF amélioré** via lib dédiée (jsPDF) si la conversion « Imprimer → PDF » navigateur montre ses limites sur certains layouts.
+- **Audit a11y** : vérification WCAG AA (contrastes, ARIA, navigation clavier complète).
+- **Web Manifest enrichi** : catégories (education), screenshots, description locale, shortcuts (brevet blanc, fiche révise).
+- **Bouton « Copier ma fiche révise en markdown »** pour la coller dans un doc / envoyer par mail / WhatsApp.
+
+### Gros (plusieurs heures)
+
+- **Extension Lycée 2de / 1re** : nouveau niveau × matière. Structure prête, c'est surtout du contenu.
+- **Tableau de bord parent / prof multi-élèves** : vue agrégée sur plusieurs pseudos enregistrés sur l'appareil.
+- **Mode « challenge hebdo »** : 10 questions fraîches chaque semaine, rétention via streak.
+- **Comparaison classe** (avec opt-in explicite + anonymisation) : où se situe ton score par rapport à la moyenne des autres utilisateurs du niveau ? Implique un backend plus riche que le PHP plat actuel.
+
+### Idées écartées
+
+Volontairement hors scope de ce projet pédagogique familial :
+
+- **Mode compétitif / classement public** : risque triche + comparaison malsaine.
+- **Autres matières scolaires** (français, anglais, EMC…) : mal servies par le format QCM diagnostique. L'histoire et la géographie restent sous un angle « faits & repères » qui se prête au QCM ; la rédaction ou la langue vivante ne s'évaluent pas comme ça.
+- **Module d'authentification / comptes utilisateurs** : volontairement absent. Un pseudo local suffit.
+- **Lib math runtime (KaTeX, MathJax)** : unicode + helper `F` couvre 100 % du programme collège. +270 KB bundle non justifiés.
+- **Schémas géométriques dynamiques (JSXGraph)** : overkill pour le niveau collège, les SVG statiques suffisent.
 
 ## Licence
 

@@ -2101,13 +2101,20 @@ function GrapheOhm() {
     fill: "currentColor",
     textAnchor: "end"
   }, "0"), React.createElement("text", {
-    x: 110,
-    y: 60,
+    x: 62,
+    y: 50,
     fontSize: 11,
     fill: "#b45309",
     fontWeight: 700,
     fontStyle: "italic"
-  }, "pente = R"), React.createElement("text", {
+  }, "pente = R"), React.createElement("line", {
+    x1: 80,
+    y1: 52,
+    x2: 92,
+    y2: 67,
+    stroke: "#b45309",
+    strokeWidth: 0.9
+  }), React.createElement("text", {
     x: 108,
     y: 145,
     fontSize: 10.5,
@@ -3081,13 +3088,14 @@ function SymetrieAxiale() {
     textAnchor: "middle",
     fill: "#334155",
     fontWeight: 700
-  }, "F"), React.createElement(FigureF, {
-    cx: 195,
+  }, "F"), React.createElement("g", {
+    transform: "translate(260 0) scale(-1 1)"
+  }, React.createElement(FigureF, {
+    cx: 65,
     cy: 50,
     sc: 2,
-    extra: "scale(-1,1) translate(-12,0)",
     color: "#b45309"
-  }), React.createElement("text", {
+  })), React.createElement("text", {
     x: 183,
     y: 108,
     fontSize: 11,
@@ -3133,24 +3141,25 @@ function SymetrieCentrale() {
     textAnchor: "middle",
     fill: "#334155",
     fontWeight: 700
-  }, "F"), React.createElement(FigureF, {
-    cx: 200,
-    cy: 112,
+  }, "F"), React.createElement("g", {
+    transform: "rotate(180 130 70)"
+  }, React.createElement(FigureF, {
+    cx: 60,
+    cy: 28,
     sc: 1.6,
-    extra: "rotate(180) translate(-12,-18)",
     color: "#b45309"
-  }), React.createElement("text", {
-    x: 205,
+  })), React.createElement("text", {
+    x: 202,
     y: 78,
     fontSize: 11,
     textAnchor: "middle",
     fill: "#b45309",
     fontWeight: 700
   }, "F'"), React.createElement("line", {
-    x1: 60,
-    y1: 28,
-    x2: 200,
-    y2: 112,
+    x1: 69,
+    y1: 42,
+    x2: 191,
+    y2: 98,
     stroke: "#b45309",
     strokeWidth: 1,
     strokeDasharray: "3 3"
@@ -3164,25 +3173,18 @@ function SymetrieCentrale() {
   }, "O est le milieu de [F F']"));
 }
 function Translation() {
+  const sc = 1.8;
+  const cy = 42;
+  const leftX = 40,
+    rightX = 190;
+  const midY = cy + 9 * sc;
   return React.createElement("svg", {
-    viewBox: "0 0 260 140",
+    viewBox: "0 0 260 135",
     style: CIRCUIT_SVG_STYLE,
     role: "img",
     "aria-label": "Translation : figure et son image par un vecteur",
     "data-schema": "translation"
-  }, React.createElement(FigureF, {
-    cx: 40,
-    cy: 50,
-    sc: 1.8,
-    color: "#334155"
-  }), React.createElement("text", {
-    x: 50,
-    y: 100,
-    fontSize: 11,
-    textAnchor: "middle",
-    fill: "#334155",
-    fontWeight: 700
-  }, "F"), React.createElement("defs", null, React.createElement("marker", {
+  }, React.createElement("defs", null, React.createElement("marker", {
     id: "arrT",
     markerWidth: 8,
     markerHeight: 8,
@@ -3192,37 +3194,49 @@ function Translation() {
   }, React.createElement("polygon", {
     points: "0,0 8,4 0,8",
     fill: "#b45309"
-  }))), React.createElement("line", {
-    x1: 70,
-    y1: 60,
-    x2: 175,
-    y2: 60,
+  }))), React.createElement(FigureF, {
+    cx: leftX,
+    cy: cy,
+    sc: sc,
+    color: "#334155"
+  }), React.createElement("text", {
+    x: leftX + 6 * sc,
+    y: cy + 22 * sc,
+    fontSize: 11,
+    textAnchor: "middle",
+    fill: "#334155",
+    fontWeight: 700
+  }, "F"), React.createElement(FigureF, {
+    cx: rightX,
+    cy: cy,
+    sc: sc,
+    color: "#b45309"
+  }), React.createElement("text", {
+    x: rightX + 6 * sc,
+    y: cy + 22 * sc,
+    fontSize: 11,
+    textAnchor: "middle",
+    fill: "#b45309",
+    fontWeight: 700
+  }, "F'"), React.createElement("line", {
+    x1: leftX + 14 * sc,
+    y1: midY,
+    x2: rightX - 2,
+    y2: midY,
     stroke: "#b45309",
     strokeWidth: 2.2,
     markerEnd: "url(#arrT)"
   }), React.createElement("text", {
-    x: 125,
-    y: 54,
+    x: (leftX + 14 * sc + rightX - 2) / 2,
+    y: midY - 5,
     fontSize: 11,
     textAnchor: "middle",
     fill: "#b45309",
     fontStyle: "italic",
     fontWeight: 700
-  }, "vecteur u"), React.createElement(FigureF, {
-    cx: 195,
-    cy: 50,
-    sc: 1.8,
-    color: "#b45309"
-  }), React.createElement("text", {
-    x: 205,
-    y: 100,
-    fontSize: 11,
-    textAnchor: "middle",
-    fill: "#b45309",
-    fontWeight: 700
-  }, "F'"), React.createElement("text", {
+  }, "vecteur u"), React.createElement("text", {
     x: 130,
-    y: 132,
+    y: 128,
     fontSize: 10.5,
     textAnchor: "middle",
     fill: "#b45309",

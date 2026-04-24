@@ -191,7 +191,9 @@ function GrapheOhm() {
       <text x={178} y={135} fontSize={11} fill="currentColor" fontStyle="italic" textAnchor="end">I (A)</text>
       <text x={28} y={22} fontSize={11} fill="currentColor" fontStyle="italic" textAnchor="end">U (V)</text>
       <text x={30} y={134} fontSize={10} fill="currentColor" textAnchor="end">0</text>
-      <text x={110} y={60} fontSize={11} fill="#b45309" fontWeight={700} fontStyle="italic">pente = R</text>
+      {/* Label "pente = R" : placé au-dessus de la courbe + petit trait indicatif pour éviter le chevauchement */}
+      <text x={62} y={50} fontSize={11} fill="#b45309" fontWeight={700} fontStyle="italic">pente = R</text>
+      <line x1={80} y1={52} x2={92} y2={67} stroke="#b45309" strokeWidth={0.9} />
       <text x={108} y={145} fontSize={10.5} textAnchor="middle" fill="#b45309" fontWeight={600}>U = R × I</text>
     </svg>
   );
@@ -472,16 +474,19 @@ function FigureF({ cx, cy, sc = 1, extra = '', color = 'currentColor' }: { cx: n
 }
 
 function SymetrieAxiale() {
+  // F original dans la moitié gauche ; l'image est obtenue par miroir autour de
+  // x=130 via `translate(260,0) scale(-1,1)` — mathématiquement équivalent à une
+  // symétrie par rapport à l'axe (x=130) dans un viewBox de largeur 260.
   return (
     <svg viewBox="0 0 260 140" style={CIRCUIT_SVG_STYLE} role="img" aria-label="Symétrie axiale : figure et son image par rapport à un axe vertical" data-schema="symetrie-axiale">
-      {/* Axe vertical */}
       <line x1={130} y1={15} x2={130} y2={125} stroke="#b45309" strokeWidth={2} strokeDasharray="5 4" />
       <text x={130} y={12} fontSize={10.5} textAnchor="middle" fill="#b45309" fontWeight={700}>axe (d)</text>
-      {/* Figure originale à gauche */}
       <FigureF cx={65} cy={50} sc={2} color="#334155" />
       <text x={77} y={108} fontSize={11} textAnchor="middle" fill="#334155" fontWeight={700}>F</text>
-      {/* Image miroir à droite (scale -1 horizontal) */}
-      <FigureF cx={195} cy={50} sc={2} extra="scale(-1,1) translate(-12,0)" color="#b45309" />
+      {/* Miroir : on réutilise la MÊME FigureF source, garantissant une image exacte */}
+      <g transform="translate(260 0) scale(-1 1)">
+        <FigureF cx={65} cy={50} sc={2} color="#b45309" />
+      </g>
       <text x={183} y={108} fontSize={11} textAnchor="middle" fill="#b45309" fontWeight={700}>F'</text>
       <text x={130} y={135} fontSize={10.5} textAnchor="middle" fill="#b45309" fontWeight={600}>l'axe est la médiatrice de [F F']</text>
     </svg>
@@ -489,42 +494,48 @@ function SymetrieAxiale() {
 }
 
 function SymetrieCentrale() {
+  // Rotation de 180° autour de O=(130,70) appliquée à la MÊME FigureF source
+  // → image géométriquement exacte sans calcul d'offset.
   return (
     <svg viewBox="0 0 260 140" style={CIRCUIT_SVG_STYLE} role="img" aria-label="Symétrie centrale : figure et son image par rapport à un centre O" data-schema="symetrie-centrale">
-      {/* Centre O */}
       <circle cx={130} cy={70} r={3} fill="#b45309" />
       <text x={138} y={66} fontSize={11} fill="#b45309" fontWeight={700}>O</text>
-      {/* Figure originale en haut-gauche */}
       <FigureF cx={60} cy={28} sc={1.6} color="#334155" />
       <text x={55} y={75} fontSize={11} textAnchor="middle" fill="#334155" fontWeight={700}>F</text>
-      {/* Image par rotation 180° autour de O → en bas-droite */}
-      <FigureF cx={200} cy={112} sc={1.6} extra="rotate(180) translate(-12,-18)" color="#b45309" />
-      <text x={205} y={78} fontSize={11} textAnchor="middle" fill="#b45309" fontWeight={700}>F'</text>
-      {/* Ligne traversant O */}
-      <line x1={60} y1={28} x2={200} y2={112} stroke="#b45309" strokeWidth={1} strokeDasharray="3 3" />
+      <g transform="rotate(180 130 70)">
+        <FigureF cx={60} cy={28} sc={1.6} color="#b45309" />
+      </g>
+      <text x={202} y={78} fontSize={11} textAnchor="middle" fill="#b45309" fontWeight={700}>F'</text>
+      {/* Diagonale pointillée passant par O, reliant les centres des deux figures */}
+      <line x1={69} y1={42} x2={191} y2={98} stroke="#b45309" strokeWidth={1} strokeDasharray="3 3" />
       <text x={130} y={134} fontSize={10.5} textAnchor="middle" fill="#b45309" fontWeight={600}>O est le milieu de [F F']</text>
     </svg>
   );
 }
 
 function Translation() {
+  // Les deux F ont le même cy ; la flèche est alignée sur leur centre vertical
+  // (cy + 9*sc). Le vecteur part juste après le bord droit de F et arrive juste
+  // avant le bord gauche de F'.
+  const sc = 1.8;
+  const cy = 42;
+  const leftX = 40, rightX = 190;
+  const midY = cy + 9 * sc; // centre vertical du glyphe F
   return (
-    <svg viewBox="0 0 260 140" style={CIRCUIT_SVG_STYLE} role="img" aria-label="Translation : figure et son image par un vecteur" data-schema="translation">
-      {/* Figure originale */}
-      <FigureF cx={40} cy={50} sc={1.8} color="#334155" />
-      <text x={50} y={100} fontSize={11} textAnchor="middle" fill="#334155" fontWeight={700}>F</text>
-      {/* Vecteur translation */}
+    <svg viewBox="0 0 260 135" style={CIRCUIT_SVG_STYLE} role="img" aria-label="Translation : figure et son image par un vecteur" data-schema="translation">
       <defs>
         <marker id="arrT" markerWidth={8} markerHeight={8} refX={7} refY={4} orient="auto">
           <polygon points="0,0 8,4 0,8" fill="#b45309" />
         </marker>
       </defs>
-      <line x1={70} y1={60} x2={175} y2={60} stroke="#b45309" strokeWidth={2.2} markerEnd="url(#arrT)" />
-      <text x={125} y={54} fontSize={11} textAnchor="middle" fill="#b45309" fontStyle="italic" fontWeight={700}>vecteur u</text>
-      {/* Image translatée */}
-      <FigureF cx={195} cy={50} sc={1.8} color="#b45309" />
-      <text x={205} y={100} fontSize={11} textAnchor="middle" fill="#b45309" fontWeight={700}>F'</text>
-      <text x={130} y={132} fontSize={10.5} textAnchor="middle" fill="#b45309" fontWeight={600}>même direction, sens, longueur</text>
+      <FigureF cx={leftX} cy={cy} sc={sc} color="#334155" />
+      <text x={leftX + 6 * sc} y={cy + 22 * sc} fontSize={11} textAnchor="middle" fill="#334155" fontWeight={700}>F</text>
+      <FigureF cx={rightX} cy={cy} sc={sc} color="#b45309" />
+      <text x={rightX + 6 * sc} y={cy + 22 * sc} fontSize={11} textAnchor="middle" fill="#b45309" fontWeight={700}>F'</text>
+      {/* Vecteur reliant le bord droit de F au bord gauche de F' à hauteur du centre */}
+      <line x1={leftX + 14 * sc} y1={midY} x2={rightX - 2} y2={midY} stroke="#b45309" strokeWidth={2.2} markerEnd="url(#arrT)" />
+      <text x={(leftX + 14 * sc + rightX - 2) / 2} y={midY - 5} fontSize={11} textAnchor="middle" fill="#b45309" fontStyle="italic" fontWeight={700}>vecteur u</text>
+      <text x={130} y={128} fontSize={10.5} textAnchor="middle" fill="#b45309" fontWeight={600}>même direction, sens, longueur</text>
     </svg>
   );
 }

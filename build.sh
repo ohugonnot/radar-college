@@ -1,6 +1,11 @@
 #!/bin/bash
-# Build SPA : inline app.css + app.tsx + quizzes/*.tsx dans index.html, bump CACHE_NAME du SW.
-# À lancer après toute modif de app.css, app.tsx ou d'un fichier dans quizzes/.
+# Build SPA :
+# 1. Pré-compile app.tsx + quizzes/*.tsx via Babel (JSX + TS → JS plain)
+# 2. Génère un CSS Tailwind statique purged depuis index.html
+# 3. Inline tout dans index.html, bump CACHE_NAME du SW
+#
+# Objectif : supprimer les dépendances CDN runtime (Babel Standalone, Tailwind CDN)
+# → chargement plus rapide + compatible file:// + pas de warnings prod.
 
 set -e
 cd "$(dirname "$0")"
@@ -28,40 +33,20 @@ PYEOF
   echo "  ✓ sw.js : CACHE_NAME → quizcollege-${STAMP}"
 fi
 
-python3 <<'PYEOF'
-import re, glob, os
+# Étape 1 — Pré-compile TSX/JSX → JS via @babel/core (Node)
+node build-compile.js
+echo "  ✓ JSX/TS pré-compilés via @babel/core"
 
-with open('app.css','r')    as f: css = f.read()
-with open('app.tsx','r')    as f: jsx = f.read()
-with open('index.html','r') as f: html = f.read()
+# Étape 2 — Génère Tailwind statique (purge depuis index.html)
+if [ -d node_modules/tailwindcss ]; then
+  npx tailwindcss -i tailwind-input.css -o build/tailwind.css --content './index.html' --minify 2>/dev/null || {
+    echo "  ⚠ tailwindcss CLI a échoué, conservation du CDN dans index.html"
+    rm -f build/tailwind.css
+  }
+  if [ -f build/tailwind.css ]; then
+    echo "  ✓ Tailwind statique : build/tailwind.css ($(wc -c < build/tailwind.css) o)"
+  fi
+fi
 
-# 1. Inline app.css : cible UNIQUEMENT <style id="app-style">...</style>.
-# Le bloc <style id="wizard-style"> est préservé (styles vanilla wizard/dashboard).
-style_re = re.compile(r'<style id="app-style">.*?</style>', re.S)
-if not style_re.search(html):
-    raise SystemExit('Marqueur <style id="app-style"> introuvable dans index.html')
-html = style_re.sub(lambda m: '<style id="app-style">\n' + css + '\n</style>', html, count=1)
-
-# 2. Inline tous les quizzes/*.tsx entre les marqueurs // BEGIN_QUIZZES et // END_QUIZZES.
-quiz_files = sorted(glob.glob('quizzes/*.tsx'))
-parts = []
-for qf in quiz_files:
-    with open(qf,'r') as f:
-        body = f.read()
-    parts.append(f"// ── {os.path.basename(qf)} ──\n{body}")
-quizzes_block = '\n'.join(parts)
-quizzes_re = re.compile(r'// BEGIN_QUIZZES\n.*?// END_QUIZZES', re.S)
-if not quizzes_re.search(html):
-    raise SystemExit("Marqueurs BEGIN_QUIZZES / END_QUIZZES introuvables dans index.html")
-# Lambda pour éviter l'interprétation des \ dans le replacement.
-html = quizzes_re.sub(lambda m: f"// BEGIN_QUIZZES\n{quizzes_block}\n// END_QUIZZES", html)
-
-# 3. Inline app.tsx entre les marqueurs // BEGIN_APP_JSX et // END_APP_JSX.
-app_re = re.compile(r'// BEGIN_APP_JSX\n.*?// END_APP_JSX', re.S)
-if not app_re.search(html):
-    raise SystemExit("Marqueurs BEGIN_APP_JSX / END_APP_JSX introuvables dans index.html")
-html = app_re.sub(lambda m: f"// BEGIN_APP_JSX\n{jsx}\n// END_APP_JSX", html)
-
-with open('index.html','w') as f: f.write(html)
-print(f"  ✓ index.html régénéré : {len(quiz_files)} quizzes + app.tsx ({len(jsx)}o) + app.css ({len(css)}o) inlinés")
-PYEOF
+# Étape 3 — Inline tout dans index.html
+node build-inline.js

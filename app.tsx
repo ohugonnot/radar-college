@@ -96,7 +96,7 @@ function youtubeSearchUrl(domainId) {
 // Kit SVG circuits — défini dans quizzes/_circuits.tsx (bundle quizzes) et
 // exposé via window.CircuitKit pour que MEMO_BANK puisse y accéder ici.
 // Les quizzes/*.tsx utilisent directement les symboles (même portée).
-const { CircuitSerie, CircuitParallele, CircuitAmperemetreSerie, CircuitVoltmetreDerivation, CircuitCourtCircuit, GrapheOhm, TriangleRectangle, ConfigThales, TriangleTrigo, GrapheAffine } = (window as any).CircuitKit;
+const { CircuitSerie, CircuitParallele, CircuitAmperemetreSerie, CircuitVoltmetreDerivation, CircuitCourtCircuit, GrapheOhm, TriangleRectangle, ConfigThales, TriangleTrigo, GrapheAffine, PropagationRectiligne, OmbreSchema, Cube3D, Pave3D, Cylindre3D, Sphere3D, Cone3D, SymetrieAxiale, SymetrieCentrale, Translation } = (window as any).CircuitKit;
 
 // ============================================================
 // FICHES MÉMO par ID de chapitre (partagées entre niveaux quand l'ID est identique)
@@ -134,7 +134,15 @@ const MEMO_BANK: Record<string, Array<string | React.ReactNode>> = {
   grandeurs: ['V cube = a³ · V pavé = L × l × h · V cylindre = π r² h · V pyramide/cône = B × h / 3', 'v = d / t (distance ÷ temps)', '1 L = 1 dm³ = 1000 cm³ ; attention : 1h30 = 1,5h'],
   proportion: ['Produit en croix : si a/b = c/d alors a×d = b×c', 'x % de N = x/100 × N', 'Réduction de 20 % = multiplier par 0,80 ; augmentation de 20 % = ×1,20'],
   probas: ['P(A) = cas favorables / cas possibles (entre 0 et 1)', 'Moyenne = somme / nombre de valeurs', 'Médiane = valeur centrale d\'une série triée'],
-  transfo: ['Symétrie centrale : O milieu de [AA\'] — conserve longueurs et angles', 'Symétrie axiale : l\'axe est la médiatrice de [AA\']', 'Translation : même direction, même sens, même longueur'],
+  transfo: [
+    '📐 Symétrie axiale : on plie la feuille le long de l\'axe, figure et image se superposent. L\'axe est la médiatrice de [AA\'].',
+    <SymetrieAxiale key="schema-sax" />,
+    '🔄 Symétrie centrale : rotation de 180° autour d\'un point O. O est le milieu de chaque segment [AA\'].',
+    <SymetrieCentrale key="schema-scent" />,
+    '➡️ Translation : on décale la figure selon un vecteur (même direction, même sens, même longueur).',
+    <Translation key="schema-trans" />,
+    '✨ Ces 3 transformations conservent les longueurs, les angles et les aires.',
+  ],
   // Maths 3ème
   arithmetique: ['PGCD par algorithme d\'Euclide : pgcd(a,b) = pgcd(b, a mod b)', 'Fraction irréductible : simplifier par le PGCD', 'Premiers entre eux ⇔ PGCD = 1'],
   remarquables: ['(a + b)² = a² + 2ab + b²', '(a − b)² = a² − 2ab + b²', '(a + b)(a − b) = a² − b²'],
@@ -147,7 +155,13 @@ const MEMO_BANK: Record<string, Array<string | React.ReactNode>> = {
     '🔑 Image de x : on calcule f(x) — lecture verticale sur le graphe.',
     '🔑 Antécédent de y : on résout f(x) = y — lecture horizontale, puis on redescend sur l\'axe x.',
   ],
-  geomespace: ['V sphère = (4/3) π r³', 'V cône = V pyramide = (B × h) / 3', 'Agrandissement k : longueurs ×k, aires ×k², volumes ×k³'],
+  geomespace: [
+    'V sphère = (4/3) π r³.',
+    <Sphere3D key="schema-sphere" />,
+    'V cône = V pyramide = (B × h) / 3.',
+    <Cone3D key="schema-cone" />,
+    '🔎 Agrandissement de rapport k : longueurs ×k, aires ×k², volumes ×k³.',
+  ],
   stats: ['Médiane : valeur du milieu (série triée)', 'Étendue = max − min', 'Fréquence = effectif / total (souvent en %)'],
   // Maths 6ème
   numeration: ['Positions : unités / dizaines / centaines / milliers · puis dixièmes / centièmes / millièmes après la virgule', 'Pour comparer : aligner les virgules et compléter par des 0 si besoin', '12,5 = 12,50 (on peut ajouter des zéros à droite de la partie décimale)'],
@@ -155,12 +169,23 @@ const MEMO_BANK: Record<string, Array<string | React.ReactNode>> = {
   angles: ['Aigu < 90° ; Droit = 90° ; Obtus entre 90° et 180° ; Plat = 180°', 'Somme des angles d\'un triangle = 180°', 'Rapporteur : aligner le 0 sur un côté'],
   geometrie: ['Équilatéral : 3 côtés égaux + 3 angles de 60°', 'Isocèle : 2 côtés égaux + 2 angles égaux à la base', 'Carré : 4 côtés égaux + 4 angles droits'],
   aires: ['P_rectangle = 2(L + l) ; A_rectangle = L × l', 'A_carré = côté × côté ; A_triangle = (base × hauteur) / 2', 'A_disque = π r² ; P_cercle = 2π r'],
-  symetrie: ['Axe de symétrie : l\'image et la figure coïncident quand on plie', 'Rectangle : 2 axes ; Carré : 4 axes ; Cercle : infinité'],
+  symetrie: [
+    'Axe de symétrie : en pliant la feuille le long de l\'axe, la figure et son image se superposent.',
+    <SymetrieAxiale key="schema-sym6" />,
+    'Rectangle : 2 axes · Carré : 4 axes · Cercle : infinité d\'axes (tous les diamètres).',
+  ],
   unites: ['km · hm · dam · m · dm · cm · mm (×10 à chaque pas)', '1 kg = 1000 g · 1 L = 100 cL = 1000 mL', '1h30 = 1,5 h (pas 1,3 !)'],
   // Maths 5ème
   triangles: ['Somme des angles = 180°', 'Inégalité triangulaire : le plus grand côté < somme des 2 autres', 'Isocèle : 2 côtés + 2 angles à la base égaux'],
   parallelog: ['2 paires de côtés parallèles + opposés égaux', 'Diagonales se coupent en leur milieu', 'Losange : 4 côtés égaux. Rectangle : 4 angles droits. Carré : les deux'],
-  volumes: ['V prisme droit = B × h (B = aire de la base)', 'V cylindre = π r² h', '1 L = 1 dm³ = 1000 cm³'],
+  volumes: [
+    'V prisme droit = B × h (B = aire de la base).',
+    'V pavé = L × l × h.',
+    <Pave3D key="schema-pave" />,
+    'V cylindre = π r² h.',
+    <Cylindre3D key="schema-cyl" />,
+    '1 L = 1 dm³ = 1000 cm³. Attention aux unités : toujours tout convertir dans la même unité avant de calculer.',
+  ],
 
   // Physique-Chimie
   electricite: [
@@ -185,7 +210,14 @@ const MEMO_BANK: Record<string, Array<string | React.ReactNode>> = {
     '📊 Conducteur ohmique : la courbe U = f(I) est une droite qui passe par l\'origine, de pente R.',
     <GrapheOhm key="graphe-ohm" />,
   ],
-  optique: ['Lumière = ligne droite dans un milieu transparent homogène', 'c ≈ 300 000 km/s = 3 × 10⁸ m/s', 'Source primaire (émet) vs secondaire (diffuse)'],
+  optique: [
+    '💡 Dans un milieu transparent homogène, la lumière se propage en ligne droite.',
+    <PropagationRectiligne key="schema-prop" />,
+    'Vitesse : c ≈ 300 000 km/s = 3 × 10⁸ m/s (même dans le vide).',
+    'Source primaire : produit sa lumière (Soleil, lampe). Source secondaire : la diffuse (Lune, papier).',
+    '🌑 Ombre = zone où la lumière est bloquée par un objet opaque.',
+    <OmbreSchema key="schema-ombre" />,
+  ],
   couleurs: ['Additive (lumières RVB) : R+V = jaune, R+V+B = blanc', 'Soustractive (peinture CMJ) : cyan-magenta-jaune', 'Objet rouge en lumière verte → paraît noir'],
   matiere: ['ρ = m / V (g/cm³ ou kg/m³) · eau = 1 g/cm³', 'ρ_obj < ρ_eau → flotte', 'Conservation de la masse aux changements d\'état'],
   atomes: ['Atome = noyau (protons + neutrons) + électrons', 'Ion = atome ayant gagné ou perdu des électrons', 'Molécules usuelles : H₂O, CO₂, O₂, N₂'],

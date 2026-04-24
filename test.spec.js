@@ -549,6 +549,37 @@ test.describe('Parcours utilisateur', () => {
     await expect(page.locator('#root svg[data-schema="graphe-affine"]')).toBeVisible();
   });
 
+  test('MEMO optique physique-4 affiche propagation et ombre', async ({ page }) => {
+    await completeWizard(page, 'Tom Optique', '4ème');
+    await page.goto(BASE + '/index.html#/4eme/physique');
+    await page.waitForTimeout(2000);
+    await page.locator('#root').getByText('Fiches mémo').click();
+    await page.locator('#root').getByRole('button', { name: /Optique/ }).click();
+    await expect(page.locator('#root svg[data-schema="propagation-rectiligne"]')).toBeVisible();
+    await expect(page.locator('#root svg[data-schema="ombre"]')).toBeVisible();
+  });
+
+  test('MEMO volumes maths-5 affiche pavé et cylindre 3D', async ({ page }) => {
+    await completeWizard(page, 'Mia Volume', '5ème');
+    await page.goto(BASE + '/index.html#/5eme/maths');
+    await page.waitForTimeout(2000);
+    await page.locator('#root').getByText('Fiches mémo').click();
+    await page.locator('#root').getByRole('button', { name: /Volumes/ }).click();
+    await expect(page.locator('#root svg[data-schema="pave-3d"]')).toBeVisible();
+    await expect(page.locator('#root svg[data-schema="cylindre-3d"]')).toBeVisible();
+  });
+
+  test('MEMO transformations maths-4 affiche symétries et translation', async ({ page }) => {
+    await completeWizard(page, 'Eva Transfo', '4ème');
+    await page.goto(BASE + '/index.html#/4eme/maths');
+    await page.waitForTimeout(2000);
+    await page.locator('#root').getByText('Fiches mémo').click();
+    await page.locator('#root').getByRole('button', { name: /Transformations/ }).click();
+    await expect(page.locator('#root svg[data-schema="symetrie-axiale"]')).toBeVisible();
+    await expect(page.locator('#root svg[data-schema="symetrie-centrale"]')).toBeVisible();
+    await expect(page.locator('#root svg[data-schema="translation"]')).toBeVisible();
+  });
+
   test('MEMO loiOhm physique-4 affiche le graphe U=f(I)', async ({ page }) => {
     await completeWizard(page, 'Théo Ohm', '4ème');
     await page.goto(BASE + '/index.html#/4eme/physique');

@@ -275,9 +275,239 @@ function GrapheAffine() {
   );
 }
 
+// ════════════════════════════════════════════════════════════════════════════
+// OPTIQUE — propagation rectiligne, ombres.
+// ════════════════════════════════════════════════════════════════════════════
+
+function PropagationRectiligne() {
+  return (
+    <svg viewBox="0 0 280 120" style={CIRCUIT_SVG_STYLE} role="img" aria-label="Propagation rectiligne : rayons lumineux en ligne droite depuis une source" data-schema="propagation-rectiligne">
+      {/* Source lumineuse (soleil stylisé) */}
+      <circle cx={40} cy={60} r={14} fill="#fcd34d" stroke="#b45309" strokeWidth={1.8} />
+      {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map(a => {
+        const rad = a * Math.PI / 180;
+        const x1 = 40 + Math.cos(rad) * 16, y1 = 60 + Math.sin(rad) * 16;
+        const x2 = 40 + Math.cos(rad) * 22, y2 = 60 + Math.sin(rad) * 22;
+        return <line key={a} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#b45309" strokeWidth={1.6} strokeLinecap="round" />;
+      })}
+      {/* 3 rayons en ligne droite vers la droite */}
+      {[35, 60, 85].map(y => (
+        <g key={y}>
+          <line x1={62} y1={y} x2={255} y2={y} stroke="#b45309" strokeWidth={1.6} />
+          <polygon points={`255,${y-4} 263,${y} 255,${y+4}`} fill="#b45309" />
+        </g>
+      ))}
+      <text x={140} y={110} fontSize={10.5} textAnchor="middle" fill="#b45309" fontWeight={600}>la lumière se propage en ligne droite</text>
+    </svg>
+  );
+}
+
+function OmbreSchema() {
+  return (
+    <svg viewBox="0 0 300 140" style={CIRCUIT_SVG_STYLE} role="img" aria-label="Schéma d'ombre portée : source, objet opaque, écran, zone d'ombre" data-schema="ombre">
+      {/* Source à gauche */}
+      <circle cx={35} cy={70} r={12} fill="#fcd34d" stroke="#b45309" strokeWidth={1.8} />
+      {[0, 45, 90, 135, 180, 225, 270, 315].map(a => {
+        const rad = a * Math.PI / 180;
+        return <line key={a} x1={35 + Math.cos(rad) * 14} y1={70 + Math.sin(rad) * 14} x2={35 + Math.cos(rad) * 18} y2={70 + Math.sin(rad) * 18} stroke="#b45309" strokeWidth={1.4} strokeLinecap="round" />;
+      })}
+      {/* Objet opaque au milieu */}
+      <rect x={130} y={50} width={14} height={40} fill="#334155" stroke="#1e293b" strokeWidth={1.4} />
+      {/* Zone d'ombre (cône qui part des bords de la source vers les bords de l'objet puis se projette sur l'écran) */}
+      <polygon points="47,62 130,50 255,0 255,140 130,90 47,78" fill="rgba(51,65,85,0.18)" />
+      {/* Rayons limites */}
+      <line x1={47} y1={62} x2={255} y2={0} stroke="#b45309" strokeWidth={1.1} strokeDasharray="3 3" />
+      <line x1={47} y1={78} x2={255} y2={140} stroke="#b45309" strokeWidth={1.1} strokeDasharray="3 3" />
+      {/* Écran à droite */}
+      <line x1={255} y1={0} x2={255} y2={140} stroke="currentColor" strokeWidth={2.4} />
+      {/* Labels */}
+      <text x={35} y={95} fontSize={10} textAnchor="middle" fill="currentColor">source</text>
+      <text x={137} y={105} fontSize={10} textAnchor="middle" fill="currentColor">objet</text>
+      <text x={268} y={75} fontSize={10} fill="currentColor">écran</text>
+      <text x={200} y={75} fontSize={10.5} textAnchor="middle" fill="#1e293b" fontWeight={700}>ombre</text>
+    </svg>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// VOLUMES 3D — vues en perspective cavalière pour MEMO aires/volumes.
+// ════════════════════════════════════════════════════════════════════════════
+
+// Cube en perspective cavalière (arêtes cachées en pointillés).
+function Cube3D({ cote = 'a' }: { cote?: string }) {
+  const dx = 22, dy = 16; // décalage perspective
+  return (
+    <svg viewBox="0 0 160 140" style={CIRCUIT_SVG_STYLE} role="img" aria-label="Cube de côté a en perspective" data-schema="cube-3d">
+      {/* Face arrière (cachée) */}
+      <path d={`M ${40+dx} ${30-dy} L ${40+dx} ${90-dy} L ${100+dx} ${90-dy}`} fill="none" stroke="currentColor" strokeWidth={1.3} strokeDasharray="3 3" />
+      <line x1={40} y1={30} x2={40+dx} y2={30-dy} stroke="currentColor" strokeWidth={1.3} strokeDasharray="3 3" />
+      {/* Face avant */}
+      <rect x={40} y={30} width={60} height={60} fill="rgba(199,138,29,0.08)" stroke="currentColor" strokeWidth={1.8} />
+      {/* Arêtes de profondeur visibles */}
+      <line x1={100} y1={30} x2={100+dx} y2={30-dy} stroke="currentColor" strokeWidth={1.8} />
+      <line x1={100} y1={90} x2={100+dx} y2={90-dy} stroke="currentColor" strokeWidth={1.8} />
+      <line x1={100+dx} y1={30-dy} x2={100+dx} y2={90-dy} stroke="currentColor" strokeWidth={1.8} />
+      {/* Label côté */}
+      <text x={70} y={106} fontSize={12} textAnchor="middle" fill="#b45309" fontStyle="italic" fontWeight={600}>{cote}</text>
+      <text x={80} y={130} fontSize={10.5} textAnchor="middle" fill="#b45309" fontWeight={600}>V = {cote}³</text>
+    </svg>
+  );
+}
+
+function Pave3D() {
+  const dx = 24, dy = 16;
+  return (
+    <svg viewBox="0 0 180 140" style={CIRCUIT_SVG_STYLE} role="img" aria-label="Pavé droit de dimensions L, l, h" data-schema="pave-3d">
+      <path d={`M ${35+dx} ${25-dy} L ${35+dx} ${80-dy} L ${125+dx} ${80-dy}`} fill="none" stroke="currentColor" strokeWidth={1.3} strokeDasharray="3 3" />
+      <line x1={35} y1={25} x2={35+dx} y2={25-dy} stroke="currentColor" strokeWidth={1.3} strokeDasharray="3 3" />
+      <rect x={35} y={25} width={90} height={55} fill="rgba(199,138,29,0.08)" stroke="currentColor" strokeWidth={1.8} />
+      <line x1={125} y1={25} x2={125+dx} y2={25-dy} stroke="currentColor" strokeWidth={1.8} />
+      <line x1={125} y1={80} x2={125+dx} y2={80-dy} stroke="currentColor" strokeWidth={1.8} />
+      <line x1={125+dx} y1={25-dy} x2={125+dx} y2={80-dy} stroke="currentColor" strokeWidth={1.8} />
+      <text x={80} y={96} fontSize={11} textAnchor="middle" fill="#b45309" fontStyle="italic" fontWeight={600}>L</text>
+      <text x={28} y={55} fontSize={11} textAnchor="end" fill="#b45309" fontStyle="italic" fontWeight={600}>h</text>
+      <text x={142} y={14} fontSize={11} fill="#b45309" fontStyle="italic" fontWeight={600}>l</text>
+      <text x={88} y={130} fontSize={10.5} textAnchor="middle" fill="#b45309" fontWeight={600}>V = L × l × h</text>
+    </svg>
+  );
+}
+
+function Cylindre3D() {
+  return (
+    <svg viewBox="0 0 140 150" style={CIRCUIT_SVG_STYLE} role="img" aria-label="Cylindre de rayon r et hauteur h" data-schema="cylindre-3d">
+      {/* Ellipse du haut */}
+      <ellipse cx={65} cy={25} rx={40} ry={10} fill="rgba(199,138,29,0.08)" stroke="currentColor" strokeWidth={1.8} />
+      {/* Côtés */}
+      <line x1={25} y1={25} x2={25} y2={105} stroke="currentColor" strokeWidth={1.8} />
+      <line x1={105} y1={25} x2={105} y2={105} stroke="currentColor" strokeWidth={1.8} />
+      {/* Ellipse du bas (bord avant plein, bord arrière pointillé) */}
+      <path d="M 25 105 A 40 10 0 0 0 105 105" fill="rgba(199,138,29,0.12)" stroke="currentColor" strokeWidth={1.8} />
+      <path d="M 25 105 A 40 10 0 0 1 105 105" fill="none" stroke="currentColor" strokeWidth={1.3} strokeDasharray="3 3" />
+      {/* Rayon */}
+      <line x1={65} y1={25} x2={105} y2={25} stroke="#b45309" strokeWidth={1.4} />
+      <text x={85} y={20} fontSize={11} textAnchor="middle" fill="#b45309" fontStyle="italic" fontWeight={600}>r</text>
+      {/* Hauteur */}
+      <line x1={120} y1={25} x2={120} y2={105} stroke="#b45309" strokeWidth={1.4} />
+      <line x1={117} y1={25} x2={123} y2={25} stroke="#b45309" strokeWidth={1.4} />
+      <line x1={117} y1={105} x2={123} y2={105} stroke="#b45309" strokeWidth={1.4} />
+      <text x={130} y={68} fontSize={11} fill="#b45309" fontStyle="italic" fontWeight={600}>h</text>
+      <text x={65} y={138} fontSize={10.5} textAnchor="middle" fill="#b45309" fontWeight={600}>V = π r² h</text>
+    </svg>
+  );
+}
+
+function Sphere3D() {
+  return (
+    <svg viewBox="0 0 130 150" style={CIRCUIT_SVG_STYLE} role="img" aria-label="Sphère de rayon r" data-schema="sphere-3d">
+      <circle cx={65} cy={65} r={45} fill="rgba(199,138,29,0.08)" stroke="currentColor" strokeWidth={1.8} />
+      {/* Équateur (arrière pointillé + avant plein pour effet 3D) */}
+      <ellipse cx={65} cy={65} rx={45} ry={12} fill="none" stroke="currentColor" strokeWidth={1.3} strokeDasharray="3 3" />
+      <path d="M 20 65 A 45 12 0 0 0 110 65" fill="none" stroke="currentColor" strokeWidth={1.6} />
+      {/* Rayon */}
+      <line x1={65} y1={65} x2={105} y2={45} stroke="#b45309" strokeWidth={1.4} />
+      <circle cx={65} cy={65} r={2.2} fill="#b45309" />
+      <text x={88} y={50} fontSize={11} fill="#b45309" fontStyle="italic" fontWeight={600}>r</text>
+      <text x={65} y={138} fontSize={10.5} textAnchor="middle" fill="#b45309" fontWeight={600}>V = (4/3) π r³</text>
+    </svg>
+  );
+}
+
+function Cone3D() {
+  return (
+    <svg viewBox="0 0 140 150" style={CIRCUIT_SVG_STYLE} role="img" aria-label="Cône de rayon r et hauteur h" data-schema="cone-3d">
+      {/* Triangle + base elliptique */}
+      <path d="M 65 15 L 25 105 L 105 105 Z" fill="rgba(199,138,29,0.08)" stroke="currentColor" strokeWidth={1.8} strokeLinejoin="round" />
+      <path d="M 25 105 A 40 10 0 0 0 105 105" fill="rgba(199,138,29,0.12)" stroke="currentColor" strokeWidth={1.8} />
+      <path d="M 25 105 A 40 10 0 0 1 105 105" fill="none" stroke="currentColor" strokeWidth={1.3} strokeDasharray="3 3" />
+      {/* Hauteur (axe central pointillé) */}
+      <line x1={65} y1={15} x2={65} y2={105} stroke="#b45309" strokeWidth={1.4} strokeDasharray="2 3" />
+      <line x1={65} y1={105} x2={105} y2={105} stroke="#b45309" strokeWidth={1.4} />
+      <text x={58} y={62} fontSize={11} textAnchor="end" fill="#b45309" fontStyle="italic" fontWeight={600}>h</text>
+      <text x={85} y={118} fontSize={11} textAnchor="middle" fill="#b45309" fontStyle="italic" fontWeight={600}>r</text>
+      <text x={65} y={138} fontSize={10.5} textAnchor="middle" fill="#b45309" fontWeight={600}>V = (1/3) π r² h</text>
+    </svg>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// TRANSFORMATIONS — symétrie axiale, symétrie centrale, translation.
+// On utilise la figure "F" stylisée (asymétrique, donc l'image est clairement
+// distinguable) pour illustrer la transformation.
+// ════════════════════════════════════════════════════════════════════════════
+
+// Mini "F" positionné à (cx,cy), échelle sc, transform optionnel additionnel.
+function FigureF({ cx, cy, sc = 1, extra = '', color = 'currentColor' }: { cx: number; cy: number; sc?: number; extra?: string; color?: string }) {
+  return (
+    <g transform={`translate(${cx},${cy}) scale(${sc}) ${extra}`}>
+      <path d="M 0 0 L 12 0 L 12 2 L 2 2 L 2 8 L 8 8 L 8 10 L 2 10 L 2 18 L 0 18 Z" fill={color} stroke={color} strokeWidth={0.5} strokeLinejoin="round" />
+    </g>
+  );
+}
+
+function SymetrieAxiale() {
+  return (
+    <svg viewBox="0 0 260 140" style={CIRCUIT_SVG_STYLE} role="img" aria-label="Symétrie axiale : figure et son image par rapport à un axe vertical" data-schema="symetrie-axiale">
+      {/* Axe vertical */}
+      <line x1={130} y1={15} x2={130} y2={125} stroke="#b45309" strokeWidth={2} strokeDasharray="5 4" />
+      <text x={130} y={12} fontSize={10.5} textAnchor="middle" fill="#b45309" fontWeight={700}>axe (d)</text>
+      {/* Figure originale à gauche */}
+      <FigureF cx={65} cy={50} sc={2} color="#334155" />
+      <text x={77} y={108} fontSize={11} textAnchor="middle" fill="#334155" fontWeight={700}>F</text>
+      {/* Image miroir à droite (scale -1 horizontal) */}
+      <FigureF cx={195} cy={50} sc={2} extra="scale(-1,1) translate(-12,0)" color="#b45309" />
+      <text x={183} y={108} fontSize={11} textAnchor="middle" fill="#b45309" fontWeight={700}>F'</text>
+      <text x={130} y={135} fontSize={10.5} textAnchor="middle" fill="#b45309" fontWeight={600}>l'axe est la médiatrice de [F F']</text>
+    </svg>
+  );
+}
+
+function SymetrieCentrale() {
+  return (
+    <svg viewBox="0 0 260 140" style={CIRCUIT_SVG_STYLE} role="img" aria-label="Symétrie centrale : figure et son image par rapport à un centre O" data-schema="symetrie-centrale">
+      {/* Centre O */}
+      <circle cx={130} cy={70} r={3} fill="#b45309" />
+      <text x={138} y={66} fontSize={11} fill="#b45309" fontWeight={700}>O</text>
+      {/* Figure originale en haut-gauche */}
+      <FigureF cx={60} cy={28} sc={1.6} color="#334155" />
+      <text x={55} y={75} fontSize={11} textAnchor="middle" fill="#334155" fontWeight={700}>F</text>
+      {/* Image par rotation 180° autour de O → en bas-droite */}
+      <FigureF cx={200} cy={112} sc={1.6} extra="rotate(180) translate(-12,-18)" color="#b45309" />
+      <text x={205} y={78} fontSize={11} textAnchor="middle" fill="#b45309" fontWeight={700}>F'</text>
+      {/* Ligne traversant O */}
+      <line x1={60} y1={28} x2={200} y2={112} stroke="#b45309" strokeWidth={1} strokeDasharray="3 3" />
+      <text x={130} y={134} fontSize={10.5} textAnchor="middle" fill="#b45309" fontWeight={600}>O est le milieu de [F F']</text>
+    </svg>
+  );
+}
+
+function Translation() {
+  return (
+    <svg viewBox="0 0 260 140" style={CIRCUIT_SVG_STYLE} role="img" aria-label="Translation : figure et son image par un vecteur" data-schema="translation">
+      {/* Figure originale */}
+      <FigureF cx={40} cy={50} sc={1.8} color="#334155" />
+      <text x={50} y={100} fontSize={11} textAnchor="middle" fill="#334155" fontWeight={700}>F</text>
+      {/* Vecteur translation */}
+      <defs>
+        <marker id="arrT" markerWidth={8} markerHeight={8} refX={7} refY={4} orient="auto">
+          <polygon points="0,0 8,4 0,8" fill="#b45309" />
+        </marker>
+      </defs>
+      <line x1={70} y1={60} x2={175} y2={60} stroke="#b45309" strokeWidth={2.2} markerEnd="url(#arrT)" />
+      <text x={125} y={54} fontSize={11} textAnchor="middle" fill="#b45309" fontStyle="italic" fontWeight={700}>vecteur u</text>
+      {/* Image translatée */}
+      <FigureF cx={195} cy={50} sc={1.8} color="#b45309" />
+      <text x={205} y={100} fontSize={11} textAnchor="middle" fill="#b45309" fontWeight={700}>F'</text>
+      <text x={130} y={132} fontSize={10.5} textAnchor="middle" fill="#b45309" fontWeight={600}>même direction, sens, longueur</text>
+    </svg>
+  );
+}
+
 // ── Export vers window pour app.tsx (MEMO_BANK) ─────────────────────────────
 (window as any).CircuitKit = {
   Fil, Pile, Resistance, Noeud, FlecheI, Lampe, Interrupteur, Mesureur, Amperemetre, Voltmetre,
   CircuitSerie, CircuitParallele, CircuitAmperemetreSerie, CircuitVoltmetreDerivation, CircuitCourtCircuit, GrapheOhm,
   TriangleRectangle, ConfigThales, TriangleTrigo, GrapheAffine,
+  PropagationRectiligne, OmbreSchema,
+  Cube3D, Pave3D, Cylindre3D, Sphere3D, Cone3D,
+  SymetrieAxiale, SymetrieCentrale, Translation,
 };

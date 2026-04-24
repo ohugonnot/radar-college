@@ -2368,6 +2368,709 @@ function GrapheAffine() {
     fontStyle: "italic"
   }, "a = pente \xB7 b = ordonn\xE9e en 0"));
 }
+function PropagationRectiligne() {
+  return React.createElement("svg", {
+    viewBox: "0 0 280 120",
+    style: CIRCUIT_SVG_STYLE,
+    role: "img",
+    "aria-label": "Propagation rectiligne : rayons lumineux en ligne droite depuis une source",
+    "data-schema": "propagation-rectiligne"
+  }, React.createElement("circle", {
+    cx: 40,
+    cy: 60,
+    r: 14,
+    fill: "#fcd34d",
+    stroke: "#b45309",
+    strokeWidth: 1.8
+  }), [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map(a => {
+    const rad = a * Math.PI / 180;
+    const x1 = 40 + Math.cos(rad) * 16,
+      y1 = 60 + Math.sin(rad) * 16;
+    const x2 = 40 + Math.cos(rad) * 22,
+      y2 = 60 + Math.sin(rad) * 22;
+    return React.createElement("line", {
+      key: a,
+      x1: x1,
+      y1: y1,
+      x2: x2,
+      y2: y2,
+      stroke: "#b45309",
+      strokeWidth: 1.6,
+      strokeLinecap: "round"
+    });
+  }), [35, 60, 85].map(y => React.createElement("g", {
+    key: y
+  }, React.createElement("line", {
+    x1: 62,
+    y1: y,
+    x2: 255,
+    y2: y,
+    stroke: "#b45309",
+    strokeWidth: 1.6
+  }), React.createElement("polygon", {
+    points: `255,${y - 4} 263,${y} 255,${y + 4}`,
+    fill: "#b45309"
+  }))), React.createElement("text", {
+    x: 140,
+    y: 110,
+    fontSize: 10.5,
+    textAnchor: "middle",
+    fill: "#b45309",
+    fontWeight: 600
+  }, "la lumi\xE8re se propage en ligne droite"));
+}
+function OmbreSchema() {
+  return React.createElement("svg", {
+    viewBox: "0 0 300 140",
+    style: CIRCUIT_SVG_STYLE,
+    role: "img",
+    "aria-label": "Sch\xE9ma d'ombre port\xE9e : source, objet opaque, \xE9cran, zone d'ombre",
+    "data-schema": "ombre"
+  }, React.createElement("circle", {
+    cx: 35,
+    cy: 70,
+    r: 12,
+    fill: "#fcd34d",
+    stroke: "#b45309",
+    strokeWidth: 1.8
+  }), [0, 45, 90, 135, 180, 225, 270, 315].map(a => {
+    const rad = a * Math.PI / 180;
+    return React.createElement("line", {
+      key: a,
+      x1: 35 + Math.cos(rad) * 14,
+      y1: 70 + Math.sin(rad) * 14,
+      x2: 35 + Math.cos(rad) * 18,
+      y2: 70 + Math.sin(rad) * 18,
+      stroke: "#b45309",
+      strokeWidth: 1.4,
+      strokeLinecap: "round"
+    });
+  }), React.createElement("rect", {
+    x: 130,
+    y: 50,
+    width: 14,
+    height: 40,
+    fill: "#334155",
+    stroke: "#1e293b",
+    strokeWidth: 1.4
+  }), React.createElement("polygon", {
+    points: "47,62 130,50 255,0 255,140 130,90 47,78",
+    fill: "rgba(51,65,85,0.18)"
+  }), React.createElement("line", {
+    x1: 47,
+    y1: 62,
+    x2: 255,
+    y2: 0,
+    stroke: "#b45309",
+    strokeWidth: 1.1,
+    strokeDasharray: "3 3"
+  }), React.createElement("line", {
+    x1: 47,
+    y1: 78,
+    x2: 255,
+    y2: 140,
+    stroke: "#b45309",
+    strokeWidth: 1.1,
+    strokeDasharray: "3 3"
+  }), React.createElement("line", {
+    x1: 255,
+    y1: 0,
+    x2: 255,
+    y2: 140,
+    stroke: "currentColor",
+    strokeWidth: 2.4
+  }), React.createElement("text", {
+    x: 35,
+    y: 95,
+    fontSize: 10,
+    textAnchor: "middle",
+    fill: "currentColor"
+  }, "source"), React.createElement("text", {
+    x: 137,
+    y: 105,
+    fontSize: 10,
+    textAnchor: "middle",
+    fill: "currentColor"
+  }, "objet"), React.createElement("text", {
+    x: 268,
+    y: 75,
+    fontSize: 10,
+    fill: "currentColor"
+  }, "\xE9cran"), React.createElement("text", {
+    x: 200,
+    y: 75,
+    fontSize: 10.5,
+    textAnchor: "middle",
+    fill: "#1e293b",
+    fontWeight: 700
+  }, "ombre"));
+}
+function Cube3D({
+  cote = 'a'
+}) {
+  const dx = 22,
+    dy = 16;
+  return React.createElement("svg", {
+    viewBox: "0 0 160 140",
+    style: CIRCUIT_SVG_STYLE,
+    role: "img",
+    "aria-label": "Cube de c\xF4t\xE9 a en perspective",
+    "data-schema": "cube-3d"
+  }, React.createElement("path", {
+    d: `M ${40 + dx} ${30 - dy} L ${40 + dx} ${90 - dy} L ${100 + dx} ${90 - dy}`,
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.3,
+    strokeDasharray: "3 3"
+  }), React.createElement("line", {
+    x1: 40,
+    y1: 30,
+    x2: 40 + dx,
+    y2: 30 - dy,
+    stroke: "currentColor",
+    strokeWidth: 1.3,
+    strokeDasharray: "3 3"
+  }), React.createElement("rect", {
+    x: 40,
+    y: 30,
+    width: 60,
+    height: 60,
+    fill: "rgba(199,138,29,0.08)",
+    stroke: "currentColor",
+    strokeWidth: 1.8
+  }), React.createElement("line", {
+    x1: 100,
+    y1: 30,
+    x2: 100 + dx,
+    y2: 30 - dy,
+    stroke: "currentColor",
+    strokeWidth: 1.8
+  }), React.createElement("line", {
+    x1: 100,
+    y1: 90,
+    x2: 100 + dx,
+    y2: 90 - dy,
+    stroke: "currentColor",
+    strokeWidth: 1.8
+  }), React.createElement("line", {
+    x1: 100 + dx,
+    y1: 30 - dy,
+    x2: 100 + dx,
+    y2: 90 - dy,
+    stroke: "currentColor",
+    strokeWidth: 1.8
+  }), React.createElement("text", {
+    x: 70,
+    y: 106,
+    fontSize: 12,
+    textAnchor: "middle",
+    fill: "#b45309",
+    fontStyle: "italic",
+    fontWeight: 600
+  }, cote), React.createElement("text", {
+    x: 80,
+    y: 130,
+    fontSize: 10.5,
+    textAnchor: "middle",
+    fill: "#b45309",
+    fontWeight: 600
+  }, "V = ", cote, "\xB3"));
+}
+function Pave3D() {
+  const dx = 24,
+    dy = 16;
+  return React.createElement("svg", {
+    viewBox: "0 0 180 140",
+    style: CIRCUIT_SVG_STYLE,
+    role: "img",
+    "aria-label": "Pav\xE9 droit de dimensions L, l, h",
+    "data-schema": "pave-3d"
+  }, React.createElement("path", {
+    d: `M ${35 + dx} ${25 - dy} L ${35 + dx} ${80 - dy} L ${125 + dx} ${80 - dy}`,
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.3,
+    strokeDasharray: "3 3"
+  }), React.createElement("line", {
+    x1: 35,
+    y1: 25,
+    x2: 35 + dx,
+    y2: 25 - dy,
+    stroke: "currentColor",
+    strokeWidth: 1.3,
+    strokeDasharray: "3 3"
+  }), React.createElement("rect", {
+    x: 35,
+    y: 25,
+    width: 90,
+    height: 55,
+    fill: "rgba(199,138,29,0.08)",
+    stroke: "currentColor",
+    strokeWidth: 1.8
+  }), React.createElement("line", {
+    x1: 125,
+    y1: 25,
+    x2: 125 + dx,
+    y2: 25 - dy,
+    stroke: "currentColor",
+    strokeWidth: 1.8
+  }), React.createElement("line", {
+    x1: 125,
+    y1: 80,
+    x2: 125 + dx,
+    y2: 80 - dy,
+    stroke: "currentColor",
+    strokeWidth: 1.8
+  }), React.createElement("line", {
+    x1: 125 + dx,
+    y1: 25 - dy,
+    x2: 125 + dx,
+    y2: 80 - dy,
+    stroke: "currentColor",
+    strokeWidth: 1.8
+  }), React.createElement("text", {
+    x: 80,
+    y: 96,
+    fontSize: 11,
+    textAnchor: "middle",
+    fill: "#b45309",
+    fontStyle: "italic",
+    fontWeight: 600
+  }, "L"), React.createElement("text", {
+    x: 28,
+    y: 55,
+    fontSize: 11,
+    textAnchor: "end",
+    fill: "#b45309",
+    fontStyle: "italic",
+    fontWeight: 600
+  }, "h"), React.createElement("text", {
+    x: 142,
+    y: 14,
+    fontSize: 11,
+    fill: "#b45309",
+    fontStyle: "italic",
+    fontWeight: 600
+  }, "l"), React.createElement("text", {
+    x: 88,
+    y: 130,
+    fontSize: 10.5,
+    textAnchor: "middle",
+    fill: "#b45309",
+    fontWeight: 600
+  }, "V = L \xD7 l \xD7 h"));
+}
+function Cylindre3D() {
+  return React.createElement("svg", {
+    viewBox: "0 0 140 150",
+    style: CIRCUIT_SVG_STYLE,
+    role: "img",
+    "aria-label": "Cylindre de rayon r et hauteur h",
+    "data-schema": "cylindre-3d"
+  }, React.createElement("ellipse", {
+    cx: 65,
+    cy: 25,
+    rx: 40,
+    ry: 10,
+    fill: "rgba(199,138,29,0.08)",
+    stroke: "currentColor",
+    strokeWidth: 1.8
+  }), React.createElement("line", {
+    x1: 25,
+    y1: 25,
+    x2: 25,
+    y2: 105,
+    stroke: "currentColor",
+    strokeWidth: 1.8
+  }), React.createElement("line", {
+    x1: 105,
+    y1: 25,
+    x2: 105,
+    y2: 105,
+    stroke: "currentColor",
+    strokeWidth: 1.8
+  }), React.createElement("path", {
+    d: "M 25 105 A 40 10 0 0 0 105 105",
+    fill: "rgba(199,138,29,0.12)",
+    stroke: "currentColor",
+    strokeWidth: 1.8
+  }), React.createElement("path", {
+    d: "M 25 105 A 40 10 0 0 1 105 105",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.3,
+    strokeDasharray: "3 3"
+  }), React.createElement("line", {
+    x1: 65,
+    y1: 25,
+    x2: 105,
+    y2: 25,
+    stroke: "#b45309",
+    strokeWidth: 1.4
+  }), React.createElement("text", {
+    x: 85,
+    y: 20,
+    fontSize: 11,
+    textAnchor: "middle",
+    fill: "#b45309",
+    fontStyle: "italic",
+    fontWeight: 600
+  }, "r"), React.createElement("line", {
+    x1: 120,
+    y1: 25,
+    x2: 120,
+    y2: 105,
+    stroke: "#b45309",
+    strokeWidth: 1.4
+  }), React.createElement("line", {
+    x1: 117,
+    y1: 25,
+    x2: 123,
+    y2: 25,
+    stroke: "#b45309",
+    strokeWidth: 1.4
+  }), React.createElement("line", {
+    x1: 117,
+    y1: 105,
+    x2: 123,
+    y2: 105,
+    stroke: "#b45309",
+    strokeWidth: 1.4
+  }), React.createElement("text", {
+    x: 130,
+    y: 68,
+    fontSize: 11,
+    fill: "#b45309",
+    fontStyle: "italic",
+    fontWeight: 600
+  }, "h"), React.createElement("text", {
+    x: 65,
+    y: 138,
+    fontSize: 10.5,
+    textAnchor: "middle",
+    fill: "#b45309",
+    fontWeight: 600
+  }, "V = \u03C0 r\xB2 h"));
+}
+function Sphere3D() {
+  return React.createElement("svg", {
+    viewBox: "0 0 130 150",
+    style: CIRCUIT_SVG_STYLE,
+    role: "img",
+    "aria-label": "Sph\xE8re de rayon r",
+    "data-schema": "sphere-3d"
+  }, React.createElement("circle", {
+    cx: 65,
+    cy: 65,
+    r: 45,
+    fill: "rgba(199,138,29,0.08)",
+    stroke: "currentColor",
+    strokeWidth: 1.8
+  }), React.createElement("ellipse", {
+    cx: 65,
+    cy: 65,
+    rx: 45,
+    ry: 12,
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.3,
+    strokeDasharray: "3 3"
+  }), React.createElement("path", {
+    d: "M 20 65 A 45 12 0 0 0 110 65",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.6
+  }), React.createElement("line", {
+    x1: 65,
+    y1: 65,
+    x2: 105,
+    y2: 45,
+    stroke: "#b45309",
+    strokeWidth: 1.4
+  }), React.createElement("circle", {
+    cx: 65,
+    cy: 65,
+    r: 2.2,
+    fill: "#b45309"
+  }), React.createElement("text", {
+    x: 88,
+    y: 50,
+    fontSize: 11,
+    fill: "#b45309",
+    fontStyle: "italic",
+    fontWeight: 600
+  }, "r"), React.createElement("text", {
+    x: 65,
+    y: 138,
+    fontSize: 10.5,
+    textAnchor: "middle",
+    fill: "#b45309",
+    fontWeight: 600
+  }, "V = (4/3) \u03C0 r\xB3"));
+}
+function Cone3D() {
+  return React.createElement("svg", {
+    viewBox: "0 0 140 150",
+    style: CIRCUIT_SVG_STYLE,
+    role: "img",
+    "aria-label": "C\xF4ne de rayon r et hauteur h",
+    "data-schema": "cone-3d"
+  }, React.createElement("path", {
+    d: "M 65 15 L 25 105 L 105 105 Z",
+    fill: "rgba(199,138,29,0.08)",
+    stroke: "currentColor",
+    strokeWidth: 1.8,
+    strokeLinejoin: "round"
+  }), React.createElement("path", {
+    d: "M 25 105 A 40 10 0 0 0 105 105",
+    fill: "rgba(199,138,29,0.12)",
+    stroke: "currentColor",
+    strokeWidth: 1.8
+  }), React.createElement("path", {
+    d: "M 25 105 A 40 10 0 0 1 105 105",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.3,
+    strokeDasharray: "3 3"
+  }), React.createElement("line", {
+    x1: 65,
+    y1: 15,
+    x2: 65,
+    y2: 105,
+    stroke: "#b45309",
+    strokeWidth: 1.4,
+    strokeDasharray: "2 3"
+  }), React.createElement("line", {
+    x1: 65,
+    y1: 105,
+    x2: 105,
+    y2: 105,
+    stroke: "#b45309",
+    strokeWidth: 1.4
+  }), React.createElement("text", {
+    x: 58,
+    y: 62,
+    fontSize: 11,
+    textAnchor: "end",
+    fill: "#b45309",
+    fontStyle: "italic",
+    fontWeight: 600
+  }, "h"), React.createElement("text", {
+    x: 85,
+    y: 118,
+    fontSize: 11,
+    textAnchor: "middle",
+    fill: "#b45309",
+    fontStyle: "italic",
+    fontWeight: 600
+  }, "r"), React.createElement("text", {
+    x: 65,
+    y: 138,
+    fontSize: 10.5,
+    textAnchor: "middle",
+    fill: "#b45309",
+    fontWeight: 600
+  }, "V = (1/3) \u03C0 r\xB2 h"));
+}
+function FigureF({
+  cx,
+  cy,
+  sc = 1,
+  extra = '',
+  color = 'currentColor'
+}) {
+  return React.createElement("g", {
+    transform: `translate(${cx},${cy}) scale(${sc}) ${extra}`
+  }, React.createElement("path", {
+    d: "M 0 0 L 12 0 L 12 2 L 2 2 L 2 8 L 8 8 L 8 10 L 2 10 L 2 18 L 0 18 Z",
+    fill: color,
+    stroke: color,
+    strokeWidth: 0.5,
+    strokeLinejoin: "round"
+  }));
+}
+function SymetrieAxiale() {
+  return React.createElement("svg", {
+    viewBox: "0 0 260 140",
+    style: CIRCUIT_SVG_STYLE,
+    role: "img",
+    "aria-label": "Sym\xE9trie axiale : figure et son image par rapport \xE0 un axe vertical",
+    "data-schema": "symetrie-axiale"
+  }, React.createElement("line", {
+    x1: 130,
+    y1: 15,
+    x2: 130,
+    y2: 125,
+    stroke: "#b45309",
+    strokeWidth: 2,
+    strokeDasharray: "5 4"
+  }), React.createElement("text", {
+    x: 130,
+    y: 12,
+    fontSize: 10.5,
+    textAnchor: "middle",
+    fill: "#b45309",
+    fontWeight: 700
+  }, "axe (d)"), React.createElement(FigureF, {
+    cx: 65,
+    cy: 50,
+    sc: 2,
+    color: "#334155"
+  }), React.createElement("text", {
+    x: 77,
+    y: 108,
+    fontSize: 11,
+    textAnchor: "middle",
+    fill: "#334155",
+    fontWeight: 700
+  }, "F"), React.createElement(FigureF, {
+    cx: 195,
+    cy: 50,
+    sc: 2,
+    extra: "scale(-1,1) translate(-12,0)",
+    color: "#b45309"
+  }), React.createElement("text", {
+    x: 183,
+    y: 108,
+    fontSize: 11,
+    textAnchor: "middle",
+    fill: "#b45309",
+    fontWeight: 700
+  }, "F'"), React.createElement("text", {
+    x: 130,
+    y: 135,
+    fontSize: 10.5,
+    textAnchor: "middle",
+    fill: "#b45309",
+    fontWeight: 600
+  }, "l'axe est la m\xE9diatrice de [F F']"));
+}
+function SymetrieCentrale() {
+  return React.createElement("svg", {
+    viewBox: "0 0 260 140",
+    style: CIRCUIT_SVG_STYLE,
+    role: "img",
+    "aria-label": "Sym\xE9trie centrale : figure et son image par rapport \xE0 un centre O",
+    "data-schema": "symetrie-centrale"
+  }, React.createElement("circle", {
+    cx: 130,
+    cy: 70,
+    r: 3,
+    fill: "#b45309"
+  }), React.createElement("text", {
+    x: 138,
+    y: 66,
+    fontSize: 11,
+    fill: "#b45309",
+    fontWeight: 700
+  }, "O"), React.createElement(FigureF, {
+    cx: 60,
+    cy: 28,
+    sc: 1.6,
+    color: "#334155"
+  }), React.createElement("text", {
+    x: 55,
+    y: 75,
+    fontSize: 11,
+    textAnchor: "middle",
+    fill: "#334155",
+    fontWeight: 700
+  }, "F"), React.createElement(FigureF, {
+    cx: 200,
+    cy: 112,
+    sc: 1.6,
+    extra: "rotate(180) translate(-12,-18)",
+    color: "#b45309"
+  }), React.createElement("text", {
+    x: 205,
+    y: 78,
+    fontSize: 11,
+    textAnchor: "middle",
+    fill: "#b45309",
+    fontWeight: 700
+  }, "F'"), React.createElement("line", {
+    x1: 60,
+    y1: 28,
+    x2: 200,
+    y2: 112,
+    stroke: "#b45309",
+    strokeWidth: 1,
+    strokeDasharray: "3 3"
+  }), React.createElement("text", {
+    x: 130,
+    y: 134,
+    fontSize: 10.5,
+    textAnchor: "middle",
+    fill: "#b45309",
+    fontWeight: 600
+  }, "O est le milieu de [F F']"));
+}
+function Translation() {
+  return React.createElement("svg", {
+    viewBox: "0 0 260 140",
+    style: CIRCUIT_SVG_STYLE,
+    role: "img",
+    "aria-label": "Translation : figure et son image par un vecteur",
+    "data-schema": "translation"
+  }, React.createElement(FigureF, {
+    cx: 40,
+    cy: 50,
+    sc: 1.8,
+    color: "#334155"
+  }), React.createElement("text", {
+    x: 50,
+    y: 100,
+    fontSize: 11,
+    textAnchor: "middle",
+    fill: "#334155",
+    fontWeight: 700
+  }, "F"), React.createElement("defs", null, React.createElement("marker", {
+    id: "arrT",
+    markerWidth: 8,
+    markerHeight: 8,
+    refX: 7,
+    refY: 4,
+    orient: "auto"
+  }, React.createElement("polygon", {
+    points: "0,0 8,4 0,8",
+    fill: "#b45309"
+  }))), React.createElement("line", {
+    x1: 70,
+    y1: 60,
+    x2: 175,
+    y2: 60,
+    stroke: "#b45309",
+    strokeWidth: 2.2,
+    markerEnd: "url(#arrT)"
+  }), React.createElement("text", {
+    x: 125,
+    y: 54,
+    fontSize: 11,
+    textAnchor: "middle",
+    fill: "#b45309",
+    fontStyle: "italic",
+    fontWeight: 700
+  }, "vecteur u"), React.createElement(FigureF, {
+    cx: 195,
+    cy: 50,
+    sc: 1.8,
+    color: "#b45309"
+  }), React.createElement("text", {
+    x: 205,
+    y: 100,
+    fontSize: 11,
+    textAnchor: "middle",
+    fill: "#b45309",
+    fontWeight: 700
+  }, "F'"), React.createElement("text", {
+    x: 130,
+    y: 132,
+    fontSize: 10.5,
+    textAnchor: "middle",
+    fill: "#b45309",
+    fontWeight: 600
+  }, "m\xEAme direction, sens, longueur"));
+}
 window.CircuitKit = {
   Fil,
   Pile,
@@ -2388,7 +3091,17 @@ window.CircuitKit = {
   TriangleRectangle,
   ConfigThales,
   TriangleTrigo,
-  GrapheAffine
+  GrapheAffine,
+  PropagationRectiligne,
+  OmbreSchema,
+  Cube3D,
+  Pave3D,
+  Cylindre3D,
+  Sphere3D,
+  Cone3D,
+  SymetrieAxiale,
+  SymetrieCentrale,
+  Translation
 };
 window.ALL_QUIZZES['geo-3'] = {
   SEARCH_SITES: 'site:lelivrescolaire.fr OR site:lumni.fr',
@@ -25459,7 +26172,17 @@ window.ALL_QUIZZES['svt-6'] = {
     TriangleRectangle,
     ConfigThales,
     TriangleTrigo,
-    GrapheAffine
+    GrapheAffine,
+    PropagationRectiligne,
+    OmbreSchema,
+    Cube3D,
+    Pave3D,
+    Cylindre3D,
+    Sphere3D,
+    Cone3D,
+    SymetrieAxiale,
+    SymetrieCentrale,
+    Translation
   } = window.CircuitKit;
   const MEMO_BANK = {
     relatifs: ['Règle des signes : + × + = + ; − × − = + ; + × − = −', 'Opposé de n : même valeur, signe contraire', 'Soustraire c\'est ajouter l\'opposé : a − b = a + (−b)'],
@@ -25478,25 +26201,41 @@ window.ALL_QUIZZES['svt-6'] = {
     grandeurs: ['V cube = a³ · V pavé = L × l × h · V cylindre = π r² h · V pyramide/cône = B × h / 3', 'v = d / t (distance ÷ temps)', '1 L = 1 dm³ = 1000 cm³ ; attention : 1h30 = 1,5h'],
     proportion: ['Produit en croix : si a/b = c/d alors a×d = b×c', 'x % de N = x/100 × N', 'Réduction de 20 % = multiplier par 0,80 ; augmentation de 20 % = ×1,20'],
     probas: ['P(A) = cas favorables / cas possibles (entre 0 et 1)', 'Moyenne = somme / nombre de valeurs', 'Médiane = valeur centrale d\'une série triée'],
-    transfo: ['Symétrie centrale : O milieu de [AA\'] — conserve longueurs et angles', 'Symétrie axiale : l\'axe est la médiatrice de [AA\']', 'Translation : même direction, même sens, même longueur'],
+    transfo: ['📐 Symétrie axiale : on plie la feuille le long de l\'axe, figure et image se superposent. L\'axe est la médiatrice de [AA\'].', React.createElement(SymetrieAxiale, {
+      key: "schema-sax"
+    }), '🔄 Symétrie centrale : rotation de 180° autour d\'un point O. O est le milieu de chaque segment [AA\'].', React.createElement(SymetrieCentrale, {
+      key: "schema-scent"
+    }), '➡️ Translation : on décale la figure selon un vecteur (même direction, même sens, même longueur).', React.createElement(Translation, {
+      key: "schema-trans"
+    }), '✨ Ces 3 transformations conservent les longueurs, les angles et les aires.'],
     arithmetique: ['PGCD par algorithme d\'Euclide : pgcd(a,b) = pgcd(b, a mod b)', 'Fraction irréductible : simplifier par le PGCD', 'Premiers entre eux ⇔ PGCD = 1'],
     remarquables: ['(a + b)² = a² + 2ab + b²', '(a − b)² = a² − 2ab + b²', '(a + b)(a − b) = a² − b²'],
     equations: ['Isoler x des deux côtés, faire passer les x à gauche, les nombres à droite', 'Équation produit nul : (A)(B) = 0 ⇔ A = 0 OU B = 0', 'Inéquation : multiplier/diviser par négatif INVERSE le sens'],
     fonctions: ['Fonction affine : f(x) = a·x + b. Sa courbe est une DROITE dans un repère.', React.createElement(GrapheAffine, {
       key: "schema-affine"
     }), '📐 a = pente (inclinaison de la droite) · b = ordonnée à l\'origine (là où la droite coupe l\'axe y).', 'Fonction linéaire = cas particulier avec b = 0 : la droite passe par l\'origine (0, 0).', '🔑 Image de x : on calcule f(x) — lecture verticale sur le graphe.', '🔑 Antécédent de y : on résout f(x) = y — lecture horizontale, puis on redescend sur l\'axe x.'],
-    geomespace: ['V sphère = (4/3) π r³', 'V cône = V pyramide = (B × h) / 3', 'Agrandissement k : longueurs ×k, aires ×k², volumes ×k³'],
+    geomespace: ['V sphère = (4/3) π r³.', React.createElement(Sphere3D, {
+      key: "schema-sphere"
+    }), 'V cône = V pyramide = (B × h) / 3.', React.createElement(Cone3D, {
+      key: "schema-cone"
+    }), '🔎 Agrandissement de rapport k : longueurs ×k, aires ×k², volumes ×k³.'],
     stats: ['Médiane : valeur du milieu (série triée)', 'Étendue = max − min', 'Fréquence = effectif / total (souvent en %)'],
     numeration: ['Positions : unités / dizaines / centaines / milliers · puis dixièmes / centièmes / millièmes après la virgule', 'Pour comparer : aligner les virgules et compléter par des 0 si besoin', '12,5 = 12,50 (on peut ajouter des zéros à droite de la partie décimale)'],
     operations: ['Priorités : parenthèses, puis × et ÷, puis + et −', 'Division euclidienne : a = b × q + r avec 0 ≤ r < b'],
     angles: ['Aigu < 90° ; Droit = 90° ; Obtus entre 90° et 180° ; Plat = 180°', 'Somme des angles d\'un triangle = 180°', 'Rapporteur : aligner le 0 sur un côté'],
     geometrie: ['Équilatéral : 3 côtés égaux + 3 angles de 60°', 'Isocèle : 2 côtés égaux + 2 angles égaux à la base', 'Carré : 4 côtés égaux + 4 angles droits'],
     aires: ['P_rectangle = 2(L + l) ; A_rectangle = L × l', 'A_carré = côté × côté ; A_triangle = (base × hauteur) / 2', 'A_disque = π r² ; P_cercle = 2π r'],
-    symetrie: ['Axe de symétrie : l\'image et la figure coïncident quand on plie', 'Rectangle : 2 axes ; Carré : 4 axes ; Cercle : infinité'],
+    symetrie: ['Axe de symétrie : en pliant la feuille le long de l\'axe, la figure et son image se superposent.', React.createElement(SymetrieAxiale, {
+      key: "schema-sym6"
+    }), 'Rectangle : 2 axes · Carré : 4 axes · Cercle : infinité d\'axes (tous les diamètres).'],
     unites: ['km · hm · dam · m · dm · cm · mm (×10 à chaque pas)', '1 kg = 1000 g · 1 L = 100 cL = 1000 mL', '1h30 = 1,5 h (pas 1,3 !)'],
     triangles: ['Somme des angles = 180°', 'Inégalité triangulaire : le plus grand côté < somme des 2 autres', 'Isocèle : 2 côtés + 2 angles à la base égaux'],
     parallelog: ['2 paires de côtés parallèles + opposés égaux', 'Diagonales se coupent en leur milieu', 'Losange : 4 côtés égaux. Rectangle : 4 angles droits. Carré : les deux'],
-    volumes: ['V prisme droit = B × h (B = aire de la base)', 'V cylindre = π r² h', '1 L = 1 dm³ = 1000 cm³'],
+    volumes: ['V prisme droit = B × h (B = aire de la base).', 'V pavé = L × l × h.', React.createElement(Pave3D, {
+      key: "schema-pave"
+    }), 'V cylindre = π r² h.', React.createElement(Cylindre3D, {
+      key: "schema-cyl"
+    }), '1 L = 1 dm³ = 1000 cm³. Attention aux unités : toujours tout convertir dans la même unité avant de calculer.'],
     electricite: ['💧 Analogie eau : la tension U = différence de pression (dénivelé qui pousse l\'eau), l\'intensité I = débit (quantité qui passe par seconde), la résistance R = étranglement du tuyau. La pile = pompe qui maintient la pression.', '🔗 Circuit en série (un seul chemin) : l\'eau traverse chaque étranglement à la suite — même débit partout, et chaque étranglement "mange" de la pression.', React.createElement(CircuitSerie, {
       key: "schema-serie"
     }), '🔀 Circuit en dérivation (plusieurs chemins) : l\'eau se partage entre les branches qui ont le même dénivelé aux bornes — même tension, et les débits s\'additionnent.', React.createElement(CircuitParallele, {
@@ -25505,7 +26244,11 @@ window.ALL_QUIZZES['svt-6'] = {
     loiOhm: ['💧 Rappel analogie eau : U = pression (le dénivelé qui pousse), I = débit (ce qui passe), R = étranglement du tuyau.', '📐 Loi d\'Ohm : U = R × I (U en volts V, R en ohms Ω, I en ampères A).', '🧠 En eau : pression = étranglement × débit. Pour un même tuyau, plus tu pousses fort, plus ça coule.', '🔄 Les 3 formulations : U = R × I · I = U / R · R = U / I (triangle magique, on cache ce qu\'on cherche).', '📈 Effet U fixée, R qui double → I divisé par 2 (tuyau plus étroit, même pression, moitié moins de débit).', '📉 Effet R fixée, U qui double → I qui double (même tuyau, 2× plus de pression, 2× plus de débit).', '📊 Conducteur ohmique : la courbe U = f(I) est une droite qui passe par l\'origine, de pente R.', React.createElement(GrapheOhm, {
       key: "graphe-ohm"
     })],
-    optique: ['Lumière = ligne droite dans un milieu transparent homogène', 'c ≈ 300 000 km/s = 3 × 10⁸ m/s', 'Source primaire (émet) vs secondaire (diffuse)'],
+    optique: ['💡 Dans un milieu transparent homogène, la lumière se propage en ligne droite.', React.createElement(PropagationRectiligne, {
+      key: "schema-prop"
+    }), 'Vitesse : c ≈ 300 000 km/s = 3 × 10⁸ m/s (même dans le vide).', 'Source primaire : produit sa lumière (Soleil, lampe). Source secondaire : la diffuse (Lune, papier).', '🌑 Ombre = zone où la lumière est bloquée par un objet opaque.', React.createElement(OmbreSchema, {
+      key: "schema-ombre"
+    })],
     couleurs: ['Additive (lumières RVB) : R+V = jaune, R+V+B = blanc', 'Soustractive (peinture CMJ) : cyan-magenta-jaune', 'Objet rouge en lumière verte → paraît noir'],
     matiere: ['ρ = m / V (g/cm³ ou kg/m³) · eau = 1 g/cm³', 'ρ_obj < ρ_eau → flotte', 'Conservation de la masse aux changements d\'état'],
     atomes: ['Atome = noyau (protons + neutrons) + électrons', 'Ion = atome ayant gagné ou perdu des électrons', 'Molécules usuelles : H₂O, CO₂, O₂, N₂'],

@@ -2420,6 +2420,71 @@ function App() {
   if (screen === 'fiche')  return <FicheReviseScreen student={student} onBack={() => setScreen('report')} />;
   return null;
 }
+// Construit une config composite "Brevet blanc 3ème" à la volée : merge des
+// quizzes maths/physique/svt/histoire/geo-3, sélection pondérée pour totaliser
+// 30 questions réparties selon les coefficients brevet (maths fort, sciences
+// et hist-géo plus modestes). Préfixe les clés de domaines avec la source
+// pour éviter les collisions (ex maths3__arithmetique).
+function buildBrevetBlancConfig(): QuizConfig | null {
+  const sources = [
+    { key: 'maths-3',    prefix: 'm3_', pick: 10, label: 'Maths' },
+    { key: 'physique-3', prefix: 'p3_', pick: 6,  label: 'Physique' },
+    { key: 'svt-3',      prefix: 's3_', pick: 6,  label: 'SVT' },
+    { key: 'histoire-3', prefix: 'h3_', pick: 5,  label: 'Histoire' },
+    { key: 'geo-3',      prefix: 'g3_', pick: 3,  label: 'Géo' },
+  ];
+  const DOMAINS: Record<string, Domain> = {};
+  const POOL: Record<string, SourceQuestion[]> = {};
+  const PICK: Record<string, number> = {};
+  const PLANS: Record<string, any> = {};
+  for (const s of sources) {
+    const src = (window as any).ALL_QUIZZES[s.key];
+    if (!src) return null;
+    const domIds = Object.keys(src.DOMAINS);
+    // Répartit s.pick questions sur les domaines du quiz, proportionnellement à leur PICK originel.
+    const totalOrigPick = domIds.reduce((sum, d) => sum + (src.PICK[d] || 0), 0) || 1;
+    let allocated = 0;
+    const picks: Record<string, number> = {};
+    domIds.forEach((d, i) => {
+      const share = Math.max(1, Math.round(s.pick * (src.PICK[d] || 1) / totalOrigPick));
+      // Garantir qu'on ne dépasse pas s.pick total, le dernier domaine compense.
+      const left = s.pick - allocated - (domIds.length - 1 - i);
+      picks[d] = Math.min(share, Math.max(0, left));
+      allocated += picks[d];
+    });
+    for (const d of domIds) {
+      if (picks[d] <= 0) continue;
+      const newId = s.prefix + d;
+      const origDom = src.DOMAINS[d];
+      DOMAINS[newId] = { ...origDom, id: newId, name: `${s.label} · ${origDom.name}`, coef: origDom.coef, icon: origDom.icon, color: origDom.color, short: `${s.label.slice(0,3)} ${origDom.short || origDom.name.slice(0,10)}` };
+      POOL[newId] = src.POOL[d] || [];
+      PICK[newId] = Math.min(picks[d], (src.POOL[d] || []).length);
+      if (src.PLANS && src.PLANS[d]) PLANS[newId] = src.PLANS[d];
+    }
+  }
+  return {
+    SUBJECT: { id: 'brevet-blanc', name: 'Brevet blanc', short: 'Brevet blanc', level: '3ème', mark: '🎓', tagline: 'Simulation examen' } as any,
+    DOMAINS,
+    POOL,
+    PICK,
+    PLANS,
+    RESOURCES: [],
+    SEARCH_SITES: 'site:fr.khanacademy.org OR site:lumni.fr',
+    YT_SUFFIX: 'brevet',
+    SUMMER_TOPIC: 'brevet',
+  } as any;
+}
+
+// Expose un mounter dédié : construit le config composite si pas encore fait, puis mount normal.
+(window as any).mountBrevetBlanc = function() {
+  if (!(window as any).ALL_QUIZZES['brevet-blanc']) {
+    const cfg = buildBrevetBlancConfig();
+    if (!cfg) { console.warn('brevet-blanc : quiz 3e manquants'); return; }
+    (window as any).ALL_QUIZZES['brevet-blanc'] = cfg;
+  }
+  (window as any).mountQuizApp('brevet-blanc');
+};
+
 // Montage dynamique — l'index.html appelle mountQuizApp(key, {reportAt}) quand la route change.
 let quizRoot = null;
 let initialReportAt = null;

@@ -722,6 +722,19 @@ window.addEventListener('error', function(ev) {
       </div>
     </div>
 
+    <!-- CTA Brevet blanc (affiché seulement si niveau 3ème actif) -->
+    <div id="dash-brevet-cta" style="display:none; margin-bottom: 24px;">
+      <a href="#/brevet-blanc" style="display:flex; align-items:center; gap:14px; padding:16px 18px; background:linear-gradient(135deg, rgba(184,50,61,0.08), rgba(199,138,29,0.10)); border:1.5px solid rgba(184,50,61,0.35); border-radius:12px; text-decoration:none; color:var(--ink); font-family:inherit;">
+        <span style="width:44px; height:44px; display:inline-flex; align-items:center; justify-content:center; border-radius:10px; background:var(--accent); color:var(--paper); font-size:22px; flex-shrink:0;">🎓</span>
+        <span style="flex:1; min-width:0;">
+          <span style="display:block; font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:var(--accent); margin-bottom:2px;">Simulation</span>
+          <span style="display:block; font-weight:700; font-size:16px;">Brevet blanc 3ème</span>
+          <span style="display:block; font-size:13px; color:var(--muted); margin-top:2px;">30 questions sur 5 matières (maths, physique, SVT, histoire, géo) dans les conditions du brevet.</span>
+        </span>
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style="color:var(--accent); flex-shrink:0;"><path d="M6 4l6 5-6 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+
     <!-- Recommandation intelligente -->
     <div id="dash-reco" style="display:none; margin-bottom: 24px;"></div>
 
@@ -975,6 +988,7 @@ function parseHash(h) {
   if (s === '/niveau')    return { step: 'level' };
   if (s === '/dashboard') return { step: 'results' };
   if (s === '/apropos')   return { step: 'apropos' };
+  if (s === '/brevet-blanc') return { step: 'brevet-blanc' };
   // Match : /5eme  |  /5eme/maths  |  /5eme/maths/report/<ISOdate>
   const m = s.match(/^\/([3-6])eme(?:\/(maths|physique|svt|histoire|geo)(?:\/report\/(.+))?)?\/?$/);
   if (!m) return null;
@@ -1050,6 +1064,12 @@ window.addEventListener('hashchange', () => {
     showQuiz(r.level, r.subject, r.reportAt);
     return;
   }
+  // Route spéciale : simulation brevet blanc 3ème (mount composite)
+  if (r.step === 'brevet-blanc') {
+    if (!getActive()) { showStep('name', true); return; }
+    showQuizBrevetBlanc();
+    return;
+  }
   // Prérequis : pseudo obligatoire pour level/subject/results, niveau pour subject
   // (apropos est accessible sans pseudo — page d'info)
   if (r.step !== 'name' && r.step !== 'apropos' && !getActive()) { showStep('name', true); return; }
@@ -1061,6 +1081,20 @@ window.addEventListener('hashchange', () => {
   }
   showStep(r.step, true);
 });
+
+function showQuizBrevetBlanc() {
+  const wiz = document.getElementById('wizard-container');
+  if (wiz) wiz.style.display = 'none';
+  const el = document.getElementById('root');
+  if (el) el.style.display = '';
+  document.title = 'Brevet blanc 3ème — Quiz Collège';
+  if (window.mountBrevetBlanc) {
+    window.mountBrevetBlanc();
+  } else {
+    // Si app.tsx pas encore compilé, on met en queue
+    window.__pendingQuizMount = { key: 'brevet-blanc', options: {} };
+  }
+}
 
 function decideStep() {
   const active = getActive();
@@ -1297,6 +1331,10 @@ function renderResults() {
   document.getElementById('results-desc').textContent = attempts.length === 0
     ? `Tu n'as encore passé aucun test. Dès ton premier quiz, ta progression apparaîtra ici.`
     : `Un récap de tous les tests que tu as passés sur cet appareil, toutes matières et tous niveaux confondus.`;
+
+  // CTA Brevet blanc : visible seulement si l'élève est en 3ème (via LEVEL_KEY)
+  const brevetCta = document.getElementById('dash-brevet-cta');
+  if (brevetCta) brevetCta.style.display = (getLevel() === 3) ? 'block' : 'none';
 
   document.getElementById('dash-tests').textContent = attempts.length;
   document.getElementById('dash-avg').textContent   = attempts.length ? (attempts.reduce((s,a)=>s+a.note,0)/attempts.length).toFixed(1) : '—';
@@ -1600,6 +1638,11 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   if (r.step === 'quiz') {
     setLevel(r.level);
     showQuiz(r.level, r.subject, r.reportAt);
+    return;
+  }
+  if (r.step === 'brevet-blanc') {
+    if (!getActive()) { decideStep(); return; }
+    showQuizBrevetBlanc();
     return;
   }
   if (r.step !== 'name' && r.step !== 'apropos' && !getActive()) { decideStep(); return; }
@@ -30063,6 +30106,98 @@ window.ALL_QUIZZES['svt-6'] = {
     });
     return null;
   }
+  function buildBrevetBlancConfig() {
+    const sources = [{
+      key: 'maths-3',
+      prefix: 'm3_',
+      pick: 10,
+      label: 'Maths'
+    }, {
+      key: 'physique-3',
+      prefix: 'p3_',
+      pick: 6,
+      label: 'Physique'
+    }, {
+      key: 'svt-3',
+      prefix: 's3_',
+      pick: 6,
+      label: 'SVT'
+    }, {
+      key: 'histoire-3',
+      prefix: 'h3_',
+      pick: 5,
+      label: 'Histoire'
+    }, {
+      key: 'geo-3',
+      prefix: 'g3_',
+      pick: 3,
+      label: 'Géo'
+    }];
+    const DOMAINS = {};
+    const POOL = {};
+    const PICK = {};
+    const PLANS = {};
+    for (const s of sources) {
+      const src = window.ALL_QUIZZES[s.key];
+      if (!src) return null;
+      const domIds = Object.keys(src.DOMAINS);
+      const totalOrigPick = domIds.reduce((sum, d) => sum + (src.PICK[d] || 0), 0) || 1;
+      let allocated = 0;
+      const picks = {};
+      domIds.forEach((d, i) => {
+        const share = Math.max(1, Math.round(s.pick * (src.PICK[d] || 1) / totalOrigPick));
+        const left = s.pick - allocated - (domIds.length - 1 - i);
+        picks[d] = Math.min(share, Math.max(0, left));
+        allocated += picks[d];
+      });
+      for (const d of domIds) {
+        if (picks[d] <= 0) continue;
+        const newId = s.prefix + d;
+        const origDom = src.DOMAINS[d];
+        DOMAINS[newId] = {
+          ...origDom,
+          id: newId,
+          name: `${s.label} · ${origDom.name}`,
+          coef: origDom.coef,
+          icon: origDom.icon,
+          color: origDom.color,
+          short: `${s.label.slice(0, 3)} ${origDom.short || origDom.name.slice(0, 10)}`
+        };
+        POOL[newId] = src.POOL[d] || [];
+        PICK[newId] = Math.min(picks[d], (src.POOL[d] || []).length);
+        if (src.PLANS && src.PLANS[d]) PLANS[newId] = src.PLANS[d];
+      }
+    }
+    return {
+      SUBJECT: {
+        id: 'brevet-blanc',
+        name: 'Brevet blanc',
+        short: 'Brevet blanc',
+        level: '3ème',
+        mark: '🎓',
+        tagline: 'Simulation examen'
+      },
+      DOMAINS,
+      POOL,
+      PICK,
+      PLANS,
+      RESOURCES: [],
+      SEARCH_SITES: 'site:fr.khanacademy.org OR site:lumni.fr',
+      YT_SUFFIX: 'brevet',
+      SUMMER_TOPIC: 'brevet'
+    };
+  }
+  window.mountBrevetBlanc = function () {
+    if (!window.ALL_QUIZZES['brevet-blanc']) {
+      const cfg = buildBrevetBlancConfig();
+      if (!cfg) {
+        console.warn('brevet-blanc : quiz 3e manquants');
+        return;
+      }
+      window.ALL_QUIZZES['brevet-blanc'] = cfg;
+    }
+    window.mountQuizApp('brevet-blanc');
+  };
   let quizRoot = null;
   let initialReportAt = null;
   window.mountQuizApp = function (key, options) {

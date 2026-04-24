@@ -666,6 +666,29 @@ test.describe('Parcours utilisateur', () => {
     }
   });
 
+  test('brevet blanc : CTA visible en 3ème, composite se monte sans erreur', async ({ page }) => {
+    await completeWizard(page, 'Lola Brevet', '3ème');
+    // Retour au dashboard pour voir le CTA
+    await page.goto(BASE + '/index.html#/dashboard');
+    await page.waitForTimeout(800);
+    await expect(page.locator('#dash-brevet-cta')).toBeVisible();
+    // Clic sur le CTA → mount composite
+    await page.locator('#dash-brevet-cta a').click();
+    await page.waitForTimeout(2500);
+    // Le root React doit être monté et contenir du texte "Brevet blanc" ou équivalent
+    const rootText = await page.locator('#root').textContent();
+    expect(rootText && rootText.length > 50, 'root vide après mount brevet blanc').toBeTruthy();
+    // URL contient brevet-blanc
+    expect(page.url()).toMatch(/brevet-blanc/);
+  });
+
+  test('brevet blanc : CTA caché pour les niveaux autres que 3ème', async ({ page }) => {
+    await completeWizard(page, 'Zoé Sixième', '6ème');
+    await page.goto(BASE + '/index.html#/dashboard');
+    await page.waitForTimeout(800);
+    await expect(page.locator('#dash-brevet-cta')).toBeHidden();
+  });
+
   test('transition quiz A → wizard → quiz B sans remount foireux', async ({ page }) => {
     // Stress-test de l'unmount/remount du React app entre deux quizzes différents.
     await completeWizard(page, 'Henri Transition', '5ème');

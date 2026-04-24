@@ -782,9 +782,9 @@ window.ALL_QUIZZES['maths-3'] = {
       { key:'fon-3', q:'La représentation graphique d\'une fonction linéaire est :',
         options:['Une courbe','Une droite passant par l\'origine','Une droite quelconque','Un cercle'], correct:1,
         hint:'Linéaire f(x)=ax → droite passant par (0,0).' },
-      { key:'fon-4', q:'La représentation graphique d\'une fonction affine f(x) = ax + b est :',
-        options:['Une droite d\'ordonnée à l\'origine b','Toujours passant par l\'origine','Une parabole','Une hyperbole'], correct:0,
-        hint:'Affine : droite, passe par (0, b).' },
+      { key:'fon-4', q:<>Ce graphe représente une fonction affine f(x) = a·x + b. Que lit-on directement ?<GrapheAffine /></>,
+        options:['Une droite d\'ordonnée à l\'origine b','La courbe passe toujours par l\'origine','Une parabole','Une hyperbole'], correct:0,
+        hint:'Affine : droite. Elle coupe l\'axe des y en (0, b) — visible sur le graphe.' },
       { key:'fon-5', gen: (rnd) => {
         const a = 1 + Math.floor(rnd() * 5);
         const b = -(1 + Math.floor(rnd() * 8));
@@ -1188,10 +1188,10 @@ window.ALL_QUIZZES['maths-3'] = {
     ],
 
     trigo: [
-      { key:'tri-1', q:'Dans un triangle rectangle, le sinus d\'un angle aigu est :',
+      { key:'tri-1', q:<>Dans ce triangle rectangle, le sinus de l'angle <i>x</i> est :<TriangleTrigo /></>,
         options:[<F n="opposé" d="hypoténuse"/>, <F n="adjacent" d="hypoténuse"/>, <F n="opposé" d="adjacent"/>, <F n="adjacent" d="opposé"/>], correct:0,
         hint:'SOH CAH TOA : Sin = Opposé/Hyp.' },
-      { key:'tri-2', q:'Le tangent d\'un angle aigu dans un triangle rectangle est :',
+      { key:'tri-2', q:<>Dans ce triangle rectangle, la tangente de l'angle <i>x</i> est :<TriangleTrigo /></>,
         options:[<F n="opposé" d="hypoténuse"/>, <F n="opposé" d="adjacent"/>, <F n="adjacent" d="opposé"/>, <F n="hypoténuse" d="adjacent"/>], correct:1,
         hint:'TOA : Tan = Opposé / Adjacent.' },
       { key:'tri-3', gen: (rnd) => {

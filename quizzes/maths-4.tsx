@@ -1081,9 +1081,9 @@ window.ALL_QUIZZES['maths-4'] = {
         hint: `c² = ${c}² − ${known}² = ${c*c} − ${known*known} = ${missing*missing} → c = ${missing} cm.`,
       };
     }},
-    { key:'pyt-4', q:'Dans un triangle rectangle, l\'hypoténuse est :',
-      options:['Le côté le plus court','Le côté opposé à l\'angle droit','N\'importe quel côté','Le côté vertical'], correct:1,
-      hint:'Hypoténuse = côté opposé à l\'angle droit, le plus long.' },
+    { key:'pyt-4', q:<>Sur ce triangle rectangle en A, l'hypoténuse est :<TriangleRectangle /></>,
+      options:['Le côté AB','Le côté BC (opposé à l\'angle droit)','Le côté AC','N\'importe lequel'], correct:1,
+      hint:'Hypoténuse = côté opposé à l\'angle droit (ici en A), le plus long. C\'est BC.' },
     { key:'pyt-5', gen: (rnd) => {
       const TRIPLETS = [[3,4,5],[5,12,13],[8,15,17],[7,24,25],[9,12,15],[6,8,10],[15,20,25],[10,24,26],[20,21,29]];
       const [a0, b0, c0] = TRIPLETS[Math.floor(rnd() * TRIPLETS.length)];
@@ -1172,7 +1172,7 @@ window.ALL_QUIZZES['maths-4'] = {
         hint: `AM/AB = AN/AC → ${AM}/${AB} = ${AN}/AC → AC = ${AN} × ${AB}/${AM} = ${AC}.`,
       };
     }},
-    { key:'tha-2', q:'Le théorème de Thalès permet de :',
+    { key:'tha-2', q:<>Dans la configuration ci-dessous, le théorème de Thalès permet de :<ConfigThales /></>,
       options:['Calculer une aire','Calculer des longueurs (droites parallèles)','Calculer un angle','Démontrer qu\'un triangle est isocèle'], correct:1,
       hint:'Thalès = longueurs dans une configuration avec droites parallèles.' },
     { key:'tha-3', gen: (rnd) => {
@@ -1197,8 +1197,8 @@ window.ALL_QUIZZES['maths-4'] = {
         hint: `AM/AB = MN/BC → ${AM}/${AB} = ${MN}/BC → BC = ${MN} × ${factor} = ${BC}.`,
       };
     }},
-    { key:'tha-4', q:'Pour appliquer Thalès il faut impérativement :',
-      options:['Un triangle rectangle','Deux droites parallèles et sécantes à deux autres droites','Un cercle','Deux angles égaux'], correct:1,
+    { key:'tha-4', q:<>Pour que le théorème de Thalès s'applique dans cette configuration, il faut :<ConfigThales /></>,
+      options:['Un triangle rectangle','Deux droites parallèles (MN et BC) coupées par deux sécantes','Un cercle','Deux angles égaux'], correct:1,
       hint:'La configuration repose sur deux parallèles coupées par deux sécantes concourantes.' },
     { key:'tha-5', gen: (rnd) => {
       const AM = 2 + Math.floor(rnd() * 5);

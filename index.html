@@ -8804,10 +8804,10 @@ window.ALL_QUIZZES['maths-3'] = {
       hint: 'Linéaire f(x)=ax → droite passant par (0,0).'
     }, {
       key: 'fon-4',
-      q: 'La représentation graphique d\'une fonction affine f(x) = ax + b est :',
-      options: ['Une droite d\'ordonnée à l\'origine b', 'Toujours passant par l\'origine', 'Une parabole', 'Une hyperbole'],
+      q: React.createElement(React.Fragment, null, "Ce graphe repr\xE9sente une fonction affine f(x) = a\xB7x + b. Que lit-on directement ?", React.createElement(GrapheAffine, null)),
+      options: ['Une droite d\'ordonnée à l\'origine b', 'La courbe passe toujours par l\'origine', 'Une parabole', 'Une hyperbole'],
       correct: 0,
-      hint: 'Affine : droite, passe par (0, b).'
+      hint: 'Affine : droite. Elle coupe l\'axe des y en (0, b) — visible sur le graphe.'
     }, {
       key: 'fon-5',
       gen: rnd => {
@@ -9238,7 +9238,7 @@ window.ALL_QUIZZES['maths-3'] = {
     }],
     trigo: [{
       key: 'tri-1',
-      q: 'Dans un triangle rectangle, le sinus d\'un angle aigu est :',
+      q: React.createElement(React.Fragment, null, "Dans ce triangle rectangle, le sinus de l'angle ", React.createElement("i", null, "x"), " est :", React.createElement(TriangleTrigo, null)),
       options: [React.createElement(F, {
         n: "oppos\xE9",
         d: "hypot\xE9nuse"
@@ -9256,7 +9256,7 @@ window.ALL_QUIZZES['maths-3'] = {
       hint: 'SOH CAH TOA : Sin = Opposé/Hyp.'
     }, {
       key: 'tri-2',
-      q: 'Le tangent d\'un angle aigu dans un triangle rectangle est :',
+      q: React.createElement(React.Fragment, null, "Dans ce triangle rectangle, la tangente de l'angle ", React.createElement("i", null, "x"), " est :", React.createElement(TriangleTrigo, null)),
       options: [React.createElement(F, {
         n: "oppos\xE9",
         d: "hypot\xE9nuse"
@@ -11287,10 +11287,10 @@ window.ALL_QUIZZES['maths-4'] = {
       }
     }, {
       key: 'pyt-4',
-      q: 'Dans un triangle rectangle, l\'hypoténuse est :',
-      options: ['Le côté le plus court', 'Le côté opposé à l\'angle droit', 'N\'importe quel côté', 'Le côté vertical'],
+      q: React.createElement(React.Fragment, null, "Sur ce triangle rectangle en A, l'hypot\xE9nuse est :", React.createElement(TriangleRectangle, null)),
+      options: ['Le côté AB', 'Le côté BC (opposé à l\'angle droit)', 'Le côté AC', 'N\'importe lequel'],
       correct: 1,
-      hint: 'Hypoténuse = côté opposé à l\'angle droit, le plus long.'
+      hint: 'Hypoténuse = côté opposé à l\'angle droit (ici en A), le plus long. C\'est BC.'
     }, {
       key: 'pyt-5',
       gen: rnd => {
@@ -11392,7 +11392,7 @@ window.ALL_QUIZZES['maths-4'] = {
       }
     }, {
       key: 'tha-2',
-      q: 'Le théorème de Thalès permet de :',
+      q: React.createElement(React.Fragment, null, "Dans la configuration ci-dessous, le th\xE9or\xE8me de Thal\xE8s permet de :", React.createElement(ConfigThales, null)),
       options: ['Calculer une aire', 'Calculer des longueurs (droites parallèles)', 'Calculer un angle', 'Démontrer qu\'un triangle est isocèle'],
       correct: 1,
       hint: 'Thalès = longueurs dans une configuration avec droites parallèles.'
@@ -11423,8 +11423,8 @@ window.ALL_QUIZZES['maths-4'] = {
       }
     }, {
       key: 'tha-4',
-      q: 'Pour appliquer Thalès il faut impérativement :',
-      options: ['Un triangle rectangle', 'Deux droites parallèles et sécantes à deux autres droites', 'Un cercle', 'Deux angles égaux'],
+      q: React.createElement(React.Fragment, null, "Pour que le th\xE9or\xE8me de Thal\xE8s s'applique dans cette configuration, il faut :", React.createElement(ConfigThales, null)),
+      options: ['Un triangle rectangle', 'Deux droites parallèles (MN et BC) coupées par deux sécantes', 'Un cercle', 'Deux angles égaux'],
       correct: 1,
       hint: 'La configuration repose sur deux parallèles coupées par deux sécantes concourantes.'
     }, {

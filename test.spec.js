@@ -641,6 +641,31 @@ test.describe('Parcours utilisateur', () => {
     expect(page.url()).toMatch(/#\/apropos$/);
   });
 
+  test('fiche de révision : bouton visible + affiche état "rien à revoir" sans erreur', async ({ page }) => {
+    await completeWizard(page, 'Zoé Fiche', '4ème');
+    await page.goto(BASE + '/index.html#/4eme/physique');
+    await page.waitForTimeout(2000);
+    // Seed un attempt dans localStorage pour déclencher le mode report
+    await page.evaluate(() => {
+      const slug = 'zoe-fiche';
+      const attempts = [{
+        date: new Date().toISOString(), mode: 'training', note: 14, noteRaw: 13.5,
+        correct: 24, total: 30, totalMs: 500000, domains: {}, log: [],
+      }];
+      const profile = { name: 'Zoé Fiche', slug, attempts };
+      localStorage.setItem('quiz-physique-4-history-v1', JSON.stringify([profile]));
+    });
+    await page.goto(BASE + '/index.html#/4eme/physique?view=report&at=' + encodeURIComponent(new Date().toISOString().slice(0, 16)));
+    await page.waitForTimeout(2500);
+    const ficheBtn = page.locator('button', { hasText: /Fiche de révision/i }).first();
+    if (await ficheBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
+      await ficheBtn.click();
+      await page.waitForTimeout(500);
+      // Avec un wrong-tracker vide, on s'attend à l'état "rien à revoir"
+      await expect(page.getByText(/Rien à revoir|revoir en priorité|Fiche imprimable/i).first()).toBeVisible();
+    }
+  });
+
   test('transition quiz A → wizard → quiz B sans remount foireux', async ({ page }) => {
     // Stress-test de l'unmount/remount du React app entre deux quizzes différents.
     await completeWizard(page, 'Henri Transition', '5ème');

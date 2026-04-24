@@ -141,7 +141,7 @@ interface StudentInfo {
 }
 
 /** Écran actif dans le cycle de vie du quiz React. */
-type QuizPhase = 'home' | 'quiz' | 'report';
+type QuizPhase = 'home' | 'quiz' | 'report' | 'fiche';
 
 // ─── Dicts runtime indexés par `Question.key` ─────────────────────────────────
 
@@ -256,8 +256,14 @@ interface ReportScreenProps {
   mode: Mode;
   onRestart: () => void;
   onRetryWrong: (wrongKeys: string[]) => void;
+  onShowFiche: () => void;
   /** true = relecture d'un attempt archivé (désactive les actions destructives). */
   historyMode: boolean;
+}
+
+interface FicheReviseScreenProps {
+  student: StudentInfo;
+  onBack: () => void;
 }
 
 // ─── Globals exposés par le routeur vanilla / React ──────────────────────────

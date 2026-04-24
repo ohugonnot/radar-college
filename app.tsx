@@ -1711,7 +1711,7 @@ function ConfirmScreen({ quiz, answers, onValidate, onCancel, onGoBack }: Confir
 // ============================================================
 // REPORT
 // ============================================================
-function ReportScreen({ student, quiz, answers, timings, totalMs, hintsUsed, mode, onRestart, onRetryWrong, historyMode }: ReportScreenProps) {
+function ReportScreen({ student, quiz, answers, timings, totalMs, hintsUsed, mode, onRestart, onRetryWrong, onShowFiche, historyMode }: ReportScreenProps) {
   const result = useMemo(() => analyze(quiz, answers), [quiz, answers]);
   const [openDomain, setOpenDomain] = useState(initialOpenDomain);
   const [profile, setProfile] = useState(() => getProfile(student.name) || initialProfile());
@@ -1814,6 +1814,7 @@ function ReportScreen({ student, quiz, answers, timings, totalMs, hintsUsed, mod
             <div className="flex gap-2 no-print flex-wrap">
               <a href="index.html" className="btn-secondary" style={{textDecoration:'none'}}>Accueil</a>
               <button onClick={() => window.print()} className="btn-secondary" title="Imprime ou enregistre en PDF (choix dans la boîte de dialogue du navigateur)">Exporter PDF / Imprimer</button>
+              <button onClick={onShowFiche} className="btn-secondary" style={{borderColor:'var(--sea)', color:'var(--sea)'}} title="Fiche imprimable avec les questions ratées (récentes + historiques)">📄 Fiche de révision</button>
               <button
                 onClick={async () => {
                   const url = 'https://www.web-developpeur.com/quizz/';
@@ -2131,6 +2132,126 @@ function ReportScreen({ student, quiz, answers, timings, totalMs, hintsUsed, mod
 }
 
 // ============================================================
+// FICHE DE RÉVISION — imprimable, listant les questions ratées récemment
+// dans ce quiz (tracker wrong > 0), groupées par chapitre, avec la MEMO du
+// chapitre en tête et la bonne réponse affichée. Destiné à être imprimé
+// (@media print gère la mise en page).
+// ============================================================
+function FicheReviseScreen({ student, onBack }: FicheReviseScreenProps) {
+  const tracker = getWrongTracker();
+
+  // 1. Collecte les questions fausses en parcourant POOL (ignore les gens —
+  //    leur contenu n'est pas stable, trop ambigu pour une fiche papier).
+  const wrongByDomain: Record<string, { domain: string; questions: SourceQuestion[] }> = {};
+  Object.entries(POOL).forEach(([domId, pool]) => {
+    const wrongs = (pool as SourceQuestion[]).filter(q => {
+      if (!q.key || typeof q.gen === 'function') return false; // skip generators
+      const e = tracker[q.key];
+      return e && e.wrong > 0;
+    });
+    if (wrongs.length > 0) wrongByDomain[domId] = { domain: domId, questions: wrongs };
+  });
+
+  // 2. Tri par nombre de ratés décroissant — les chapitres les plus fragiles en premier.
+  const domainsSorted = Object.entries(wrongByDomain).sort((a, b) => {
+    const totA = a[1].questions.reduce((s, q) => s + (tracker[q.key]?.wrong || 0), 0);
+    const totB = b[1].questions.reduce((s, q) => s + (tracker[q.key]?.wrong || 0), 0);
+    return totB - totA;
+  });
+
+  const totalWrong = domainsSorted.reduce((s, [, d]) => s + d.questions.length, 0);
+
+  return (
+    <div className="layer min-h-screen px-5 py-8 md:py-12">
+      <div className="max-w-4xl mx-auto">
+        <div className="print-header" aria-hidden="true">
+          <div style={{display:'flex', justifyContent:'space-between', alignItems:'baseline'}}>
+            <div>
+              <div style={{fontSize:'9pt', textTransform:'uppercase', letterSpacing:'0.2em', color:'#666'}}>Fiche de révision</div>
+              <div style={{fontSize:'16pt', fontWeight:700, marginTop:'2mm'}}>{student.name}{student.klass ? ` — ${student.klass}` : ''}</div>
+              <div style={{fontSize:'10pt', color:'#444', marginTop:'1mm'}}>{SUBJECT.name} — {SUBJECT.level} · {new Date().toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' })}</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-8 no-print flex items-start justify-between gap-3 flex-wrap">
+          <div>
+            <div className="font-mono text-[10px] uppercase tracking-[0.22em]" style={{color:'var(--sea)'}}>📄 Fiche imprimable</div>
+            <h1 className="font-display font-light text-4xl md:text-5xl leading-tight mt-1">À revoir en priorité</h1>
+            <div className="mt-2" style={{color:'var(--muted)'}}>Compilée depuis tes erreurs récentes sur <strong>{SUBJECT.name}</strong> — {SUBJECT.level}.</div>
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            <button onClick={onBack} className="btn-secondary">← Retour au rapport</button>
+            <button onClick={() => window.print()} className="btn-secondary" style={{borderColor:'var(--sea)', color:'var(--sea)'}}>🖨️ Imprimer / PDF</button>
+          </div>
+        </div>
+
+        {totalWrong === 0 ? (
+          <div style={{padding:'20px 24px', border:'1.5px solid var(--line)', borderRadius:12, background:'rgba(255,255,255,0.55)'}}>
+            <div style={{fontSize:18, fontWeight:600, marginBottom:6}}>🎉 Rien à revoir pour le moment !</div>
+            <div style={{color:'var(--ink-soft)'}}>Tu n'as pas d'erreur récente enregistrée sur {SUBJECT.name} {SUBJECT.level}. Refais un test pour identifier les chapitres fragiles, ou change de matière.</div>
+          </div>
+        ) : (
+          <>
+            <div className="mb-6" style={{color:'var(--ink-soft)', fontSize:15}}>
+              <strong>{totalWrong}</strong> question{totalWrong > 1 ? 's' : ''} à revoir, sur <strong>{domainsSorted.length}</strong> chapitre{domainsSorted.length > 1 ? 's' : ''}. Tirée{totalWrong > 1 ? 's' : ''} de l'historique complet de tes tests.
+            </div>
+            {domainsSorted.map(([domId, { questions }]) => {
+              const dom = DOMAINS[domId];
+              const memoLines = MEMO_BANK[domId] || [];
+              return (
+                <section key={domId} className="mb-10 domain-card" style={{border:'1.5px solid var(--line)', borderRadius:14, padding:'18px 20px', background:'rgba(255,255,255,0.55)'}}>
+                  <div style={{display:'flex', alignItems:'center', gap:12, marginBottom:12}}>
+                    <span style={{width:40, height:40, display:'inline-flex', alignItems:'center', justifyContent:'center', borderRadius:10, background:`${dom?.color || '#475569'}22`, color:dom?.color || '#475569', fontWeight:700, fontSize:17, flexShrink:0}}>{dom?.icon || '•'}</span>
+                    <div>
+                      <div className="font-mono text-[10px] uppercase tracking-[0.18em]" style={{color:'var(--muted)'}}>{questions.length} question{questions.length > 1 ? 's' : ''} à revoir</div>
+                      <div className="font-display font-semibold text-xl">{dom?.name || domId}</div>
+                    </div>
+                  </div>
+                  {memoLines.length > 0 && (
+                    <div style={{background:'rgba(199,138,29,0.08)', border:'1px dashed var(--ochre)', borderRadius:10, padding:'10px 14px', marginBottom:14}}>
+                      <div className="font-mono text-[9px] uppercase tracking-[0.2em] mb-1" style={{color:'var(--ochre)'}}>💡 Rappel de cours</div>
+                      <ul style={{margin:0, padding:0, listStyle:'none', fontSize:14, lineHeight:1.55}}>
+                        {memoLines.map((line, i) => typeof line === 'string' ? (
+                          <li key={i} style={{display:'flex', gap:8, marginTop:2}}><span style={{color:'var(--ochre)', fontWeight:700}}>·</span><span>{line}</span></li>
+                        ) : (
+                          <li key={i} style={{listStyle:'none', margin:'6px 0'}}>{line}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  <ol style={{margin:0, paddingLeft:22, fontSize:15, lineHeight:1.55}}>
+                    {questions.map(q => {
+                      const entry = tracker[q.key];
+                      const ratio = entry && entry.seen > 0 ? Math.round((entry.wrong / entry.seen) * 100) : 0;
+                      const correct = typeof q.correct === 'number' ? q.options?.[q.correct] : null;
+                      return (
+                        <li key={q.key} style={{marginBottom:14, breakInside:'avoid'}}>
+                          <div style={{fontWeight:600, marginBottom:4}}>{q.q}</div>
+                          {correct != null && (
+                            <div style={{fontSize:14, color:'var(--success)'}}>✓ Réponse : <strong>{correct}</strong></div>
+                          )}
+                          {q.hint && <div style={{fontSize:13, color:'var(--ink-soft)', marginTop:3, fontStyle:'italic'}}>💬 {q.hint}</div>}
+                          {entry && entry.seen > 0 && <div className="font-mono text-[10px] mt-1" style={{color:'var(--muted)'}}>raté {entry.wrong}× sur {entry.seen} passage{entry.seen > 1 ? 's' : ''} ({ratio}%)</div>}
+                        </li>
+                      );
+                    })}
+                  </ol>
+                </section>
+              );
+            })}
+          </>
+        )}
+
+        <div className="print-footer" aria-hidden="true">
+          Fiche générée depuis web-developpeur.com/quizz · données locales de {student.name}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
 // APP
 // ============================================================
 // Reconstitue un quiz + answers à partir d'un attempt stocké (mode relecture)
@@ -2295,7 +2416,8 @@ function App() {
 
   if (screen === 'home')   return <HomeScreen onStart={handleStart} />;
   if (screen === 'quiz')   return <QuizScreen student={student} quiz={quiz} onFinish={handleFinish} mode={mode} />;
-  if (screen === 'report') return <ReportScreen student={student} quiz={quiz} answers={answers} timings={timings} totalMs={totalMs} hintsUsed={hintsUsed} mode={mode} onRestart={handleRestart} onRetryWrong={handleRetryWrong} historyMode={historyMode} />;
+  if (screen === 'report') return <ReportScreen student={student} quiz={quiz} answers={answers} timings={timings} totalMs={totalMs} hintsUsed={hintsUsed} mode={mode} onRestart={handleRestart} onRetryWrong={handleRetryWrong} onShowFiche={() => setScreen('fiche')} historyMode={historyMode} />;
+  if (screen === 'fiche')  return <FicheReviseScreen student={student} onBack={() => setScreen('report')} />;
   return null;
 }
 // Montage dynamique — l'index.html appelle mountQuizApp(key, {reportAt}) quand la route change.

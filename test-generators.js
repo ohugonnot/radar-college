@@ -42,14 +42,18 @@ function frenchify(node) {
 
 // Stringify un ReactNode : JSX compilé → objet { type, props }.
 // On descend récursivement pour produire un texte représentatif.
+// Les props non-children sont incluses pour différencier les composants
+// paramétrés (ex : <CircuitParallele r1={5} r2={10}/> vs r1={3}) dans la
+// détection de variabilité.
 function serializeNode(n) {
   if (n == null || n === false) return '';
   if (typeof n === 'string' || typeof n === 'number') return String(n);
   if (Array.isArray(n)) return n.map(serializeNode).join('');
   if (typeof n === 'object' && n.props) {
-    const children = n.props.children;
-    if (children == null) return `<${typeof n.type === 'string' ? n.type : 'C'}/>`;
-    return serializeNode(children);
+    const { children, ...otherProps } = n.props;
+    const propsStr = Object.keys(otherProps).length ? '{' + Object.entries(otherProps).map(([k, v]) => `${k}=${JSON.stringify(v)}`).join(',') + '}' : '';
+    if (children == null) return `<${typeof n.type === 'string' ? n.type : 'C'}${propsStr}/>`;
+    return propsStr + serializeNode(children);
   }
   return '';
 }

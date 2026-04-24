@@ -291,13 +291,80 @@
   .input-paper::placeholder { color: var(--muted); font-weight: 400; opacity: .7; }
   .input-paper:focus { border-color: var(--accent); }
 
-  /* Print */
-  @media print {
-    body { background: white; }
-    body::before, body::after { display: none; }
-    .no-print { display: none !important; }
-    .domain-card { break-inside: avoid; }
+  /* Print — rapport d'évaluation exportable en PDF via la boîte de dialogue
+     "Imprimer → Enregistrer en PDF" du navigateur. Vise un rendu papier propre
+     noir/blanc-ish, sans fond décoratif, avec coupures de page entre sections. */
+  @page {
+    margin: 14mm 12mm 16mm 12mm;
+    size: A4;
   }
+  @media print {
+    /* Force un thème papier même si l'utilisateur est en mode sombre */
+    html, html.dark, body {
+      background: #ffffff !important;
+      color: #111111 !important;
+      font-size: 11pt;
+      line-height: 1.45;
+    }
+    body::before, body::after { display: none !important; }
+
+    /* Retire toute la navigation et les CTA */
+    .no-print, header nav, .celebration { display: none !important; }
+
+    /* Les fonds semi-transparents et ombres partent au panier */
+    * {
+      box-shadow: none !important;
+      text-shadow: none !important;
+    }
+
+    /* Cartes et blocs : évite la coupure en milieu de carte */
+    .domain-card, .frame, .memo-card, svg[data-circuit], svg[data-schema], .gauge-ring { break-inside: avoid; page-break-inside: avoid; }
+
+    /* Titres : on ne coupe pas juste après un titre */
+    h1, h2, h3, .font-display { break-after: avoid; page-break-after: avoid; }
+
+    /* Les grands titres peuvent tasser leur taille */
+    h1 { font-size: 22pt !important; }
+    h2 { font-size: 15pt !important; }
+
+    /* Les gros radars / courbes passent en pleine largeur */
+    svg { max-width: 100% !important; height: auto !important; }
+
+    /* Le gauge circulaire (note) : réduire un chouia, retirer l'anim */
+    .gauge-ring { transition: none !important; }
+
+    /* Forcer des couleurs qui impriment bien : on garde les accents mais sur fond blanc */
+    a { color: inherit !important; text-decoration: none !important; }
+
+    /* Print header : en haut de chaque page, discret */
+    body::before {
+      content: none;
+    }
+
+    /* En-tête imprimé (visible seulement au print) */
+    .print-header {
+      display: block !important;
+      border-bottom: 1.5px solid #111;
+      padding-bottom: 6mm;
+      margin-bottom: 8mm;
+    }
+    .print-footer {
+      display: block !important;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      font-size: 8pt;
+      color: #666;
+      text-align: center;
+    }
+
+    /* Les options du quiz n'ont pas lieu d'être dans un rapport */
+    .option { border: 1px solid #999 !important; background: #fff !important; }
+  }
+
+  /* Par défaut (écran), ces éléments spécifiques au print sont cachés */
+  .print-header, .print-footer { display: none; }
 
   /* Mode sombre : override des variables de base */
   html.dark {

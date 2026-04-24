@@ -1702,6 +1702,18 @@ function ReportScreen({ student, quiz, answers, timings, totalMs, hintsUsed, mod
     <div className="layer min-h-screen px-5 py-8 md:py-12">
       <div className="max-w-5xl mx-auto">
 
+        {/* En-tête imprimée (visible seulement sur papier / PDF) */}
+        <div className="print-header" aria-hidden="true">
+          <div style={{display:'flex', justifyContent:'space-between', alignItems:'baseline'}}>
+            <div>
+              <div style={{fontSize:'9pt', textTransform:'uppercase', letterSpacing:'0.2em', color:'#666'}}>Rapport d'évaluation</div>
+              <div style={{fontSize:'16pt', fontWeight:700, marginTop:'2mm'}}>{student.name}{student.klass ? ` — ${student.klass}` : ''}</div>
+              <div style={{fontSize:'10pt', color:'#444', marginTop:'1mm'}}>{SUBJECT.name} — {SUBJECT.level} · {new Date().toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' })}</div>
+            </div>
+            <div style={{fontSize:'9pt', color:'#666'}}>quizz collège · radar-college</div>
+          </div>
+        </div>
+
         <div className="mb-10 fade-up">
           <div className="flex items-start justify-between gap-4 flex-wrap mb-8">
             <div className="flex items-center gap-3">
@@ -1713,7 +1725,7 @@ function ReportScreen({ student, quiz, answers, timings, totalMs, hintsUsed, mod
             </div>
             <div className="flex gap-2 no-print flex-wrap">
               <a href="index.html" className="btn-secondary" style={{textDecoration:'none'}}>Accueil</a>
-              <button onClick={() => window.print()} className="btn-secondary">Imprimer</button>
+              <button onClick={() => window.print()} className="btn-secondary" title="Imprime ou enregistre en PDF (choix dans la boîte de dialogue du navigateur)">Exporter PDF / Imprimer</button>
               {(() => {
                 const wrongKeys = quiz.filter(q => answers[q.key] !== q.correct).map(q => q.key);
                 if (wrongKeys.length === 0) return null;

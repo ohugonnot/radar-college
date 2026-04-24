@@ -241,8 +241,16 @@ function main() {
     for (const [gen, n] of suspicious) console.log(`    ${gen} (${n}/200 seeds)`);
     console.log(`    → inspection manuelle recommandée via \`node test-samples.js <quiz> <key>\`.\n`);
   }
-  console.log(`\n${totalIssues === 0 ? '✅' : '❌'} ${totalIssues} problème(s) sur ${totalGenerators} générateurs\n`);
-  process.exit(totalIssues === 0 ? 0 : 1);
+  // Split issues : les "options doublons" / "correct hors range" / "options<4"
+  // sont des BUGS (l'élève voit quelque chose de cassé). La "variabilité faible"
+  // est un WARN qualité (l'input space du gen est naturellement étroit) — on
+  // n'échoue pas dessus pour garder le pre-commit non-bloquant sur du cosmétique.
+  let bugs = 0, warns = 0;
+  for (const r of results) for (const i of r.issues) {
+    if (i.startsWith('variabilité faible')) warns++; else bugs++;
+  }
+  console.log(`\n${bugs === 0 ? '✅' : '❌'} ${bugs} bug(s) · ${warns} warning(s) variabilité faible · ${totalGenerators} générateurs testés\n`);
+  process.exit(bugs === 0 ? 0 : 1);
 }
 
 main();

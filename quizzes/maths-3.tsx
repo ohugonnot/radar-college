@@ -1545,13 +1545,16 @@ window.ALL_QUIZZES['maths-3'] = {
         const fn = numGood / g, fd = denGood / g;
         const goodStr = `${fn}/${fd}`;
         const used = new Set([goodStr]);
-        const w1 = `${numA}/${denA}`; // oublie de multiplier par la deuxième
-        const w2 = `${numA + numB}/${denA + denB}`; // additionne
-        const w3 = `${fn+1}/${fd}`;
-        const finalW3 = used.has(w3) ? `${fn}/${fd+1}` : w3;
+        const pick = (candidates: string[], fallback: (i: number) => string) => {
+          for (const c of candidates) if (!used.has(c)) { used.add(c); return c; }
+          let i = 1; while (true) { const c = fallback(i++); if (!used.has(c)) { used.add(c); return c; } }
+        };
+        const w1 = pick([`${numA}/${denA}`, `${numB}/${denB}`], i => `${fn+i}/${fd}`);
+        const w2 = pick([`${numA + numB}/${denA + denB}`, `${numA}/${denB}`], i => `${fn}/${fd+i}`);
+        const w3 = pick([`${fn+1}/${fd}`, `${fn}/${fd+1}`, `${fn+2}/${fd}`], i => `${fn+i+2}/${fd}`);
         return {
           q: `Dans un arbre, P(A) = ${numA}/${denA} et P(B|A) = ${numB}/${denB}. P(A et B) =`,
-          options: [goodStr, w1, w2, finalW3],
+          options: [goodStr, w1, w2, w3],
           correct: 0,
           hint: `P(A∩B) = P(A) × P(B|A) = ${numA}/${denA} × ${numB}/${denB} = ${numGood}/${denGood}${g>1 ? ` = ${goodStr}` : ''}.`,
         };
@@ -1561,14 +1564,16 @@ window.ALL_QUIZZES['maths-3'] = {
         const effectif = 3 + Math.floor(rnd() * 7); // 3..9
         const total = effectif + 5 + Math.floor(rnd() * 10); // effectif+5..effectif+14
         const pct = Math.round(effectif / total * 100);
-        const w1 = effectif;     // donne effectif brut
-        const w2 = total - effectif;  // donne complément
-        const w3 = pct + 10;
-        const used = new Set([pct, w1, w2, w3]);
-        let v3 = w3; while (used.has(v3)) { v3 += 5; }
+        const used = new Set([pct]);
+        let w1 = effectif;                 // donne effectif brut
+        while (used.has(w1)) w1++; used.add(w1);
+        let w2 = total - effectif;         // donne complément
+        while (used.has(w2)) w2++; used.add(w2);
+        let w3 = pct + 10;
+        while (used.has(w3)) w3 += 5;
         return {
           q: `Dans un groupe de ${total} élèves, ${effectif} ont eu 20/20. Fréquence (%) :`,
-          options: [`${pct} %`, `${effectif} %`, `${total - effectif} %`, `${v3} %`],
+          options: [`${pct} %`, `${w1} %`, `${w2} %`, `${w3} %`],
           correct: 0,
           hint: `${effectif} ÷ ${total} × 100 ≈ ${pct} %.`,
         };

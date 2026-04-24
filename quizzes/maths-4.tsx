@@ -1743,11 +1743,19 @@ window.ALL_QUIZZES['maths-4'] = {
       const nums = [1, 2, 3, 4]; const dens = [5, 8, 10];
       const n = nums[Math.floor(rnd() * nums.length)];
       const d = dens[Math.floor(rnd() * dens.length)];
-      if (n >= d) return { q: 'P(A) = 3/10. P(non A) =', options:['7/10','3/10','1/10','6/10'], correct:0, hint:'P(non A) = 1 − 3/10 = 7/10.' };
+      if (n >= d || n * 2 === d) return { q: 'P(A) = 3/10. P(non A) =', options:['7/10','3/10','1/10','6/10'], correct:0, hint:'P(non A) = 1 − 3/10 = 7/10.' };
       const goodN = d - n, goodD = d;
+      const used = new Set([`${goodN}/${goodD}`]);
+      const pickFrac = (candidates: string[]) => {
+        for (const c of candidates) if (!used.has(c)) { used.add(c); return c; }
+        let i = 1; while (used.has(`${goodN+i}/${goodD}`)) i++; const c = `${goodN+i}/${goodD}`; used.add(c); return c;
+      };
+      const o1 = pickFrac([`${n}/${d}`, `${n+1}/${d}`]);
+      const o2 = pickFrac([`1/${d}`, `2/${d}`, `1/${d+1}`]);
+      const o3 = pickFrac([`${goodN}/${d+1}`, `${goodN+1}/${d+1}`]);
       return {
         q: `P(A) = ${n}/${d}. P(non A) =`,
-        options: [`${goodN}/${goodD}`, `${n}/${d}`, `1/${d}`, `${goodN}/${d+1}`],
+        options: [`${goodN}/${goodD}`, o1, o2, o3],
         correct: 0,
         hint: `P(non A) = 1 − ${n}/${d} = ${d-n}/${d}.`,
       };

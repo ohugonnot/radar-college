@@ -174,9 +174,11 @@ window.ALL_QUIZZES['maths-5'] = {
         const num = neg ? -A : A;
         const good = num * B;
         const fmt = (n: number) => n >= 0 ? `+${n}` : `${n}`;
-        const piege1 = Math.abs(good);     // oublie le signe
-        const piege2 = num + B;            // addition au lieu de multiplication
-        const used = new Set([good, piege1, piege2]);
+        let piege1 = -good;                // mauvais signe (inverse de good)
+        let piege2 = num + B;              // addition au lieu de multiplication
+        const used = new Set([good]);
+        while (used.has(piege1)) piege1 += (piege1 >= 0 ? 1 : -1); used.add(piege1);
+        while (used.has(piege2)) piege2 += (piege2 >= 0 ? 1 : -1); used.add(piege2);
         let v3 = good - 1; while (used.has(v3)) { v3 += (v3 < 0 ? -1 : 1); }
         return {
           q: <>Calcule : <M>({fmt(num)}) × {B} =</M></>,
@@ -194,9 +196,11 @@ window.ALL_QUIZZES['maths-5'] = {
         const numA = sA * A, numB = sB * B;
         const good = numA * numB;
         const fmt = (n: number) => n >= 0 ? `+${n}` : `${n}`;
-        const piege1 = -good;    // mauvais signe
-        const piege2 = numA + numB;
-        const used = new Set([good, piege1, piege2]);
+        let piege1 = -good;    // mauvais signe
+        let piege2 = numA + numB;
+        const used = new Set([good]);
+        while (used.has(piege1)) piege1 += (piege1 >= 0 ? 1 : -1); used.add(piege1);
+        while (used.has(piege2)) piege2 += (piege2 >= 0 ? 1 : -1); used.add(piege2);
         let v3 = good + 1; while (used.has(v3)) { v3++; }
         return {
           q: <>Calcule : <M>({fmt(numA)}) × ({fmt(numB)}) =</M></>,
@@ -238,9 +242,11 @@ window.ALL_QUIZZES['maths-5'] = {
         const dividend = neg ? -(q * d) : (q * d);
         const good = neg ? -q : q;
         const fmt = (n: number) => n >= 0 ? `+${n}` : `${n}`;
-        const piege1 = -good;
-        const piege2 = dividend - d;
-        const used = new Set([good, piege1, piege2]);
+        let piege1 = -good;
+        let piege2 = dividend - d;
+        const used = new Set([good]);
+        while (used.has(piege1)) piege1 += (piege1 >= 0 ? 1 : -1); used.add(piege1);
+        while (used.has(piege2)) piege2 += (piege2 >= 0 ? 1 : -1); used.add(piege2);
         let v3 = good + 1; while (used.has(v3)) { v3++; }
         return {
           q: <>Calcule : <M>({fmt(dividend)}) ÷ {d} =</M></>,
@@ -691,9 +697,13 @@ window.ALL_QUIZZES['maths-5'] = {
         const multStr = String(mult).replace('.', ',');
         const wrongA = 1 - pct / 100;
         const wrongAStr = String(wrongA).replace('.', ',');
+        const wrongB = String(pct / 100).replace('.', ',');
+        // Distracteur "1 + pct" (confusion pct ↔ coef). Évite la collision
+        // avec multStr quand pct est à 2 chiffres (ex 25 → 1,25 = mult).
+        const wrongC = pct < 10 ? `1,${pct}0` : String(1 + pct).replace('.', ',');
         return {
           q: `Un prix augmente de ${pct} %. Le coefficient multiplicateur est :`,
-          options: [multStr, wrongAStr, String(pct / 100).replace('.', ','), `1,${pct}`],
+          options: [multStr, wrongAStr, wrongB, wrongC],
           correct: 0,
           hint: `Augmentation de ${pct} % → multiplier par 1 + ${pct}/100 = ${multStr}.`,
         };
@@ -1272,8 +1282,9 @@ window.ALL_QUIZZES['maths-5'] = {
         const c2 = 5 + Math.floor(rnd() * 8);
         const good = a + b + c2;
         const piege1 = a * b * c2 / 4;  // fausse formule (Héron mal compris)
-        const piege2 = 2 * (a + b);     // oublie c
-        const used = new Set([good, piege2]);
+        let piege2 = 2 * (a + b);       // oublie c
+        const used = new Set([good]);
+        while (used.has(piege2)) piege2++; used.add(piege2);
         let v1 = Math.round(piege1); while (used.has(v1)) { v1++; } used.add(v1);
         let v3 = good + a; while (used.has(v3)) { v3 += a; }
         return {
@@ -1510,12 +1521,14 @@ window.ALL_QUIZZES['maths-5'] = {
         for (let i = 0; i < 5; i++) { vals.push(x); x += 1 + Math.floor(rnd() * 4); }
         const median = vals[2];
         const mean = Math.round(vals.reduce((a,b) => a+b, 0) / 5 * 10) / 10;
-        const used = new Set([median, mean]);
+        let effectiveMean = mean;
+        const used = new Set([median]);
+        while (used.has(effectiveMean)) effectiveMean = Math.round((effectiveMean + 0.1) * 10) / 10; used.add(effectiveMean);
         let w3 = vals[1]; while (used.has(w3)) w3++; used.add(w3);
         let w4 = vals[3]; while (used.has(w4)) w4++;
         return {
           q: <>Médiane de {vals.join(', ')} :</>,
-          options: [String(median), String(mean), String(w3), String(w4)],
+          options: [String(median), String(effectiveMean), String(w3), String(w4)],
           correct: 0,
           hint: `5 valeurs triées : la médiane est la 3ᵉ valeur = ${median}.`,
         };
@@ -1589,8 +1602,9 @@ window.ALL_QUIZZES['maths-5'] = {
         let x = base;
         for (let i = 0; i < 6; i++) { vals.push(x); x += 1 + Math.floor(rnd() * 3); }
         const median = (vals[2] + vals[3]) / 2;
-        const mean = Math.round(vals.reduce((a,b)=>a+b,0)/6 * 10) / 10;
-        const used = new Set([median, mean]);
+        let mean = Math.round(vals.reduce((a,b)=>a+b,0)/6 * 10) / 10;
+        const used = new Set([median]);
+        while (used.has(mean)) mean = Math.round((mean + 0.1) * 10) / 10; used.add(mean);
         let w3 = vals[2]; while (used.has(w3)) w3++;
         used.add(w3);
         let w4 = vals[3]; while (used.has(w4)) w4++;

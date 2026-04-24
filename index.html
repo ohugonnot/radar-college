@@ -9727,13 +9727,26 @@ window.ALL_QUIZZES['maths-3'] = {
           fd = denGood / g;
         const goodStr = `${fn}/${fd}`;
         const used = new Set([goodStr]);
-        const w1 = `${numA}/${denA}`;
-        const w2 = `${numA + numB}/${denA + denB}`;
-        const w3 = `${fn + 1}/${fd}`;
-        const finalW3 = used.has(w3) ? `${fn}/${fd + 1}` : w3;
+        const pick = (candidates, fallback) => {
+          for (const c of candidates) if (!used.has(c)) {
+            used.add(c);
+            return c;
+          }
+          let i = 1;
+          while (true) {
+            const c = fallback(i++);
+            if (!used.has(c)) {
+              used.add(c);
+              return c;
+            }
+          }
+        };
+        const w1 = pick([`${numA}/${denA}`, `${numB}/${denB}`], i => `${fn + i}/${fd}`);
+        const w2 = pick([`${numA + numB}/${denA + denB}`, `${numA}/${denB}`], i => `${fn}/${fd + i}`);
+        const w3 = pick([`${fn + 1}/${fd}`, `${fn}/${fd + 1}`, `${fn + 2}/${fd}`], i => `${fn + i + 2}/${fd}`);
         return {
           q: `Dans un arbre, P(A) = ${numA}/${denA} et P(B|A) = ${numB}/${denB}. P(A et B) =`,
-          options: [goodStr, w1, w2, finalW3],
+          options: [goodStr, w1, w2, w3],
           correct: 0,
           hint: `P(A∩B) = P(A) × P(B|A) = ${numA}/${denA} × ${numB}/${denB} = ${numGood}/${denGood}${g > 1 ? ` = ${goodStr}` : ''}.`
         };
@@ -9744,17 +9757,18 @@ window.ALL_QUIZZES['maths-3'] = {
         const effectif = 3 + Math.floor(rnd() * 7);
         const total = effectif + 5 + Math.floor(rnd() * 10);
         const pct = Math.round(effectif / total * 100);
-        const w1 = effectif;
-        const w2 = total - effectif;
-        const w3 = pct + 10;
-        const used = new Set([pct, w1, w2, w3]);
-        let v3 = w3;
-        while (used.has(v3)) {
-          v3 += 5;
-        }
+        const used = new Set([pct]);
+        let w1 = effectif;
+        while (used.has(w1)) w1++;
+        used.add(w1);
+        let w2 = total - effectif;
+        while (used.has(w2)) w2++;
+        used.add(w2);
+        let w3 = pct + 10;
+        while (used.has(w3)) w3 += 5;
         return {
           q: `Dans un groupe de ${total} élèves, ${effectif} ont eu 20/20. Fréquence (%) :`,
-          options: [`${pct} %`, `${effectif} %`, `${total - effectif} %`, `${v3} %`],
+          options: [`${pct} %`, `${w1} %`, `${w2} %`, `${w3} %`],
           correct: 0,
           hint: `${effectif} ÷ ${total} × 100 ≈ ${pct} %.`
         };
@@ -12174,7 +12188,7 @@ window.ALL_QUIZZES['maths-4'] = {
         const dens = [5, 8, 10];
         const n = nums[Math.floor(rnd() * nums.length)];
         const d = dens[Math.floor(rnd() * dens.length)];
-        if (n >= d) return {
+        if (n >= d || n * 2 === d) return {
           q: 'P(A) = 3/10. P(non A) =',
           options: ['7/10', '3/10', '1/10', '6/10'],
           correct: 0,
@@ -12182,9 +12196,24 @@ window.ALL_QUIZZES['maths-4'] = {
         };
         const goodN = d - n,
           goodD = d;
+        const used = new Set([`${goodN}/${goodD}`]);
+        const pickFrac = candidates => {
+          for (const c of candidates) if (!used.has(c)) {
+            used.add(c);
+            return c;
+          }
+          let i = 1;
+          while (used.has(`${goodN + i}/${goodD}`)) i++;
+          const c = `${goodN + i}/${goodD}`;
+          used.add(c);
+          return c;
+        };
+        const o1 = pickFrac([`${n}/${d}`, `${n + 1}/${d}`]);
+        const o2 = pickFrac([`1/${d}`, `2/${d}`, `1/${d + 1}`]);
+        const o3 = pickFrac([`${goodN}/${d + 1}`, `${goodN + 1}/${d + 1}`]);
         return {
           q: `P(A) = ${n}/${d}. P(non A) =`,
-          options: [`${goodN}/${goodD}`, `${n}/${d}`, `1/${d}`, `${goodN}/${d + 1}`],
+          options: [`${goodN}/${goodD}`, o1, o2, o3],
           correct: 0,
           hint: `P(non A) = 1 − ${n}/${d} = ${d - n}/${d}.`
         };
@@ -12626,9 +12655,13 @@ window.ALL_QUIZZES['maths-5'] = {
         const num = neg ? -A : A;
         const good = num * B;
         const fmt = n => n >= 0 ? `+${n}` : `${n}`;
-        const piege1 = Math.abs(good);
-        const piege2 = num + B;
-        const used = new Set([good, piege1, piege2]);
+        let piege1 = -good;
+        let piege2 = num + B;
+        const used = new Set([good]);
+        while (used.has(piege1)) piege1 += piege1 >= 0 ? 1 : -1;
+        used.add(piege1);
+        while (used.has(piege2)) piege2 += piege2 >= 0 ? 1 : -1;
+        used.add(piege2);
         let v3 = good - 1;
         while (used.has(v3)) {
           v3 += v3 < 0 ? -1 : 1;
@@ -12651,9 +12684,13 @@ window.ALL_QUIZZES['maths-5'] = {
           numB = sB * B;
         const good = numA * numB;
         const fmt = n => n >= 0 ? `+${n}` : `${n}`;
-        const piege1 = -good;
-        const piege2 = numA + numB;
-        const used = new Set([good, piege1, piege2]);
+        let piege1 = -good;
+        let piege2 = numA + numB;
+        const used = new Set([good]);
+        while (used.has(piege1)) piege1 += piege1 >= 0 ? 1 : -1;
+        used.add(piege1);
+        while (used.has(piege2)) piege2 += piege2 >= 0 ? 1 : -1;
+        used.add(piege2);
         let v3 = good + 1;
         while (used.has(v3)) {
           v3++;
@@ -12701,9 +12738,13 @@ window.ALL_QUIZZES['maths-5'] = {
         const dividend = neg ? -(q * d) : q * d;
         const good = neg ? -q : q;
         const fmt = n => n >= 0 ? `+${n}` : `${n}`;
-        const piege1 = -good;
-        const piege2 = dividend - d;
-        const used = new Set([good, piege1, piege2]);
+        let piege1 = -good;
+        let piege2 = dividend - d;
+        const used = new Set([good]);
+        while (used.has(piege1)) piege1 += piege1 >= 0 ? 1 : -1;
+        used.add(piege1);
+        while (used.has(piege2)) piege2 += piege2 >= 0 ? 1 : -1;
+        used.add(piege2);
         let v3 = good + 1;
         while (used.has(v3)) {
           v3++;
@@ -13361,9 +13402,11 @@ window.ALL_QUIZZES['maths-5'] = {
         const multStr = String(mult).replace('.', ',');
         const wrongA = 1 - pct / 100;
         const wrongAStr = String(wrongA).replace('.', ',');
+        const wrongB = String(pct / 100).replace('.', ',');
+        const wrongC = pct < 10 ? `1,${pct}0` : String(1 + pct).replace('.', ',');
         return {
           q: `Un prix augmente de ${pct} %. Le coefficient multiplicateur est :`,
-          options: [multStr, wrongAStr, String(pct / 100).replace('.', ','), `1,${pct}`],
+          options: [multStr, wrongAStr, wrongB, wrongC],
           correct: 0,
           hint: `Augmentation de ${pct} % → multiplier par 1 + ${pct}/100 = ${multStr}.`
         };
@@ -14183,8 +14226,10 @@ window.ALL_QUIZZES['maths-5'] = {
         const c2 = 5 + Math.floor(rnd() * 8);
         const good = a + b + c2;
         const piege1 = a * b * c2 / 4;
-        const piege2 = 2 * (a + b);
-        const used = new Set([good, piege2]);
+        let piege2 = 2 * (a + b);
+        const used = new Set([good]);
+        while (used.has(piege2)) piege2++;
+        used.add(piege2);
         let v1 = Math.round(piege1);
         while (used.has(v1)) {
           v1++;
@@ -14554,7 +14599,10 @@ window.ALL_QUIZZES['maths-5'] = {
         }
         const median = vals[2];
         const mean = Math.round(vals.reduce((a, b) => a + b, 0) / 5 * 10) / 10;
-        const used = new Set([median, mean]);
+        let effectiveMean = mean;
+        const used = new Set([median]);
+        while (used.has(effectiveMean)) effectiveMean = Math.round((effectiveMean + 0.1) * 10) / 10;
+        used.add(effectiveMean);
         let w3 = vals[1];
         while (used.has(w3)) w3++;
         used.add(w3);
@@ -14562,7 +14610,7 @@ window.ALL_QUIZZES['maths-5'] = {
         while (used.has(w4)) w4++;
         return {
           q: React.createElement(React.Fragment, null, "M\xE9diane de ", vals.join(', '), " :"),
-          options: [String(median), String(mean), String(w3), String(w4)],
+          options: [String(median), String(effectiveMean), String(w3), String(w4)],
           correct: 0,
           hint: `5 valeurs triées : la médiane est la 3ᵉ valeur = ${median}.`
         };
@@ -14666,8 +14714,10 @@ window.ALL_QUIZZES['maths-5'] = {
           x += 1 + Math.floor(rnd() * 3);
         }
         const median = (vals[2] + vals[3]) / 2;
-        const mean = Math.round(vals.reduce((a, b) => a + b, 0) / 6 * 10) / 10;
-        const used = new Set([median, mean]);
+        let mean = Math.round(vals.reduce((a, b) => a + b, 0) / 6 * 10) / 10;
+        const used = new Set([median]);
+        while (used.has(mean)) mean = Math.round((mean + 0.1) * 10) / 10;
+        used.add(mean);
         let w3 = vals[2];
         while (used.has(w3)) w3++;
         used.add(w3);
@@ -15122,9 +15172,14 @@ window.ALL_QUIZZES['maths-6'] = {
     }, {
       key: 'num-14',
       gen: rnd => {
-        const ent = 1 + Math.floor(rnd() * 9);
-        const dix = 1 + Math.floor(rnd() * 9);
-        const cent = 1 + Math.floor(rnd() * 9);
+        const pool = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+        for (let i = pool.length - 1; i > 0; i--) {
+          const j = Math.floor(rnd() * (i + 1));
+          [pool[i], pool[j]] = [pool[j], pool[i]];
+        }
+        const ent = pool[0],
+          dix = pool[1],
+          cent = pool[2];
         const nb = ent + dix / 10 + cent / 100;
         const nbStr = String(nb).replace('.', ',');
         return {
@@ -15864,14 +15919,27 @@ window.ALL_QUIZZES['maths-6'] = {
         const d = 3 + Math.floor(rnd() * 5);
         const n = 1 + Math.floor(rnd() * (d - 1));
         const goodStr = `${n}/${d}`;
-        const w1 = `${d - n}/${d}`;
-        const w2 = `${n}/${d + 1}`;
-        const w3 = `${n + 1}/${d}`;
-        const used = new Set([goodStr, w1, w2, w3]);
-        const finalW3 = used.size < 4 ? `${n}/${d + 2}` : w3;
+        const used = new Set([goodStr]);
+        const pick = (candidates, fallback) => {
+          for (const c of candidates) if (!used.has(c)) {
+            used.add(c);
+            return c;
+          }
+          let i = 1;
+          while (true) {
+            const c = fallback(i++);
+            if (!used.has(c)) {
+              used.add(c);
+              return c;
+            }
+          }
+        };
+        const w1 = pick([`${d - n}/${d}`, `${d - n + 1}/${d}`], i => `${d - n + i + 1}/${d}`);
+        const w2 = pick([`${n}/${d + 1}`, `${n}/${d + 2}`], i => `${n}/${d + 2 + i}`);
+        const w3 = pick([`${n + 1}/${d}`, `${n + 2}/${d}`], i => `${n + 2 + i}/${d}`);
         return {
           q: React.createElement(React.Fragment, null, "Une figure est divis\xE9e en ", d, " parts \xE9gales et ", n, " sont colori\xE9es. La fraction colori\xE9e est :"),
-          options: [goodStr, w1, w2, finalW3],
+          options: [goodStr, w1, w2, w3],
           correct: 0,
           hint: `${n} parts sur ${d} au total → fraction = ${goodStr}.`
         };
@@ -16337,18 +16405,18 @@ window.ALL_QUIZZES['maths-6'] = {
         const grams = [200, 250, 500, 750][Math.floor(rnd() * 4)];
         const good = Math.round(pricePerKg * grams / 1000 * 100) / 100;
         const fmt = n => n % 1 === 0 ? String(n) : n.toFixed(2);
-        const used = new Set([good]);
-        let w2 = pricePerKg + grams;
-        while (used.has(w2)) w2++;
-        used.add(w2);
-        let w3 = pricePerKg * grams;
-        while (used.has(w3)) w3++;
-        used.add(w3);
-        let w4 = good + pricePerKg * 0.5;
-        while (used.has(w4)) w4 += 0.5;
+        const seen = new Set([fmt(good)]);
+        const bump = v => {
+          while (seen.has(fmt(v))) v = Math.round((v + 0.5) * 100) / 100;
+          seen.add(fmt(v));
+          return v;
+        };
+        const w1 = bump(pricePerKg);
+        const w2 = bump(good + pricePerKg * 0.5);
+        const w3 = bump(pricePerKg * grams / 100);
         return {
           q: `Fromage à ${pricePerKg} €/kg. Prix pour ${grams} g :`,
-          options: [`${fmt(good)} €`, `${pricePerKg} €`, `${fmt(w4)} €`, `${fmt(pricePerKg * grams / 100)} €`],
+          options: [`${fmt(good)} €`, `${fmt(w1)} €`, `${fmt(w2)} €`, `${fmt(w3)} €`],
           correct: 0,
           hint: `${grams} g = ${grams / 1000} kg. ${pricePerKg} × ${grams / 1000} = ${fmt(good)} €.`
         };
@@ -16825,7 +16893,8 @@ window.ALL_QUIZZES['maths-6'] = {
     }, {
       key: 'air-11',
       gen: rnd => {
-        const c = 3 + Math.floor(rnd() * 16);
+        let c = 3 + Math.floor(rnd() * 16);
+        if (c === 4) c = 5;
         const aire = c * c;
         const perim = 4 * c;
         const used = new Set([aire, perim]);
@@ -16943,11 +17012,16 @@ window.ALL_QUIZZES['maths-6'] = {
     }, {
       key: 'air-16',
       gen: rnd => {
-        const c = 4 + Math.floor(rnd() * 9);
+        let c = 4 + Math.floor(rnd() * 9);
+        if (c === 4) c = 5;
         const aire = c * c;
-        const perim = 4 * c;
-        const demi = 2 * c;
-        const used = new Set([aire, perim, demi]);
+        let perim = 4 * c;
+        let demi = 2 * c;
+        const used = new Set([aire]);
+        while (used.has(perim)) perim++;
+        used.add(perim);
+        while (used.has(demi)) demi++;
+        used.add(demi);
         let v4 = c + 3;
         while (used.has(v4)) v4++;
         return {

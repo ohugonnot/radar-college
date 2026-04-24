@@ -217,12 +217,17 @@ window.ALL_QUIZZES['maths-6'] = {
       } },
       // num-14 : valeur d'un chiffre en position décimale
       { key:'num-14', gen: (rnd) => {
-        const ent = 1 + Math.floor(rnd() * 9);
-        const dix = 1 + Math.floor(rnd() * 9);
-        const cent = 1 + Math.floor(rnd() * 9);
+        // Tire 3 chiffres distincts et non nuls pour éviter les options
+        // doublons dans les distracteurs (ent, dix, cent).
+        const pool = [1,2,3,4,5,6,7,8,9];
+        // Fisher-Yates partiel basé sur rnd()
+        for (let i = pool.length - 1; i > 0; i--) {
+          const j = Math.floor(rnd() * (i + 1));
+          [pool[i], pool[j]] = [pool[j], pool[i]];
+        }
+        const ent = pool[0], dix = pool[1], cent = pool[2];
         const nb = ent + dix / 10 + cent / 100;
         const nbStr = String(nb).replace('.', ',');
-        // Demander le chiffre des dixièmes
         return {
           q: <>Dans {nbStr}, le chiffre des dixièmes est :</>,
           options: [String(ent), String(dix), String(cent), '0'],
@@ -805,14 +810,17 @@ window.ALL_QUIZZES['maths-6'] = {
         const d = 3 + Math.floor(rnd() * 5); // 3..7 parts
         const n = 1 + Math.floor(rnd() * (d - 1));
         const goodStr = `${n}/${d}`;
-        const w1 = `${d - n}/${d}`;
-        const w2 = `${n}/${d + 1}`;
-        const w3 = `${n + 1}/${d}`;
-        const used = new Set([goodStr, w1, w2, w3]);
-        const finalW3 = used.size < 4 ? `${n}/${d + 2}` : w3;
+        const used = new Set([goodStr]);
+        const pick = (candidates: string[], fallback: (i: number) => string) => {
+          for (const c of candidates) if (!used.has(c)) { used.add(c); return c; }
+          let i = 1; while (true) { const c = fallback(i++); if (!used.has(c)) { used.add(c); return c; } }
+        };
+        const w1 = pick([`${d - n}/${d}`, `${d - n + 1}/${d}`], i => `${d - n + i + 1}/${d}`);
+        const w2 = pick([`${n}/${d + 1}`, `${n}/${d + 2}`], i => `${n}/${d + 2 + i}`);
+        const w3 = pick([`${n + 1}/${d}`, `${n + 2}/${d}`], i => `${n + 2 + i}/${d}`);
         return {
           q: <>Une figure est divisée en {d} parts égales et {n} sont coloriées. La fraction coloriée est :</>,
-          options: [goodStr, w1, w2, finalW3],
+          options: [goodStr, w1, w2, w3],
           correct: 0,
           hint: `${n} parts sur ${d} au total → fraction = ${goodStr}.`,
         };
@@ -1138,13 +1146,16 @@ window.ALL_QUIZZES['maths-6'] = {
         const grams = [200, 250, 500, 750][Math.floor(rnd() * 4)];
         const good = Math.round(pricePerKg * grams / 1000 * 100) / 100;
         const fmt = (n: number) => n % 1 === 0 ? String(n) : n.toFixed(2);
-        const used = new Set([good]);
-        let w2 = pricePerKg + grams; while (used.has(w2)) w2++; used.add(w2);
-        let w3 = pricePerKg * grams; while (used.has(w3)) w3++; used.add(w3);
-        let w4 = good + pricePerKg * 0.5; while (used.has(w4)) w4 += 0.5;
+        // Déduplique les options sur leur représentation formatée (évite good=w4
+        // quand w4 = good + k*0.5 tombe pile sur pricePerKg ou pricePerKg*grams/100).
+        const seen = new Set([fmt(good)]);
+        const bump = (v: number) => { while (seen.has(fmt(v))) v = Math.round((v + 0.5) * 100) / 100; seen.add(fmt(v)); return v; };
+        const w1 = bump(pricePerKg);
+        const w2 = bump(good + pricePerKg * 0.5);
+        const w3 = bump(pricePerKg * grams / 100);
         return {
           q: `Fromage à ${pricePerKg} €/kg. Prix pour ${grams} g :`,
-          options: [`${fmt(good)} €`, `${pricePerKg} €`, `${fmt(w4)} €`, `${fmt(pricePerKg * grams / 100)} €`],
+          options: [`${fmt(good)} €`, `${fmt(w1)} €`, `${fmt(w2)} €`, `${fmt(w3)} €`],
           correct: 0,
           hint: `${grams} g = ${grams/1000} kg. ${pricePerKg} × ${grams/1000} = ${fmt(good)} €.`,
         };
@@ -1419,7 +1430,8 @@ window.ALL_QUIZZES['maths-6'] = {
       } },
       // air-11 : aire d'un carré donné son côté (avec périmètre comme distracteur)
       { key:'air-11', gen: (rnd) => {
-        const c = 3 + Math.floor(rnd() * 16); // 3..18 cm
+        let c = 3 + Math.floor(rnd() * 16); // 3..18 cm
+        if (c === 4) c = 5;                 // évite aire=perim=16
         const aire = c * c;
         const perim = 4 * c;
         const used = new Set([aire, perim]);
@@ -1498,11 +1510,14 @@ window.ALL_QUIZZES['maths-6'] = {
       } },
       // air-16 : aire d'un carré — côté donné par fraction entière
       { key:'air-16', gen: (rnd) => {
-        const c = 4 + Math.floor(rnd() * 9); // côté 4..12 cm
+        let c = 4 + Math.floor(rnd() * 9); // côté 4..12 cm
+        if (c === 4) c = 5;                // évite aire=perim=16
         const aire = c * c;
-        const perim = 4 * c;
-        const demi = 2 * c;
-        const used = new Set([aire, perim, demi]);
+        let perim = 4 * c;
+        let demi = 2 * c;
+        const used = new Set([aire]);
+        while (used.has(perim)) perim++; used.add(perim);
+        while (used.has(demi)) demi++; used.add(demi);
         let v4 = c + 3; while (used.has(v4)) v4++;
         return {
           q: <>Un carré a un côté de {c} cm. Son aire en cm² :</>,

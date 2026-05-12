@@ -688,8 +688,8 @@ window.addEventListener('error', function(ev) {
 </head>
 <body>
 
-<!-- SEO : contenu statique crawlable — masqué dès que le JS s'exécute -->
-<div id="seo-content">
+<!-- SEO : contenu statique crawlable — visible uniquement sans JS (crawlers, noscript) -->
+<div id="seo-content" style="display:none;" aria-hidden="true">
   <h1>Quiz Collège — Évaluations diagnostiques gratuites</h1>
   <p>16 quiz gratuits pour collégiens de la <strong>6ème à la 3ème</strong> en <strong>maths</strong>, <strong>physique-chimie</strong>, <strong>SVT</strong> et <strong>histoire-géographie</strong>. Programme officiel de l'Éducation Nationale. Aucun compte requis.</p>
 
@@ -720,7 +720,7 @@ window.addEventListener('error', function(ev) {
 </div>
 
 <noscript>
-  <style>#seo-content { max-width: 720px; margin: 0 auto; padding: 24px; font-family: system-ui, sans-serif; }</style>
+  <style>#seo-content { display: block !important; max-width: 720px; margin: 0 auto; padding: 24px; font-family: system-ui, sans-serif; }</style>
 </noscript>
 
 <!-- SPA : deux conteneurs, un seul visible à la fois selon la route hash.
@@ -1752,9 +1752,6 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     }
   });
 })();
-
-// Masquer le contenu SEO statique maintenant que le JS est actif
-(function() { var s = document.getElementById('seo-content'); if (s) s.style.display = 'none'; })();
 
 // Démarrage : si le hash de l'URL matche une étape, on y va ; sinon flow normal.
 (function initFromHashOrDecide() {

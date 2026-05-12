@@ -29,18 +29,95 @@
 <meta name="twitter:description" content="16 quiz diagnostiques gratuits pour collégiens de la 6ème à la 3ème. Note sur 20, rapport détaillé, plan de révision.">
 <meta name="twitter:image" content="https://www.web-developpeur.com/assets/images/projects/radar-college.png">
 
-<!-- Schema.org -->
+<!-- Schema.org — EducationalApplication -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "EducationalApplication",
-  "name": "Quiz Collège",
+  "name": "Quiz Collège — Évaluations diagnostiques",
+  "url": "https://www.web-developpeur.com/quizz/",
+  "image": "https://www.web-developpeur.com/assets/images/projects/radar-college.png",
   "applicationCategory": "EducationalApplication",
-  "description": "16 quiz diagnostiques pour collégiens en maths, physique-chimie, SVT et histoire (6ème à 3ème). Programme officiel Éducation Nationale.",
+  "description": "16 quiz diagnostiques gratuits pour collégiens en maths, physique-chimie, SVT et histoire-géographie, de la 6ème à la 3ème. Programme officiel Éducation Nationale. Note sur 20, radar de compétences, plan de révision personnalisé.",
   "inLanguage": "fr",
-  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
-  "educationalLevel": "Secondary school",
-  "audience": { "@type": "EducationalAudience", "educationalRole": "student" }
+  "operatingSystem": "Web",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR", "availability": "https://schema.org/InStock" },
+  "educationalLevel": ["6ème", "5ème", "4ème", "3ème", "Collège", "Brevet"],
+  "audience": { "@type": "EducationalAudience", "educationalRole": "student", "suggestedMinAge": 10, "suggestedMaxAge": 15 },
+  "author": { "@type": "Person", "name": "Odilon Hugonnot", "url": "https://www.web-developpeur.com/" },
+  "datePublished": "2026-04-22",
+  "dateModified": "2026-05-12"
+}
+</script>
+
+<!-- Schema.org — ItemList des 16 quiz (rich results) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Quiz collège par niveau et matière",
+  "description": "16 évaluations diagnostiques couvrant maths, physique-chimie, SVT et histoire-géographie de la 6ème à la 3ème.",
+  "numberOfItems": 16,
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Quiz Maths 6ème", "url": "https://www.web-developpeur.com/quizz/#/6eme/maths" },
+    { "@type": "ListItem", "position": 2, "name": "Quiz Physique-Chimie 6ème", "url": "https://www.web-developpeur.com/quizz/#/6eme/physique" },
+    { "@type": "ListItem", "position": 3, "name": "Quiz SVT 6ème", "url": "https://www.web-developpeur.com/quizz/#/6eme/svt" },
+    { "@type": "ListItem", "position": 4, "name": "Quiz Histoire-Géo 6ème", "url": "https://www.web-developpeur.com/quizz/#/6eme/histoire" },
+    { "@type": "ListItem", "position": 5, "name": "Quiz Maths 5ème", "url": "https://www.web-developpeur.com/quizz/#/5eme/maths" },
+    { "@type": "ListItem", "position": 6, "name": "Quiz Physique-Chimie 5ème", "url": "https://www.web-developpeur.com/quizz/#/5eme/physique" },
+    { "@type": "ListItem", "position": 7, "name": "Quiz SVT 5ème", "url": "https://www.web-developpeur.com/quizz/#/5eme/svt" },
+    { "@type": "ListItem", "position": 8, "name": "Quiz Histoire-Géo 5ème", "url": "https://www.web-developpeur.com/quizz/#/5eme/histoire" },
+    { "@type": "ListItem", "position": 9, "name": "Quiz Maths 4ème", "url": "https://www.web-developpeur.com/quizz/#/4eme/maths" },
+    { "@type": "ListItem", "position": 10, "name": "Quiz Physique-Chimie 4ème", "url": "https://www.web-developpeur.com/quizz/#/4eme/physique" },
+    { "@type": "ListItem", "position": 11, "name": "Quiz SVT 4ème", "url": "https://www.web-developpeur.com/quizz/#/4eme/svt" },
+    { "@type": "ListItem", "position": 12, "name": "Quiz Histoire-Géo 4ème", "url": "https://www.web-developpeur.com/quizz/#/4eme/histoire" },
+    { "@type": "ListItem", "position": 13, "name": "Quiz Maths 3ème — Brevet", "url": "https://www.web-developpeur.com/quizz/#/3eme/maths" },
+    { "@type": "ListItem", "position": 14, "name": "Quiz Physique-Chimie 3ème — Brevet", "url": "https://www.web-developpeur.com/quizz/#/3eme/physique" },
+    { "@type": "ListItem", "position": 15, "name": "Quiz SVT 3ème — Brevet", "url": "https://www.web-developpeur.com/quizz/#/3eme/svt" },
+    { "@type": "ListItem", "position": 16, "name": "Quiz Histoire-Géo 3ème — Brevet", "url": "https://www.web-developpeur.com/quizz/#/3eme/histoire" }
+  ]
+}
+</script>
+
+<!-- Schema.org — FAQPage (featured snippets) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Comment réviser le brevet des collèges gratuitement ?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Quiz Collège propose 16 quiz diagnostiques gratuits couvrant les 4 matières principales du brevet : maths, physique-chimie, SVT et histoire-géographie. Chaque quiz contient 30 questions issues du programme officiel de l'Éducation Nationale. Vous obtenez une note sur 20 et un plan de révision personnalisé basé sur vos points faibles." }
+    },
+    {
+      "@type": "Question",
+      "name": "Est-ce que les quiz sont adaptés au programme officiel du collège ?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Oui. Les questions couvrent le programme officiel de l'Éducation Nationale pour chaque niveau (6ème, 5ème, 4ème, 3ème) en mathématiques, physique-chimie, SVT et histoire-géographie. Les quiz de 3ème ciblent spécifiquement les compétences évaluées au brevet." }
+    },
+    {
+      "@type": "Question",
+      "name": "Faut-il créer un compte pour utiliser les quiz ?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Non. Aucun compte n'est nécessaire. Les résultats sont sauvegardés localement dans votre navigateur. Entrez simplement un prénom pour commencer." }
+    },
+    {
+      "@type": "Question",
+      "name": "Quelles matières sont disponibles pour les quiz collège ?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Quatre matières sont disponibles pour chaque niveau du collège : Mathématiques (calcul, géométrie, probabilités, fonctions), Physique-Chimie (électricité, mécanique, chimie, optique), SVT (génétique, écologie, corps humain, géologie) et Histoire-Géographie (dates clés, personnages, repères chronologiques)." }
+    }
+  ]
+}
+</script>
+
+<!-- Schema.org — BreadcrumbList -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://www.web-developpeur.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Quiz Collège", "item": "https://www.web-developpeur.com/quizz/" }
+  ]
 }
 </script>
 
@@ -610,6 +687,41 @@ window.addEventListener('error', function(ev) {
 
 </head>
 <body>
+
+<!-- SEO : contenu statique crawlable — masqué dès que le JS s'exécute -->
+<div id="seo-content">
+  <h1>Quiz Collège — Évaluations diagnostiques gratuites</h1>
+  <p>16 quiz gratuits pour collégiens de la <strong>6ème à la 3ème</strong> en <strong>maths</strong>, <strong>physique-chimie</strong>, <strong>SVT</strong> et <strong>histoire-géographie</strong>. Programme officiel de l'Éducation Nationale. Aucun compte requis.</p>
+
+  <h2>Quiz par niveau</h2>
+
+  <h3>3ème — Préparation brevet</h3>
+  <p>Quiz de 30 questions pour réviser le <strong>brevet des collèges</strong> : mathématiques (Pythagore, Thalès, fonctions, probabilités), physique-chimie (électricité, mécanique, transformations chimiques), SVT (génétique, immunologie, écosystèmes) et histoire-géographie (guerres mondiales, République, mondialisation).</p>
+
+  <h3>4ème</h3>
+  <p>Évaluations diagnostiques en maths (calcul littéral, théorème de Pythagore, statistiques), physique-chimie (optique, électricité, atomes), SVT (reproduction, géologie, nutrition) et histoire-géographie (Révolution française, Europe des Lumières, urbanisation).</p>
+
+  <h3>5ème</h3>
+  <p>Quiz en mathématiques (fractions, proportionnalité, symétrie), physique-chimie (circuits électriques, mélanges, changements d'état), SVT (respiration, digestion, géologie externe) et histoire-géographie (Moyen Âge, Islam, développement durable).</p>
+
+  <h3>6ème</h3>
+  <p>Premières évaluations du collège en maths (nombres décimaux, géométrie de base, périmètres et aires), physique-chimie (états de la matière, mesures), SVT (classification du vivant, environnement) et histoire-géographie (Antiquité, premiers empires, habiter le monde).</p>
+
+  <h2>Fonctionnalités</h2>
+  <ul>
+    <li><strong>Note sur 20</strong> — Barème type brevet avec pénalité de -0,5 pour les erreurs</li>
+    <li><strong>Radar de compétences</strong> — Visualisation des acquis par domaine (SVG)</li>
+    <li><strong>Plan de révision personnalisé</strong> — Basé sur les chapitres les moins maîtrisés</li>
+    <li><strong>Questions adaptatives</strong> — L'algorithme cible vos points faibles (répétition espacée)</li>
+    <li><strong>Mode dyslexie</strong> — Police OpenDyslexic, espacement adapté</li>
+    <li><strong>Zéro inscription</strong> — Sauvegarde locale dans le navigateur</li>
+    <li><strong>Badges et streaks</strong> — Gamification pour la motivation</li>
+  </ul>
+</div>
+
+<noscript>
+  <style>#seo-content { max-width: 720px; margin: 0 auto; padding: 24px; font-family: system-ui, sans-serif; }</style>
+</noscript>
 
 <!-- SPA : deux conteneurs, un seul visible à la fois selon la route hash.
      #wizard-container = flow d'onboarding + dashboard (vanilla JS ci-dessous).
@@ -1640,6 +1752,9 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     }
   });
 })();
+
+// Masquer le contenu SEO statique maintenant que le JS est actif
+(function() { var s = document.getElementById('seo-content'); if (s) s.style.display = 'none'; })();
 
 // Démarrage : si le hash de l'URL matche une étape, on y va ; sinon flow normal.
 (function initFromHashOrDecide() {

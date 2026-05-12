@@ -688,39 +688,37 @@ window.addEventListener('error', function(ev) {
 </head>
 <body>
 
-<!-- SEO : contenu statique crawlable — visible uniquement sans JS (crawlers, noscript) -->
-<div id="seo-content" style="display:none;" aria-hidden="true">
-  <h1>Quiz Collège — Évaluations diagnostiques gratuites</h1>
-  <p>16 quiz gratuits pour collégiens de la <strong>6ème à la 3ème</strong> en <strong>maths</strong>, <strong>physique-chimie</strong>, <strong>SVT</strong> et <strong>histoire-géographie</strong>. Programme officiel de l'Éducation Nationale. Aucun compte requis.</p>
-
-  <h2>Quiz par niveau</h2>
-
-  <h3>3ème — Préparation brevet</h3>
-  <p>Quiz de 30 questions pour réviser le <strong>brevet des collèges</strong> : mathématiques (Pythagore, Thalès, fonctions, probabilités), physique-chimie (électricité, mécanique, transformations chimiques), SVT (génétique, immunologie, écosystèmes) et histoire-géographie (guerres mondiales, République, mondialisation).</p>
-
-  <h3>4ème</h3>
-  <p>Évaluations diagnostiques en maths (calcul littéral, théorème de Pythagore, statistiques), physique-chimie (optique, électricité, atomes), SVT (reproduction, géologie, nutrition) et histoire-géographie (Révolution française, Europe des Lumières, urbanisation).</p>
-
-  <h3>5ème</h3>
-  <p>Quiz en mathématiques (fractions, proportionnalité, symétrie), physique-chimie (circuits électriques, mélanges, changements d'état), SVT (respiration, digestion, géologie externe) et histoire-géographie (Moyen Âge, Islam, développement durable).</p>
-
-  <h3>6ème</h3>
-  <p>Premières évaluations du collège en maths (nombres décimaux, géométrie de base, périmètres et aires), physique-chimie (états de la matière, mesures), SVT (classification du vivant, environnement) et histoire-géographie (Antiquité, premiers empires, habiter le monde).</p>
-
-  <h2>Fonctionnalités</h2>
-  <ul>
-    <li><strong>Note sur 20</strong> — Barème type brevet avec pénalité de -0,5 pour les erreurs</li>
-    <li><strong>Radar de compétences</strong> — Visualisation des acquis par domaine (SVG)</li>
-    <li><strong>Plan de révision personnalisé</strong> — Basé sur les chapitres les moins maîtrisés</li>
-    <li><strong>Questions adaptatives</strong> — L'algorithme cible vos points faibles (répétition espacée)</li>
-    <li><strong>Mode dyslexie</strong> — Police OpenDyslexic, espacement adapté</li>
-    <li><strong>Zéro inscription</strong> — Sauvegarde locale dans le navigateur</li>
-    <li><strong>Badges et streaks</strong> — Gamification pour la motivation</li>
-  </ul>
-</div>
-
+<!-- SEO : contenu crawlable dans <noscript> — Googlebot le lit, Playwright l'ignore -->
 <noscript>
-  <style>#seo-content { display: block !important; max-width: 720px; margin: 0 auto; padding: 24px; font-family: system-ui, sans-serif; }</style>
+  <div style="max-width:720px;margin:0 auto;padding:24px;font-family:system-ui,sans-serif;">
+    <h1>Quiz Collège — Évaluations diagnostiques gratuites</h1>
+    <p>16 quiz gratuits pour collégiens de la <strong>6ème à la 3ème</strong> en <strong>maths</strong>, <strong>physique-chimie</strong>, <strong>SVT</strong> et <strong>histoire-géographie</strong>. Programme officiel de l'Éducation Nationale. Aucun compte requis.</p>
+
+    <h2>Quiz par niveau</h2>
+
+    <h3>3ème — Préparation brevet</h3>
+    <p>Quiz de 30 questions pour réviser le <strong>brevet des collèges</strong> : mathématiques (Pythagore, Thalès, fonctions, probabilités), physique-chimie (électricité, mécanique, transformations chimiques), SVT (génétique, immunologie, écosystèmes) et histoire-géographie (guerres mondiales, République, mondialisation).</p>
+
+    <h3>4ème</h3>
+    <p>Évaluations diagnostiques en maths (calcul littéral, théorème de Pythagore, statistiques), physique-chimie (optique, électricité, atomes), SVT (reproduction, géologie, nutrition) et histoire-géographie (Révolution française, Europe des Lumières, urbanisation).</p>
+
+    <h3>5ème</h3>
+    <p>Quiz en mathématiques (fractions, proportionnalité, symétrie), physique-chimie (circuits électriques, mélanges, changements d'état), SVT (respiration, digestion, géologie externe) et histoire-géographie (Moyen Âge, Islam, développement durable).</p>
+
+    <h3>6ème</h3>
+    <p>Premières évaluations du collège en maths (nombres décimaux, géométrie de base, périmètres et aires), physique-chimie (états de la matière, mesures), SVT (classification du vivant, environnement) et histoire-géographie (Antiquité, premiers empires, habiter le monde).</p>
+
+    <h2>Fonctionnalités</h2>
+    <ul>
+      <li><strong>Note sur 20</strong> — Barème type brevet avec pénalité de -0,5 pour les erreurs</li>
+      <li><strong>Radar de compétences</strong> — Visualisation des acquis par domaine</li>
+      <li><strong>Plan de révision personnalisé</strong> — Basé sur les chapitres les moins maîtrisés</li>
+      <li><strong>Questions adaptatives</strong> — L'algorithme cible vos points faibles</li>
+      <li><strong>Mode dyslexie</strong> — Police OpenDyslexic, espacement adapté</li>
+      <li><strong>Zéro inscription</strong> — Sauvegarde locale dans le navigateur</li>
+      <li><strong>Badges et streaks</strong> — Gamification pour la motivation</li>
+    </ul>
+  </div>
 </noscript>
 
 <!-- SPA : deux conteneurs, un seul visible à la fois selon la route hash.
